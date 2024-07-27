@@ -1,8 +1,4 @@
-# Cribbage Hand Calculator
-Counts the points in your cribbage hand regardless of how many cards are in the hand.
-Run "Cribbage_Calculator.exe" for the program.
-
-# Cribbage Game (Discord Bot)
+# Card Bot
 
 ### Requirements:
 * python 3

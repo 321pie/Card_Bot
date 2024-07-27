@@ -15,11 +15,12 @@ import copy
 #Local imports
 import message
 import credentials
-import format
-import game
+import Games.game as game
 
 spectators = []
 spectator_messages = []
+
+games:list[game.Game] = []
 
 def run_bot():
     # Get token from credentials.json file
