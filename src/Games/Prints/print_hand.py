@@ -1,24 +1,26 @@
+from math import floor
 from PIL import Image
 import pygame as pg
 import os
 
-import deck
+import Games.deck as deck
 
 class Print_Hand():
     #Gets the path for the images
-    def get_path(limited_path):
+    def get_path(self, limited_path):
         # if(EXECUTABLE_MODE):
         #     return sys.executable.rsplit('\\', 2)[0] + '\\' + limited_path
         # else:
-        return os.path.join(os.path.dirname(__file__), limited_path)
+        # return os.path.join(os.path.dirname(__file__), limited_path)
+        return os.path.join(os.getcwd(), limited_path)
     
     #Converts a PIL image to a pygame surface
-    def pil_image_to_surface(pil_image:Image) -> pg.Surface:
-        return pg.image.fromstring(pil_image.tobytes(), pil_image.size, pil_image.mode).convert()
+    def pil_image_to_surface(self, pil_image:Image) -> pg.Surface:
+        return pg.image.fromstring(pil_image.tobytes(), pil_image.size, pil_image.mode)
     
-    def surface_to_pil_image(surface:pg.Surface) -> Image:
+    def surface_to_pil_image(self, surface:pg.Surface) -> Image:
         pil_string_image = pg.image.tobytes(surface, "RGBA", False)
-        return Image.fromstring("RGBA", (surface.get_width(), surface.get_height()), pil_string_image)
+        return Image.frombytes("RGBA", (surface.get_width(), surface.get_height()), pil_string_image)
     
     #Returns an Image of the selected card
     def get_card(self, card:deck.Card, index:int=None) -> Image:

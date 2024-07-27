@@ -1,4 +1,4 @@
-import deck
+import Games.deck as deck
 
 class Game():
     #Inits variables common to all games

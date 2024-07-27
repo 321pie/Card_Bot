@@ -5,8 +5,8 @@ import discord
 import os
 
 #Local imports
-import game
-import deck as dk
+import Games.Cribbage.game as game
+import Games.deck as dk
 
 hand_messages = [] #Variable to hold most recent hand message so that it can be modified as needed
 

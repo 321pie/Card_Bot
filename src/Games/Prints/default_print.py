@@ -1,14 +1,13 @@
 #Foreign Imports
-from math import floor
 from PIL import Image
 import pygame as pg
 
 #Local Imports
-import deck
-import print_hand
+import Games.deck as deck
+import Games.Prints.print_hand as ph
 
 
-class Default_Print(print_hand.Print_Hand):
+class Default_Print(ph.Print_Hand):
     def __init__(self):
         #The size of the sprites
         self.base_card_width = 32 #Excess room on sprite sheet before first card
@@ -51,4 +50,4 @@ class Default_Print(print_hand.Print_Hand):
             all_hands_img.paste(hand_image, (0, self.card_height*hand_index))
 
         #Return image path
-        return self.surface_to_pil_image(pg.transform.rotozoom(all_hands_img, 0, self.sprite_scalar))
+        return self.surface_to_pil_image(pg.transform.rotozoom(self.pil_image_to_surface(all_hands_img), 0, self.sprite_scalar))
