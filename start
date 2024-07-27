@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+# Find python.
+PYTHON=$(which python 2>/dev/null)
+
+# Check if python3 is installed.
+if [ -z $PYTHON ]; then
+    echo "Please install python to use the bot."
+    exit 1
+fi
+
+# Start main.py.
+$PYTHON src/main.py

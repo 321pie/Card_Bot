@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+# Find pip.
+PIP=$(which pip3)
+
+# Check if pip is installed.
+if [ -z $PIP ]; then
+    echo "Please install pip to use the bot."
+    exit 1
+fi
+
+# Install dependencies.
+$PIP install -r requirements.txt
