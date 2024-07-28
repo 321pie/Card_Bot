@@ -269,31 +269,128 @@ class Cribbage(game.Game):
 
         return None
 
-#Resets variables for end of pegging round. Return sum of pegging_list.
-def pegging_done():
-    global calc_string
-    global pegging_phase
-    global pegging_list
-    global pegging_index
-    global hands
-    global backup_hands
+    #Resets variables for end of pegging round. Return sum of pegging_list.
+    def pegging_done(self) -> int:
+        #Prepare for next round
+        self.pegging_phase = False
+        my_sum = sum([my_card.to_int_15s() for my_card in self.pegging_list])
+        self.pegging_index += 1
+        self.pegging_list = []
 
-    #Prepare for next round
-    pegging_phase = False
-    my_sum = sum([my_card.to_int_15s() for my_card in pegging_list])
-    pegging_index += 1
-    pegging_list = []
+        #Restore the siphoned hands to their former glory
+        self.hands = self.backup_hands
 
-    #Restore the siphoned hands to their former glory
-    hands = backup_hands
+        #Reset calc_string so that it can be filled with new data
+        self.calc_string = ""
 
-    #Reset calc_string so that it can be filled with new data
-    calc_string = ""
+        return my_sum
 
-    return my_sum
+    #The given player pegs the given card and gets associated points. Returns [number of points, old pegging sum, current pegging sum, cards remaining, card played, next player] on success and None on failure.
+    def peg(self, player, card_index):
+        #Get player index
+        try:
+            main_player_index = self.players.index(player)
+            card = self.hands[main_player_index][card_index]
+        except:
+            return None
+
+        #Make sure it's author's turn
+        if(self.players[self.pegging_index % len(self.players)] != self.players[main_player_index]):
+            return None
+
+        cur_sum = sum([my_card.to_int_15s() for my_card in self.pegging_list]) + card.to_int_15s()
+
+        #Make sure sum <= 31
+        if(cur_sum <= 31):
+            #Remove card from hand, get points, and add to pegging list
+            self.hands[main_player_index].remove(card)
+            peg_points = cp.check_points(card, self.pegging_list, cur_sum)
+            self.points[main_player_index] += peg_points
+            self.pegging_list.append(card)
+
+            #Make sure that someone has a hand
+            for player_index in range(len(self.players)):
+                if(len(self.hands[player_index]) > 0):
+                    new_sum = sum([my_card.to_int_15s() for my_card in self.pegging_list])
+                    
+                    #Make sure next person can play. If go, then reset.
+                    for _ in range(len(self.players)):
+                        self.pegging_index += 1
+
+                        if(self.can_peg(self.hands[self.pegging_index % len(self.players)], new_sum)):
+                            return [peg_points, cur_sum, new_sum, len(self.hands[main_player_index]), card, self.players[self.pegging_index % len(self.players)]]
+                    
+            #If nobody can peg, reset variables for next pegging iteration (up to 31)
+            self.pegging_list = []
+            if(cur_sum != 31):
+                self.points[self.pegging_index % len(self.players)] += 1
+                peg_points += 1
+            self.pegging_index += 1
+
+            #Make sure next person has a hand. If not, then increment.
+            for _ in range(len(self.players)):
+                if(len(self.hands[self.pegging_index % len(self.players)]) > 0):
+                    #If here, return points, a new_sum of 0, and player
+                    return [peg_points, cur_sum, 0, len(self.hands[main_player_index]), card, self.players[self.pegging_index % len(self.players)]]
+                else:
+                    self.pegging_index += 1
+
+            #Return variables and none since no player has a hand
+            return [peg_points, cur_sum, 0, len(self.hands[main_player_index]), card, None]
+        
+        #If player can't play that card, return None
+        return None
+
+    #Returns an array of points (formats for teams or singles as needed)
+    def get_point_array(self):
+        point_array = []
+
+        point_count = 0
+        num_teams = len(self.players) // self.team_count
+
+        for team_num in range(num_teams):
+            for player in range(self.team_count):
+                point_count += self.points[player*num_teams + team_num]
+            point_array.append(point_count)
+            point_count = 0
+
+        return point_array
+
+    #Sets up game for standard mode
+    def standard_mode(self):
+        self.deck = deck.Deck()
+        self.points = []
+        self.hands = []
+        self.backup_hands = []
+        self.crib = []
+        self.end = []
+        self.num_thrown = []
+        self.pegging_list = []
+        self.point_goal = 121
+        self.skunk_length = 30
+        self.crib_count = 4
+        self.hand_size = 4
+        self.crib_index = 0
+        self.pegging_index = 0
+        self.throw_count = 0
+        self.game_started = False
+        self.throw_away_phase = False
+        self.pegging_phase = False
+
+    #Sets up game for mega hand
+    def mega_hand(self):
+        if(self.game_started == False):
+            self.point_goal = 241
+            self.skunk_length = 60
+            self.hand_size = 8
+
+    #Sets up game for joker mode
+    def joker_mode(self):
+        if(self.game_started == False):
+            self.deck = deck.JokerDeck()
 
 #Calculate hands, add points, and return a string with the details.
-def count_hand(player):
+def count_hand(self, player):
     global deck
     global calc_string
     global players
@@ -302,7 +399,7 @@ def count_hand(player):
 
     #Get player index
     try:
-        player_index = players.index(player)
+        player_index = self.players.index(player)
     except:
         return ""
 
@@ -310,11 +407,11 @@ def count_hand(player):
     output_string = ""
 
     #Add points from hand
-    [get_points, get_output] = cp.calculate_hand(hands[(player_index + crib_index + 1) % len(players)], deck.get_flipped())
-    points[(player_index + crib_index + 1) % len(players)] += get_points
+    [get_points, get_output] = cp.calculate_hand(self.hands[(player_index + crib_index + 1) % len(self.players)], deck.get_flipped())
+    self.points[(player_index + self.crib_index + 1) % len(self.players)] += get_points
 
     #Send calculation to variable in game.py
-    calc_string += f"**{players[(player_index + crib_index + 1) % len(players)]}'s Hand**:\n" + get_output + "\n\n"
+    self.calc_string += f"**{self.players[(player_index + self.crib_index + 1) % len(self.players)]}'s Hand**:\n" + get_output + "\n\n"
 
     #Add data to group output
     output_string += f"{players[(player_index + crib_index + 1) % len(players)].name}'s hand: {[hand_card.display() for hand_card in sorted(hands[(player_index + crib_index + 1) % len(players)], key=lambda x: x.to_int_runs())]} for {get_points} points.\n"
@@ -341,70 +438,40 @@ def count_crib():
 
     return output_string
 
-#The given player pegs the given card and gets associated points. Returns [number of points, old pegging sum, current pegging sum, cards remaining, card played, next player] on success and None on failure.
-def peg(player, card_index):
-    global players
+#Get string of hand to print for player at given index
+def get_hand_string(player_index):
     global hands
-    global pegging_list
-    global points
-    global pegging_index
 
-    #Get player index
-    try:
-        main_player_index = players.index(player)
-        card = hands[main_player_index][card_index]
-    except:
-        return None
+    output_string = f"Hand:\n"
+    for card in [card.display() for card in sorted(hands[player_index], key=lambda x: x.to_int_runs())]:
+        output_string += f"{card}, "
+    output_string = output_string[:-2] + "\n"
+    for card in [card for card in sorted(hands[player_index], key=lambda x: x.to_int_runs())]:
+        output_string += f"!{hands[player_index].index(card)},\t\t"
+    output_string = output_string[:-3] + "\n"
 
-    #Make sure it's author's turn
-    if(players[pegging_index % len(players)] != players[main_player_index]):
-        return None
+    return output_string
 
-    cur_sum = sum([my_card.to_int_15s() for my_card in pegging_list]) + card.to_int_15s()
+#Creates a string to represent each team.
+def get_teams_string():
+    global players
+    global team_count
 
-    #Make sure sum <= 31
-    if(cur_sum <= 31):
-        #Remove card from hand, get points, and add to pegging list
-        hands[main_player_index].remove(card)
-        peg_points = cp.check_points(card, pegging_list, cur_sum)
-        points[main_player_index] += peg_points
-        pegging_list.append(card)
+    num_players = len(players)
 
-        #Make sure that someone has a hand
-        for player_index in range(len(players)):
-            if(len(hands[player_index]) > 0):
-                new_sum = sum([my_card.to_int_15s() for my_card in pegging_list])
-                
-                #Make sure next person can play. If go, then reset.
-                for _ in range(len(players)):
-                    pegging_index += 1
+    #Get the list of teams
+    team_list = ""
+    num_teams = num_players // team_count
+    for team_num in range(num_teams):
+        team_list += f"Team {team_num}: "
+        for player in range(team_count):
+            team_list += f"{players[player*num_teams + team_num]}, "
+        team_list = team_list[:-2] + "\n"
 
-                    if(can_peg(hands[pegging_index % len(players)], new_sum)):
-                        return [peg_points, cur_sum, new_sum, len(hands[main_player_index]), card, players[pegging_index % len(players)]]
-                
-        #If nobody can peg, reset variables for next pegging iteration (up to 31)
-        pegging_list = []
-        if(cur_sum != 31):
-            points[pegging_index % len(players)] += 1
-            peg_points += 1
-        pegging_index += 1
-
-        #Make sure next person has a hand. If not, then increment.
-        for _ in range(len(players)):
-            if(len(hands[pegging_index % len(players)]) > 0):
-                #If here, return points, a new_sum of 0, and player
-                return [peg_points, cur_sum, 0, len(hands[main_player_index]), card, players[pegging_index % len(players)]]
-            else:
-                pegging_index += 1
-
-        #Return variables and none since no player has a hand
-        return [peg_points, cur_sum, 0, len(hands[main_player_index]), card, None]
-    
-    #If player can't play that card, return None
-    return None
+    return team_list
 
 #Ends the game and returns a string with point details.
-def get_winner_string(winner, show_hands=True):
+def get_winner_string(self, winner, show_hands=True):
     global players
     global point_goal
     global skunk_length
@@ -488,82 +555,3 @@ def get_point_string(always_solo=False):
             point_count = 0
 
     return output_string[:-1]
-
-def get_point_array():
-    global team_count
-    global players
-    global points
-
-    output_string = ""
-    point_array = []
-
-    point_count = 0
-    num_teams = len(players) // team_count
-
-    for team_num in range(num_teams):
-        for player in range(team_count):
-            point_count += points[player*num_teams + team_num]
-        point_array.append(point_count)
-        point_count = 0
-
-    return point_array
-
-#Sets up game for standard mode
-def standard_mode():
-    global deck
-    global points
-    global hands
-    global backup_hands
-    global crib
-    global end
-    global num_thrown
-    global pegging_list
-    global point_goal
-    global skunk_length
-    global crib_count
-    global hand_size
-    global crib_index
-    global pegging_index
-    global throw_count
-    global game_started
-    global throw_away_phase
-    global pegging_phase
-
-    deck = dk.Deck()
-    points = []
-    hands = []
-    backup_hands = []
-    crib = []
-    end = []
-    num_thrown = []
-    pegging_list = []
-    point_goal = 121
-    skunk_length = 30
-    crib_count = 4
-    hand_size = 4
-    crib_index = 0
-    pegging_index = 0
-    throw_count = 0
-    game_started = False
-    throw_away_phase = False
-    pegging_phase = False
-
-#Sets up game for mega hand
-def mega_hand():
-    global game_started
-    global point_goal
-    global skunk_length
-    global hand_size
-
-    if(game_started == False):
-        point_goal = 241
-        skunk_length = 60
-        hand_size = 8
-
-#Sets up game for joker mode
-def joker_mode():
-    global game_started
-    global deck
-
-    if(game_started == False):
-        deck = deck.JokerDeck()
