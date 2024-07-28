@@ -10,65 +10,76 @@ class Game():
         self.game_started = False #True if the game has begun, else False
 
     #Adds a player to the game
-    #Returns 0 on success, -1 on failure
-    def add_player(self, player) -> int:
+    #Returns True on success, False on failure
+    def add_player(self, player) -> bool:
         if player not in self.players:
             self.players.append(player)
-            return 0
+            return True
         else:
-            return -1
+            return False
         
     #Returns and removes card at given index
-    #Returns 0 on success, -1 on failure
-    def card_select(self, player, index:int) -> int | deck.Card:
+    #Returns card on success, False on failure
+    def card_select(self, player, index:int) -> bool | deck.Card:
         try:
             player_index = self.players.index(player)
         except:
-            return -1
+            return False
         
         if (index >= len(self.hands[player_index])) or (index < 0):
-            return -1
+            return False
         else:
+            self.process_card_select(player_index, index)
             return self.hands[player_index].pop(index)
         
     #Gets the specified player's hand
-    #Returns 0 on success, -1 on failure
-    def get_hand(self, player) -> int | list[deck.Card]:
+    #Returns hand on success, False on failure
+    def get_hand(self, player) -> bool | list[deck.Card]:
         try:
             player_index = self.players.index(player)
         except:
-            return -1
+            return False
         
         return self.hands[player_index]
     
     #Create hands of the specified size
-    #Returns 0 on success, -1 on failure
-    def create_hands(self, hand_size:int):
+    #Returns True on success, False on failure
+    def create_hands(self, hand_size:int) -> bool:
         self.deck.reset_deck()
 
         self.hands = self.deck.get_hands(len(self.players), hand_size)
 
         if len(self.hands) == 0:
-            return -1
+            return False
         
-        return 0
+        return True
     
     #Starts the game
-    #Returns 0 on success, -1 on failure
+    #Returns True on success, False on failure
     def start_game(self):
         if len(self.players) == 0:
-            return -1
-        elif self.initialize_game() == -1:
-            return -1
+            return False
+        if self.game_started == True:
+            return False
+        elif self.initialize_game() == False:
+            return False
         else:
             self.game_started = True
 
-        return 0
+        return True
     
 ###############################################################################
 # List of common functions that must be implemented
 ###############################################################################
     #Initializes the game on start
     #Returns 0 on success, -1 on failure
-    def initialize_game(self) -> int:
-        return -1
+    def initialize_game(self) -> bool:
+        return False
+    
+###############################################################################
+# List of common functions that may be implemented
+###############################################################################
+    #Optionally used to modify variables on card select
+    #NOTE: Card gets deleted, so don't modify self.hands. See self.card_select() for more details.
+    def process_card_select(self, player_index:int, card_index:int):
+        pass
