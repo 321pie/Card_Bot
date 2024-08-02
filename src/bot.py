@@ -135,7 +135,7 @@ def run_bot():
     #Sends each available command
     @tree.command(name="help", description='''See all available commands.''')
     async def help_command(interaction):
-        await interaction.response.send_message(message.help_message(), ephemeral=True)
+        await interaction.response.send_message(message.HELP_MESSAGE, ephemeral=True)
 
     @client.event
     async def on_message(msg):

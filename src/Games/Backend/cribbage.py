@@ -1,6 +1,6 @@
 import copy
 
-import Cribbage.calculate_points as cp
+import Helper.Cribbage.calculate_points as cp
 from deck import Card
 import deck
 import game
@@ -54,7 +54,7 @@ class Cribbage(game.Game):
         self.pegging_index = (crib_index + 1) % len(players)
         
         #Get hands
-        self.hands = deck.get_hands(len(players), hand_size + throw_count)
+        self.hands = deck.get_hands(len(players), self.hand_size + self.throw_count)
         
         #Initiate player variables
         for _ in range(len(self.players)):
@@ -107,7 +107,7 @@ class Cribbage(game.Game):
             self.num_thrown[ii] = 0
 
         #Get hands for next round
-        self.hands = deck.get_hands(len(players), hand_size + throw_count)
+        self.hands = deck.get_hands(len(players), self.hand_size + self.throw_count)
         self.backup_hands = []
 
     #Ends the game by resetting every variable to standard cribbage
@@ -494,17 +494,17 @@ def get_winner_string(self, winner, show_hands=True):
                 player_hands += f"{players[hand_index]}'s hand: {[card.display() for card in sorted(backup_hands[hand_index], key=lambda card:card.to_int_15s())]}\n"
 
         #Make sure that crib has been initialized
-        if(len(crib) == crib_count):
+        if(len(self.crib) == self.crib_count):
             player_hands += f"{players[crib_index%len(players)]}'s crib: {[card.display() for card in sorted(crib, key=lambda card:card.to_int_15s())]}\n"
 
     #Shows the ending point totals
-    point_array = get_point_array()
+    point_array = self.get_point_array()
     for point_index in range(len(point_array)):
         if(point_array[point_index] < (point_goal - skunk_length)):
             if team_count == 1: #If no teams, display based on name
-                player_scores += f"{players[point_index]} got skunked x{(point_goal - point_array[point_index]) // skunk_length} at {point_array[point_index]} points.\n"
+                player_scores += f"{self.players[point_index]} got skunked x{(point_goal - point_array[point_index]) // skunk_length} at {point_array[point_index]} points.\n"
             else: #If teams, display by team
-                num_teams = len(players) // team_count
+                num_teams = len(self.players) // team_count
                 player_scores += f"Team {point_index} ("
                 for player in range(num_teams):
                     player_scores += f"{players[player*num_teams + point_index]}, "
@@ -526,7 +526,7 @@ def get_winner_string(self, winner, show_hands=True):
                 #Add team and point data to output string player_scores
                 player_scores += team + f" ended with {point_array[point_index]} points.\n"
 
-    end_game()
+    self.end_game()
     return player_hands + player_scores + f"{winner_string} has won the game! Everything will now be reset."
 
 #Returns a string with each team and the number of points they have

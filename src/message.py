@@ -5,28 +5,21 @@ import discord
 import os
 
 #Local imports
-import Games.Cribbage.game as game
+import Games.Backend.Helper.Cribbage.game as game
 import Games.deck as dk
 
 hand_messages = [] #Variable to hold most recent hand message so that it can be modified as needed
 
-def help_message():
-    return '''The bot knows the following commands:
-
-    Cribbage:
+HELP_MESSAGE = '''The bot knows the following commands:
+    ***General***:
       Start Game:
         '**!join**': Let the bot know that you'd like to play cribbage.
         '**!unjoin**': Let the bot know that you changed your mind and don't want to play.
-        '**!standard**': Play a regular game of cribbage (default).
-        '**!mega**': Play a game of mega hand (8 cards, twice as many points to win).
-        '**!joker**': Play a game of joker mode (2 wild cards).
-        '**![A2-9JQK]|10 [HDCS]**': Used to transform the joker into the desired card.
-        '**!start**': Starts a game with up to 8 players who have done !join.
-        '**!teams [0-9]+**': Splits players into teams with the specified number of players on each team. Will automatically start the game.
+        '**!start**': Starts a game with all players who have done !join
+        '**![0-9]+**': Plays the card with the given index.
 
       Private Commands:
         '**/hand**', '**/h**': View your hand.
-        '**/thrown**': View the cards you've most recently thrown away.
 
       Public Commands:
         '**/spectate**': View hands of all players (only works if not participating in the game).
@@ -36,18 +29,24 @@ def help_message():
         '**/help**': Display orders that the bot can execute.
         '**/rules**': Show the rules of cribbage.
 
-      Throw Into Crib:
-        '**![0-9]+**': Puts the card with the given index into the current crib.
-
-      Counting:
-        '**![0-9]+**': Plays the card with the given index.
-
       End Early:
         '**!end**': All players must type in the command to end the game early.
 
-    Other:
-    '**!treasurelady**', '**!tl**': Change role to Treasure Lady.
-    '**!garbageman**', '**!gm**': Change role to Garbage Man.'''
+      Other:
+        '**!treasurelady**', '**!tl**': Change role to Treasure Lady.
+        '**!garbageman**', '**!gm**': Change role to Garbage Man.
+
+    ***Cribbage***:
+      Start Game:
+        '**!cribbage**': Create a game of Cribbage.
+        '**!standard**': Play a regular game of cribbage (default).
+        '**!mega**': Play a game of mega hand (8 cards, twice as many points to win).
+        '**!joker**': Play a game of joker mode (2 wild cards).
+        '**![A2-9JQK]|10 [HDCS]**': Used to transform the joker into the desired card.
+        '**!teams [0-9]+**': Splits players into teams with the specified number of players on each team. Will automatically start the game.
+
+      Private Commands:
+        '**/thrown**': View the cards you've most recently thrown away.'''
 
 
 async def process_message(msg):
@@ -55,27 +54,21 @@ async def process_message(msg):
         bot_feedback = await handle_user_messages(msg)
         if(len(bot_feedback) > 0):
             for item in bot_feedback:
-                if(item[1] == False): #Not a file
+                if(item[1] == None): #Not a file
                     await msg.channel.send(item[0])
                 else:
-                    #Check for valid path
-                    if not os.path.exists(os.path.dirname(item[0])):
-                        print(f"Invalid path: {item[0]}")
-                        return
-                    await msg.channel.send(content=f"Flipped card: {game.deck.get_flipped().display()}", file=discord.File(item[0]))
-                    os.remove(item[0])
-
+                    await msg.channel.send(content=item[0], file=discord.File(item[1]))
     except Exception as error:
         print(error)
 
-def add_return(return_list, return_string, isFile=False, index=None):
+def add_return(return_list, return_string, file=None, index=None):
     if(index == None):
         index = len(return_list)
 
     if(index >= len(return_list)):
-        return_list.append([return_string, isFile])
+        return_list.append([return_string, file])
     elif(index < len(return_list)):
-        return_list.insert(index, [return_string, isFile])
+        return_list.insert(index, [return_string, file])
 
     return return_list
 
