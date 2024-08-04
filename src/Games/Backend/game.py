@@ -18,6 +18,15 @@ class Game():
         else:
             return False
         
+    #Removes a player from the game
+    #Returns True on success, False on failure
+    def remove_player(self, player) -> bool:
+        if player in self.players:
+            self.players.remove(player)
+            return True
+        else:
+            return False
+        
     #Returns and removes card at given index
     #Returns card on success, False on failure
     def card_select(self, player, index:int) -> bool | deck.Card:
