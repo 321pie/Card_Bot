@@ -1,6 +1,5 @@
 import copy
 
-import Helper.Cribbage.calculate_points as cp
 from deck import Card
 import deck
 import game
@@ -26,7 +25,6 @@ class Cribbage(game.Game):
         self.throw_count = 0 #How many cards each player throws, initialized upon starting game
         self.throw_away_phase = False #True if players still need to throw cards away
         self.pegging_phase = False #True if players are in the pegging phase
-        self.calc_string = "" #Saves most recent hand calculations
         self.team_count = 1 #Variable to hold number of players per team (combine points)
 
     #Initializes the game on start
@@ -51,10 +49,10 @@ class Cribbage(game.Game):
             
         #Change game phase
         self.throw_away_phase = True
-        self.pegging_index = (crib_index + 1) % len(players)
+        self.pegging_index = (self.crib_index + 1) % len(self.players)
         
         #Get hands
-        self.hands = deck.get_hands(len(players), self.hand_size + self.throw_count)
+        self.hands = deck.get_hands(len(self.players), self.hand_size + self.throw_count)
         
         #Initiate player variables
         for _ in range(len(self.players)):
@@ -85,7 +83,7 @@ class Cribbage(game.Game):
             point_array = self.get_point_array()
 
         for player_index in range(len(point_array)):
-            if(point_array[player_index] >= point_goal):
+            if(point_array[player_index] >= self.point_goal):
                 return self.players[player_index]
 
         return None
@@ -97,17 +95,17 @@ class Cribbage(game.Game):
         self.throw_away_phase = True
         self.pegging_list = []
         self.crib_index += 1
-        self.pegging_index = (crib_index + 1) % len(players)
+        self.pegging_index = (self.crib_index + 1) % len(self.players)
         self.hands = []
         self.backup_hands = []
         self.crib = []
-        self.thrown_cards = [[] for _ in range(len(players))]
+        self.thrown_cards = [[] for _ in range(len(self.players))]
 
         for ii in range(len(self.num_thrown)):
             self.num_thrown[ii] = 0
 
         #Get hands for next round
-        self.hands = deck.get_hands(len(players), self.hand_size + self.throw_count)
+        self.hands = deck.get_hands(len(self.players), self.hand_size + self.throw_count)
         self.backup_hands = []
 
     #Ends the game by resetting every variable to standard cribbage
@@ -150,7 +148,7 @@ class Cribbage(game.Game):
     #Changes joker that was flipped up. Returns True on success and False if no joker or if incorrect player.
     def change_flipped_joker(self, card:Card, player) -> bool:
         try:
-            player_index = players.index(player)
+            player_index = self.players.index(player)
         except:
             return False
 
@@ -163,7 +161,7 @@ class Cribbage(game.Game):
 
                 #Calculate nibs and add points accordingly
                 num_points = cp.nibs(card)
-                points[crib_index % len(self.players)] += num_points
+                self.points[self.crib_index % len(self.players)] += num_points
 
                 return True
                 
@@ -280,9 +278,6 @@ class Cribbage(game.Game):
         #Restore the siphoned hands to their former glory
         self.hands = self.backup_hands
 
-        #Reset calc_string so that it can be filled with new data
-        self.calc_string = ""
-
         return my_sum
 
     #The given player pegs the given card and gets associated points. Returns [number of points, old pegging sum, current pegging sum, cards remaining, card played, next player] on success and None on failure.
@@ -388,170 +383,3 @@ class Cribbage(game.Game):
     def joker_mode(self):
         if(self.game_started == False):
             self.deck = deck.JokerDeck()
-
-#Calculate hands, add points, and return a string with the details.
-def count_hand(self, player):
-    global deck
-    global calc_string
-    global players
-    global hands
-    global crib_index
-
-    #Get player index
-    try:
-        player_index = self.players.index(player)
-    except:
-        return ""
-
-    #Variable to hold output
-    output_string = ""
-
-    #Add points from hand
-    [get_points, get_output] = cp.calculate_hand(self.hands[(player_index + crib_index + 1) % len(self.players)], deck.get_flipped())
-    self.points[(player_index + self.crib_index + 1) % len(self.players)] += get_points
-
-    #Send calculation to variable in game.py
-    self.calc_string += f"**{self.players[(player_index + self.crib_index + 1) % len(self.players)]}'s Hand**:\n" + get_output + "\n\n"
-
-    #Add data to group output
-    output_string += f"{players[(player_index + crib_index + 1) % len(players)].name}'s hand: {[hand_card.display() for hand_card in sorted(hands[(player_index + crib_index + 1) % len(players)], key=lambda x: x.to_int_runs())]} for {get_points} points.\n"
-
-    return output_string
-
-def count_crib():
-    global deck
-    global calc_string
-    global players
-    global crib
-    global crib_index
-    
-    #Calculate crib
-    [get_points, get_output] = cp.calculate_crib(crib, deck.flipped)
-    points[crib_index % len(players)] += get_points
-    output_string = f"{players[crib_index % len(players)].name}'s crib: {[crib_card.display() for crib_card in sorted(crib, key=lambda x: x.to_int_runs())]} for {get_points} points."
-    
-    #Send calculation to variable in game.py
-    calc_string += f"**{players[crib_index % len(players)]}'s Crib**:\n" + get_output + "\n\n"
-
-    #Add total points for each person to the group chat variable
-    output_string += f"\nTotal Points:\n{get_point_string()}"
-
-    return output_string
-
-#Get string of hand to print for player at given index
-def get_hand_string(player_index):
-    global hands
-
-    output_string = f"Hand:\n"
-    for card in [card.display() for card in sorted(hands[player_index], key=lambda x: x.to_int_runs())]:
-        output_string += f"{card}, "
-    output_string = output_string[:-2] + "\n"
-    for card in [card for card in sorted(hands[player_index], key=lambda x: x.to_int_runs())]:
-        output_string += f"!{hands[player_index].index(card)},\t\t"
-    output_string = output_string[:-3] + "\n"
-
-    return output_string
-
-#Creates a string to represent each team.
-def get_teams_string():
-    global players
-    global team_count
-
-    num_players = len(players)
-
-    #Get the list of teams
-    team_list = ""
-    num_teams = num_players // team_count
-    for team_num in range(num_teams):
-        team_list += f"Team {team_num}: "
-        for player in range(team_count):
-            team_list += f"{players[player*num_teams + team_num]}, "
-        team_list = team_list[:-2] + "\n"
-
-    return team_list
-
-#Ends the game and returns a string with point details.
-def get_winner_string(self, winner, show_hands=True):
-    global players
-    global point_goal
-    global skunk_length
-    global hands
-    global backup_hands
-    global crib
-    global crib_index
-    global deck
-
-    player_scores = ""
-    player_hands = ""
-    winner_string = winner.name
-
-    #Shows the hands
-    if(show_hands):
-        #Make sure that backup_hands has been initialized
-        if(len(backup_hands) == len(players)):
-            player_hands += f"Flipped card is: {deck.get_flipped().display()}\n"
-            for hand_index in range(len(players)):
-                player_hands += f"{players[hand_index]}'s hand: {[card.display() for card in sorted(backup_hands[hand_index], key=lambda card:card.to_int_15s())]}\n"
-
-        #Make sure that crib has been initialized
-        if(len(self.crib) == self.crib_count):
-            player_hands += f"{players[crib_index%len(players)]}'s crib: {[card.display() for card in sorted(crib, key=lambda card:card.to_int_15s())]}\n"
-
-    #Shows the ending point totals
-    point_array = self.get_point_array()
-    for point_index in range(len(point_array)):
-        if(point_array[point_index] < (point_goal - skunk_length)):
-            if team_count == 1: #If no teams, display based on name
-                player_scores += f"{self.players[point_index]} got skunked x{(point_goal - point_array[point_index]) // skunk_length} at {point_array[point_index]} points.\n"
-            else: #If teams, display by team
-                num_teams = len(self.players) // team_count
-                player_scores += f"Team {point_index} ("
-                for player in range(num_teams):
-                    player_scores += f"{players[player*num_teams + point_index]}, "
-                player_scores = player_scores[:-2] + f") got skunked x{(point_goal - point_array[point_index]) // skunk_length} at {point_array[point_index]} points.\n"
-        else:
-            if team_count == 1: #If no teams, display based on name
-                player_scores += f"{players[point_index]} ended with {point_array[point_index]} points.\n"
-            else: #If teams, display by team
-                num_teams = len(players) // team_count
-                team = f"Team {point_index} ("
-                for player in range(team_count):
-                    team += f"{players[player*num_teams + point_index]}, "
-                team = team[:-2] + ")"
-
-                #If this team won, replace winner_string with team
-                if(point_array[point_index] >= point_goal):
-                    winner_string = team
-
-                #Add team and point data to output string player_scores
-                player_scores += team + f" ended with {point_array[point_index]} points.\n"
-
-    self.end_game()
-    return player_hands + player_scores + f"{winner_string} has won the game! Everything will now be reset."
-
-#Returns a string with each team and the number of points they have
-def get_point_string(always_solo=False):
-    global team_count
-    global players
-    global points
-
-    output_string = ""
-
-    #If playing alone, don't have team names
-    #Else, print out teams and points for team
-    if team_count == 1 or always_solo == True:
-        for player_index in range(len(players)):
-            output_string += f"{players[player_index].name} has {points[player_index]} points.\n"
-    else:
-        point_count = 0
-        num_teams = len(players) // team_count
-
-        for team_num in range(num_teams):
-            output_string += f"Team {team_num} ("
-            for player in range(team_count):
-                point_count += points[player*num_teams + team_num]
-                output_string += f"{players[player*num_teams + team_num]}, "
-            output_string = output_string[:-2] + f") has {point_count} points.\n"
-            point_count = 0
-
-    return output_string[:-1]

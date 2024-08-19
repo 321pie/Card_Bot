@@ -81,7 +81,7 @@ class Game():
 # List of common functions that must be implemented
 ###############################################################################
     #Initializes the game on start
-    #Returns 0 on success, -1 on failure
+    #Returns True on success, False on failure
     def initialize_game(self) -> bool:
         return False
     
