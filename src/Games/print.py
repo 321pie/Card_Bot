@@ -61,6 +61,7 @@ class Print():
                     hands_img.paste(self.get_card(handCopy[card_index], hand.index(handCopy[card_index]), customDeck, show_index), (card_index * self.card_width, hand_index * card_height))
                     
         #Return image path
+        hands_img.show()
         return self.surface_to_pil_image(pg.transform.rotozoom(self.pil_image_to_surface(hands_img), 0, self.sprite_scalar))
     
 #Returns an Image of the selected card
@@ -114,18 +115,14 @@ class Print():
 
             draw = ImageDraw.Draw(index_card)
             try:
-                font = ImageFont.truetype(f"src\\Font\\{customDeck}.ttf", 40)
+                font = ImageFont.truetype(f"src\\Font\\{customDeck}_Font.ttf", 40)
             except:
                 return None
 
             #Adding the text to bar
             text = "!" + str(index)
-            draw.text((self.card_width / 2.5, self.card_height), text, font=font, fill=(255, 255,255))
+            draw.text((self.card_width / 2.5, self.card_height - 10), text, font=font, fill=(255, 255,255))
             return index_card
 
         #Return image path
         return card_image
-
-myVar = Print()
-hand = [[deck.Card(deck.ACE, deck.SPADE), deck.Card(deck.QUEEN, deck.CLUB), deck.Card(deck.ACE, deck.DIAMOND), deck.Card(deck.ACE, deck.CLUB)]]
-myVar.get_hand_pic(hand)
