@@ -121,7 +121,7 @@ class Print():
 
             #Adding the text to bar
             text = "!" + str(index)
-            draw.text((self.card_width / 2.5, self.card_height - 10), text, font=font, fill=(255, 255,255))
+            draw.text((self.card_width / 2.5, self.card_height - 5), text, font=font, fill=(255, 255,255))
             return index_card
 
         #Return image path
