@@ -1,9 +1,8 @@
 import copy
 
-from deck import Card
-import deck
-import game
-
+from Games.deck import Card
+import Games.deck as deck
+import Games.game as game
 
 class Cribbage(game.Game):
     def __init__(self):

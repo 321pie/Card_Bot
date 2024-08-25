@@ -1,23 +1,65 @@
 import copy
 import itertools
 from collections import OrderedDict
+import discord
 
-from cribbage import Cribbage
-from game_print import game_print
-import deck as dk
+from Games.Cribbage.cribbage import Cribbage
+from Games.game_print import game_print
+import Games.deck as dk
 
-class cribbage_print(game_print):
+class Cribbage_Print(game_print):
     def __init__(self):
-        super.__init__()
+        super().__init__()
         self.game = Cribbage()
         self.commands["^![0-9]+$"] = [self.select_card, self.select_card_parse]
+        self.commands["^![a2-9jqk]|10 [hdcs]$"] = [self.make_joker]
+        self.commands["^!standard$"] = [self.play_standard]
+        self.commands["^!mega$"] = [self.play_mega]
+        self.commands["^!joker$"] = [self.play_joker]
+
+        hand_messages = [] #Variable to hold most recent hand message so that it can be modified as needed
 
         self.calc_string = "" #Saves most recent hand calculations
 
+    #Input: player and str as defined in message.py for commands
+    #Output: add_return print for message handler
+    def play_standard(self, player, _sent_str):
+        if player in self.game.players:
+            self.game.standard_mode()
+        else:
+            return self.add_return([], player.name + f"You can't start a game you aren't queued for, {player.name}. Use !join to join the game.")
+        
+    #Input: player and str as defined in message.py for commands
+    #Output: add_return print for message handler
+    def play_mega(self, player, _sent_str):
+        if player in self.game.players:
+            self.game.mega_hand()
+        else:
+            return self.add_return([], player.name + f"You can't start a game you aren't queued for, {player.name}. Use !join to join the game.")
+        
+    #Input: player and str as defined in message.py for commands
+    #Output: add_return print for message handler
+    def play_joker(self, player, _sent_str):
+        if player in self.game.players:
+            self.game.joker_mode()
+        else:
+            return self.add_return([], player.name + f"You can't start a game you aren't queued for, {player.name}. Use !join to join the game.")
+        
+    #Input: player and team_count as defined in default_print
+    #Output: add_return print for message handler
+    #NOTE: predefined function from base class
+    def create_teams(self, _player, team_count:int):
+        #If teams are even, start game
+        if (self.game.create_teams(team_count) == True):
+            #Add the teams to be printed before the start returns (index=0)
+            return self.add_return([], f"Teams of {team_count} have been formed:\n{self.game.get_teams_string()}", index=0)
+        else:
+            return False, self.add_return([], "There must be an equal number of players on each team in order to form teams.")
+
     #Input: parse string of form "^![0-9]+$"
-    #Output: integer index parsed from string
+    #Output: integer index parsed from string in list
     def select_card_parse(self, parse_str):
-        return int(parse_str[1:])
+        return [int(parse_str[1:])]
 
     #Input: integer index parsed from string
     #Output: list of return statements using add_return
@@ -546,3 +588,9 @@ class cribbage_print(game_print):
         output_string += f"Total points: {points}"
 
         return points, output_string
+    
+    #Updates a player's hand if applicable.
+    async def update_hand(self, player):
+        if self.hand_messages[self.game.players.index(player)] != None:
+            hand_pic = await self.deck_print.get_hand_pic(self.game.players.index(player))
+            await self.hand_messages[self.game.players.index(player)].edit_original_response(attachments=[discord.File(hand_pic)])

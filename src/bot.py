@@ -20,8 +20,6 @@ import Games.game as game
 spectators = []
 spectator_messages = []
 
-games:list[game.Game] = []
-
 def run_bot():
     # Get token from credentials.json file
     discord_token = credentials.load_from_file('credentials.json')

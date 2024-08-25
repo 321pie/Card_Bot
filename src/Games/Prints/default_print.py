@@ -7,7 +7,7 @@ import Games.deck as deck
 
 class Standard_Print(bp.Base_Print):
     def __init__(self):
-        super.__init__() #Not needed due to overwrites
+        super().__init__() #Not needed due to overwrites
 
         #The size of the sprites
         self.base_card_width = 32 #Excess room on sprite sheet before first card

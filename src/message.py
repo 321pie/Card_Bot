@@ -1,14 +1,15 @@
 #Foreign imports
 import re
-import copy
 import discord
 import os
 
 #Local imports
-import Games.Backend.Helper.Cribbage.game as game
-import Games.deck as dk
+import Games.game as gm
+from Games.Cribbage.cribbage_print import Cribbage_Print
 
-hand_messages = [] #Variable to hold most recent hand message so that it can be modified as needed
+active_games = []
+
+cur_game = None
 
 HELP_MESSAGE = '''The bot knows the following commands:
     ***General***:
@@ -29,9 +30,6 @@ HELP_MESSAGE = '''The bot knows the following commands:
         '**/help**': Display orders that the bot can execute.
         '**/rules**': Show the rules of cribbage.
 
-      End Early:
-        '**!end**': All players must type in the command to end the game early.
-
       Other:
         '**!treasurelady**', '**!tl**': Change role to Treasure Lady.
         '**!garbageman**', '**!gm**': Change role to Garbage Man.
@@ -47,7 +45,6 @@ HELP_MESSAGE = '''The bot knows the following commands:
 
       Private Commands:
         '**/thrown**': View the cards you've most recently thrown away.'''
-
 
 async def process_message(msg):
     try:
@@ -80,27 +77,23 @@ async def handle_user_messages(msg):
     if(message[0] != '!'):
         return return_list
     
-    #Cribbage commands
-    elif(re.search('^![0-9]+$', message) != None):
-        return await card_select(msg.author, int(message[1:]))
-    elif(message == '!join' or message == '!jion'):
-        return join(msg.author)
-    elif(message == '!unjoin' or message == '!unjion'):
-        return unjoin(msg.author)
-    elif(message == '!standard'):
-        return standard(msg.author)
-    elif(message == '!mega'):
-        return mega(msg.author)
-    elif(message == '!joker'):
-        return joker(msg.author)
-    elif(message == '!start'):
-        return await start(msg.author)
-    elif(re.search('^!teams [0-9]+$', message) != None):
+    #Commands from an active game
+    for active_game in active_games:
+        if msg.author in active_game.get_players():
+            for command in active_game.commands:
+                if re.search(command, message) != None:
+                    func_list = active_game.commands[command]
+                    if len(func_list) > 1:
+                        return func_list[0](msg.author, *func_list[1])
+                    else:
+                        return func_list[0](msg.author)
+                    
+    if re.search('^!teams [0-9]+$', message) != None:
         return await form_teams(msg.author, int(message[7:]))
-    elif(re.search('^![a2-9jqk]|10 [hdcs]$', message) != None):
-        return await make_joker(msg.author, message)
-    elif(message == '!end'):
-        return end(msg.author)
+    
+    #Commands to add a game
+    elif message == "!cribbage":
+        return await make_cribbage(msg.author)
     
     #Roles
     elif(message == '!gm' or message == '!garbageman'):
@@ -111,147 +104,81 @@ async def handle_user_messages(msg):
     #Default case (orders bot doesn't understand)
     return return_list
 
-#Updates a player's hand if applicable.
-async def update_hand(author):
-    if(hand_messages[game.players.index(author)] != None):
-        hand_pic = await game.get_hand_pic(game.players.index(author))
-        await hand_messages[game.players.index(author)].edit_original_response(attachments=[discord.File(hand_pic)])
-        os.remove(hand_pic)
 
-def join(author):
-    return_list = []
+    
+# #Starts the game
+# async def start(player):
+#     global cur_game
 
-    if(game.game_started == False):
-        #Add person to player list and send confirmation message
-        if(author not in game.players):
-            if(len(game.players) < 8):
-                game.players.append(author)
-                return add_return(return_list, f"Welcome to the game, {author.name}! Type !start to begin game with {len(game.players)} players.")
-            else:
-                return add_return(return_list, f"Sorry, {author.name}. This game already has 8 players {[player.name for player in game.players]}. If this is wrong, type !unjoinall.")
-        else:
-            return add_return(return_list, f"You've already queued for this game, {author.name}. Type !start to begin game with {len(game.players)} players.")
+#     return_list = []
+
+#     #Start game
+#     if(player in cur_game.game.players):
+#         #Initiate game vars
+#         return_list = await start(player)
+#         active_games.append(cur_game)
+#         cur_game = None
         
-    return return_list
+#     return return_list
+
+# #Function to form teams of two if applicable
+# async def form_teams(player, count):
+#     created, return_list = []
+
+#     #If teams are even, start game
+#     if (cur_game.create_teams(count) == True):
+#         return_list = await start(player)
+
+#         #Add the teams to be printed before the start returns (index=0)
+#         add_return(return_list, f"Teams of {count} have been formed:\n{game.get_teams_string()}", index=0)
+#     else:
+#         add_return(return_list, "There must be an equal number of players on each team in order to form teams.")
     
-def unjoin(author):
-    return_list = []
+#     return return_list
 
-    if(game.game_started == False):
-        #Remove person from player list and send confirmation message
-        if(author in game.players):
-            game.players.remove(author)
-            return add_return(return_list, f"So long, {author.name}.")
-        else:
-            return add_return(return_list, f"You never queued for this game, {author.name}.")
-        
-    return return_list
+def make_cribbage(player):
+    global cur_game
     
-#Changes game mode to standard
-def standard(author):
-    return_list = []
-
-    if(game.game_started == False):
-        game.end_game()
-        return add_return(return_list, f"{author.name} has changed game mode to standard. Consider giving !mega and !joker a try, or use !start to begin.")
-    
-    return return_list
-
-#Changes game mode to mega hand
-def mega(author):
-    return_list = []
-
-    if(game.game_started == False):
-        game.mega_hand()
-        return add_return(return_list, f"{author.name} has changed game mode to mega. Use !standard to play regular cribbage or !start to begin.")
-    
-    return return_list
-
-#Changes game mode to joker mode
-def joker(author):
-    return_list = []
-
-    if(game.game_started == False):
-        game.joker_mode()
-        return add_return(return_list, f"{author.name} has changed game mode to joker mode. Use !standard to play regular cribbage or !start to begin.")
-    
-    return return_list
-    
-#Starts the game
-async def start(author):
-    return_list = []
-
-    if(game.game_started == False):
-        #Start game
-        if(author in game.players):
-            #Initiate game vars
-            game.start_game()
-            for _ in range(len(game.players)):
-                hand_messages.append(None)
-
-            return add_return(return_list, f'''{author.name} has started the game.\nThrow {game.throw_count} card(s) into **{game.players[game.crib_index % len(game.players)]}**'s crib.\n*Use "/hand" to see your hand.*''')
-        else:
-            return add_return(return_list, f"You can't start a game you aren't queued for, {author.name}.")
-        
-    return return_list
-
-#Function to form teams of two if applicable
-async def form_teams(author, count):
-    return_list = []
-
-    #If teams are even, start game
-    if (game.create_teams(count) == True):
-        return_list = await start(author)
-
-        #Add the teams to be printed before the start returns (index=0)
-        add_return(return_list, f"Teams of {count} have been formed:\n{game.get_teams_string()}", index=0)
+    if cur_game != None:
+        return add_return([], f"Sorry, {player.name}. You need to wait until the current game is created")
     else:
-        add_return(return_list, "There must be an equal number of players on each team in order to form teams.")
-    
-    return return_list
-
-
-        
-
-
-
-
-
-
-def end(author):
-    if(author in game.players):
-        #Get player index
-        try:
-            player_index = game.players.index(author)
-        except:
-            return ''
-
-        if(game.game_started == True):
-            game.end[player_index] = True
-            
-            #Check to see if all players agree
-            game_over = True
-            for ii in range(len(game.end)):
-                if(game.end[ii] == False):
-                    game_over = False
-                    break
-
-            if(game_over == True):
-                winner = 0
-                for point_index in range(1, len(game.points)):
-                    if(game.points[point_index] > game.points[winner]):
-                        winner = point_index
-                winner = game.players[winner]
-
-                return add_return([], f"Game has been ended early by unanimous vote.\n" + game.get_winner_string(winner))
-            else:
-                return add_return([], f"{author.name} wants to end the game early. Type !end to agree.")
-        else:
-            return add_return([], f"You can't end a game that hasn't started yet, {author.name}. Use !unjoin to leave queue.")
-        
-    return []
+        cur_game = Cribbage_Print()
 
 #Give role to user
 async def give_role(member, role):
     await member.edit(roles=[discord.utils.get(member.guild.roles, name=role)])
     return add_return([], member.name + ' is now a ' + role + '!')
+
+# def end(player):
+#     if(player in game.players):
+#         #Get player index
+#         try:
+#             player_index = game.players.index(player)
+#         except:
+#             return ''
+
+#         if(game.game_started == True):
+#             game.end[player_index] = True
+            
+#             #Check to see if all players agree
+#             game_over = True
+#             for ii in range(len(game.end)):
+#                 if(game.end[ii] == False):
+#                     game_over = False
+#                     break
+
+#             if(game_over == True):
+#                 winner = 0
+#                 for point_index in range(1, len(game.points)):
+#                     if(game.points[point_index] > game.points[winner]):
+#                         winner = point_index
+#                 winner = game.players[winner]
+
+#                 return add_return([], f"Game has been ended early by unanimous vote.\n" + game.get_winner_string(winner))
+#             else:
+#                 return add_return([], f"{player.name} wants to end the game early. Type !end to agree.")
+#         else:
+#             return add_return([], f"You can't end a game that hasn't started yet, {player.name}. Use !unjoin to leave queue.")
+        
+#     return []
+
