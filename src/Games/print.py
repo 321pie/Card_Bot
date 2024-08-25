@@ -7,7 +7,7 @@ import copy
 class Print():
     def __init__(self):
         #The size of the sprites
-        self.card_width = 158 #Width of each card
+        self.card_width = 157 #Width of each card
         self.card_height = 221 #Height of each card
         self.CLASSIC = "Classic"
         self.GENSHIN = "Genshin"
