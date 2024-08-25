@@ -160,7 +160,7 @@ class Cribbage(game.Game):
                 self.pegging_phase = True
 
                 #Calculate nibs and add points accordingly
-                num_points = cp.nibs(card)
+                num_points = self.nibs(card)
                 self.points[self.crib_index % len(self.players)] += num_points
 
                 return True
@@ -253,7 +253,7 @@ class Cribbage(game.Game):
         flipped = deck.get_flipped()
 
         #Calculate nibs and add points accordingly
-        num_points = cp.nibs(flipped)
+        num_points = self.nibs(flipped)
         self.points[self.crib_index % len(self.players)] += num_points
 
         #Make sure crib has proper number of cards
@@ -299,7 +299,7 @@ class Cribbage(game.Game):
         if(cur_sum <= 31):
             #Remove card from hand, get points, and add to pegging list
             self.hands[main_player_index].remove(card)
-            peg_points = cp.check_points(card, self.pegging_list, cur_sum)
+            peg_points = self.check_points(card, self.pegging_list, cur_sum)
             self.points[main_player_index] += peg_points
             self.pegging_list.append(card)
 
@@ -383,3 +383,55 @@ class Cribbage(game.Game):
     def joker_mode(self):
         if(self.game_started == False):
             self.deck = deck.JokerDeck()
+
+    #Finding Nibs  
+    def nibs(flipped):
+        points = 0
+
+        #For Nibs (flipping a jack)
+        if flipped.value == deck.JACK:
+            points += 2
+
+        return points
+
+    #Check points for counting, with cur_card NOT in old_cards, but cur_card IS included in sum
+    def check_points(self, cur_card, old_cards, sum):
+        points = 0
+        if(len(old_cards) >= 2): #Find longest run if enough cards
+            complete_run = True
+            total_card_index = 2
+            while(total_card_index <= len(old_cards)):
+                #Populate card list for runs, starting with 3 and incrementing until run is broken or there are no more cards
+                cards = [cur_card.to_int_runs()]
+                for card_index in range(1, total_card_index+1):
+                    cards.append(old_cards[-card_index].to_int_runs())
+
+                #sort cards to determine run and increment total_caard_index for next iteration
+                cards = sorted(cards, reverse=True)
+                total_card_index += 1
+
+                #See if run is valid
+                for ii in range(len(cards)-1):
+                    if(cards[ii]-1 != cards[ii+1]):
+                        complete_run = False
+                        break
+
+                #If valid run, get number of points and reset complete_run
+                if(complete_run == True):
+                    points = len(cards)
+                complete_run = True
+
+        if(len(old_cards) >= 1):
+            if(cur_card.value == old_cards[-1].value): #Check for pair
+                points += 2
+                if(len(old_cards) >= 2):
+                    if(cur_card.value == old_cards[-2].value): #Check for double pair (3 of a kind)
+                        points += 4 #2 + 4 = 6
+                        if(len(old_cards) >= 3):
+                            if(cur_card.value == old_cards[-3].value): #Check for double pair (3 of a kind)
+                                points += 6 #6 + 6 = 12
+
+        if(sum == 15 or sum == 31): #Check for 15 and 31
+            points += 2
+
+        return points
