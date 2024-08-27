@@ -51,7 +51,7 @@ class Cribbage(game.Game):
         self.pegging_index = (self.crib_index + 1) % len(self.players)
         
         #Get hands
-        self.hands = deck.get_hands(len(self.players), self.hand_size + self.throw_count)
+        self.hands = self.deck.get_hands(len(self.players), self.hand_size + self.throw_count)
         
         #Initiate player variables
         for _ in range(len(self.players)):
@@ -63,8 +63,7 @@ class Cribbage(game.Game):
         return True
 
     #Checks if player can peg. True if they can, false if they can't
-    @staticmethod
-    def can_peg(hand, cur_sum) -> bool:
+    def can_peg(self, hand, cur_sum) -> bool:
         #Check for basic case before iterating. Probably doesn't save time for small hands, but whatever.
         if(cur_sum <= 21 and len(hand) > 0):
             return True
@@ -104,7 +103,7 @@ class Cribbage(game.Game):
             self.num_thrown[ii] = 0
 
         #Get hands for next round
-        self.hands = deck.get_hands(len(self.players), self.hand_size + self.throw_count)
+        self.hands = self.deck.get_hands(len(self.players), self.hand_size + self.throw_count)
         self.backup_hands = []
 
     #Ends the game by resetting every variable to standard cribbage
@@ -249,7 +248,7 @@ class Cribbage(game.Game):
     #Prepare variables for pegging round
     def prepare_pegging(self) -> None:
         self.backup_hands = copy.deepcopy(self.hands)
-        flipped = deck.get_flipped()
+        flipped = self.deck.get_flipped()
 
         #Calculate nibs and add points accordingly
         num_points = self.nibs(flipped)
@@ -257,7 +256,7 @@ class Cribbage(game.Game):
 
         #Make sure crib has proper number of cards
         while(len(self.crib) < self.crib_count):
-            self.crib.append(deck.get_card())
+            self.crib.append(self.deck.get_card())
         
         #Make sure variables are set up for pegging round
         if flipped.value != deck.JOKER:

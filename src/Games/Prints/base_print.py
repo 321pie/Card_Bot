@@ -26,12 +26,12 @@ class Base_Print():
     def pil_image_to_surface(self, pil_image:Image) -> pg.Surface:
         return pg.image.fromstring(pil_image.tobytes(), pil_image.size, pil_image.mode)
     
-    def surface_to_pil_image(self, surface:pg.Surface) -> Image:
+    def surface_to_pil_image(self, surface:pg.Surface) -> Image.Image:
         pil_string_image = pg.image.tobytes(surface, "RGBA", False)
         return Image.frombytes("RGBA", (surface.get_width(), surface.get_height()), pil_string_image)
     
     #Get single picture with all hands in it
-    def get_hand_pic(self, hands:list[list[deck.Card]], show_index=True) -> Image:
+    def get_hand_pic(self, hands:list[list[deck.Card]], show_index=True) -> Image.Image:
         #Stores index number
         hand_index = 0
         max_hand_len = 0
@@ -69,5 +69,5 @@ class Base_Print():
 ###############################################################################
 
 #Returns an Image of the selected card
-    def get_card(self, card:deck.Card, index:int=None) -> Image:
+    def get_card(self, card:deck.Card, index:int=None) -> Image.Image:
         pass

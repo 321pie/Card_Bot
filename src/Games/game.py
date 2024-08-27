@@ -1,3 +1,4 @@
+import copy
 import Games.deck as deck
 
 class Game():
@@ -8,6 +9,7 @@ class Game():
         self.hands:list[list[deck.Card]] = [] #The hands of each player, indexed the same as the players
         self.end = [] #List of players who wish to prematurely end the game
         self.game_started = False #True if the game has begun, else False
+        self.max_player_count = 8 #Defines the maximum number of players
 
     #Adds a player to the game
     #Returns True on success, False on failure
@@ -73,9 +75,36 @@ class Game():
         elif self.initialize_game() == False:
             return False
         else:
+            for _ in range(len(self.players)):
+                self.end.append(False)
             self.game_started = True
 
         return True
+    
+    #Adds a player to the end list and ends the game if needed
+    #Returns True if player is added to end list, and False if player isn't in game or has already tried to end.
+    def end_game(self, player) -> bool:
+        if (player in self.players) and (self.game_started):
+            self.end[self.get_player_index(player)] = True
+
+            #End game if needed
+            if self.end.count(True) == len(self.end):
+                self.game_started = False
+
+            return True
+        else:
+            return False
+
+    #Returns the player list
+    def get_players(self):
+        return copy.copy(self.players)
+    
+    #Returns the index of the player or None if the player doesn't exist
+    def get_player_index(self, player):
+        try:
+            return self.players.index(player)
+        except:
+            return None
     
 ###############################################################################
 # List of common functions that must be implemented

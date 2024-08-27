@@ -21,9 +21,9 @@ class Standard_Print(bp.Base_Print):
         self.sprite_scalar = 3 #Multiplier to zoom by to make hand a good size
 
     #Returns an Image of the selected card
-    def get_card(self, card:deck.Card, index:int=None) -> Image:
+    def get_card(self, card:deck.Card, index:int=None) -> Image.Image:
         #Define path to assets
-        asset_file_path = self.get_path('card_art\\all_assets.png')
+        asset_file_path = self.get_path('src\\card_art\\all_assets.png')
 
         #Get values for card in sprite sheet
         if card.value != deck.JOKER:

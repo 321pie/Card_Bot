@@ -1,15 +1,14 @@
 #Foreign imports
 import re
 import discord
-import os
 
 #Local imports
-import Games.game as gm
+from Games.game_print import Game_Print as gp
 from Games.Cribbage.cribbage_print import Cribbage_Print
 
-active_games = []
+active_games:list[gp] = []
 
-cur_game = None
+cur_game:gp = None
 
 HELP_MESSAGE = '''The bot knows the following commands:
     ***General***:
@@ -70,6 +69,9 @@ def add_return(return_list, return_string, file=None, index=None):
     return return_list
 
 async def handle_user_messages(msg):
+    global active_games
+    global cur_game
+
     message = msg.content.lower()
     return_list = []
 
@@ -77,23 +79,35 @@ async def handle_user_messages(msg):
     if(message[0] != '!'):
         return return_list
     
+    player_in_game:bool = False
+    
     #Commands from an active game
     for active_game in active_games:
         if msg.author in active_game.get_players():
-            for command in active_game.commands:
-                if re.search(command, message) != None:
-                    func_list = active_game.commands[command]
-                    if len(func_list) > 1:
-                        return func_list[0](msg.author, *func_list[1])
-                    else:
-                        return func_list[0](msg.author)
+            player_in_game = True
+            return_var = await run_commands(msg.author, message, active_game)
+            if return_var != None:
+                #Remove game from list if ended
+                if active_game.is_started() == False:
+                    active_games.remove(active_game)
+
+                return return_var
+            else:
+                break #Player can only be in one game at a time
                     
-    if re.search('^!teams [0-9]+$', message) != None:
-        return await form_teams(msg.author, int(message[7:]))
+    #Commands from game that is being created (don't allow people already in a game)
+    if (cur_game != None) and (player_in_game == False):
+        return_var = await run_commands(msg.author, message, cur_game)
+        if return_var != None:
+            if cur_game.is_started():
+                active_games.append(cur_game)
+                cur_game = None
+
+            return return_var
     
     #Commands to add a game
-    elif message == "!cribbage":
-        return await make_cribbage(msg.author)
+    if message == "!cribbage":
+        return make_cribbage(msg.author)
     
     #Roles
     elif(message == '!gm' or message == '!garbageman'):
@@ -104,81 +118,28 @@ async def handle_user_messages(msg):
     #Default case (orders bot doesn't understand)
     return return_list
 
-
-    
-# #Starts the game
-# async def start(player):
-#     global cur_game
-
-#     return_list = []
-
-#     #Start game
-#     if(player in cur_game.game.players):
-#         #Initiate game vars
-#         return_list = await start(player)
-#         active_games.append(cur_game)
-#         cur_game = None
-        
-#     return return_list
-
-# #Function to form teams of two if applicable
-# async def form_teams(player, count):
-#     created, return_list = []
-
-#     #If teams are even, start game
-#     if (cur_game.create_teams(count) == True):
-#         return_list = await start(player)
-
-#         #Add the teams to be printed before the start returns (index=0)
-#         add_return(return_list, f"Teams of {count} have been formed:\n{game.get_teams_string()}", index=0)
-#     else:
-#         add_return(return_list, "There must be an equal number of players on each team in order to form teams.")
-    
-#     return return_list
-
 def make_cribbage(player):
     global cur_game
     
-    if cur_game != None:
-        return add_return([], f"Sorry, {player.name}. You need to wait until the current game is created")
-    else:
+    if cur_game == None:
         cur_game = Cribbage_Print()
+        return add_return([], f"{player.name} has created a cribbage game. Use !join to join it!")
+    else:
+        return add_return([], f"Sorry, {player.name}. You need to wait until the current game is created.")
 
 #Give role to user
 async def give_role(member, role):
     await member.edit(roles=[discord.utils.get(member.guild.roles, name=role)])
     return add_return([], member.name + ' is now a ' + role + '!')
 
-# def end(player):
-#     if(player in game.players):
-#         #Get player index
-#         try:
-#             player_index = game.players.index(player)
-#         except:
-#             return ''
-
-#         if(game.game_started == True):
-#             game.end[player_index] = True
-            
-#             #Check to see if all players agree
-#             game_over = True
-#             for ii in range(len(game.end)):
-#                 if(game.end[ii] == False):
-#                     game_over = False
-#                     break
-
-#             if(game_over == True):
-#                 winner = 0
-#                 for point_index in range(1, len(game.points)):
-#                     if(game.points[point_index] > game.points[winner]):
-#                         winner = point_index
-#                 winner = game.players[winner]
-
-#                 return add_return([], f"Game has been ended early by unanimous vote.\n" + game.get_winner_string(winner))
-#             else:
-#                 return add_return([], f"{player.name} wants to end the game early. Type !end to agree.")
-#         else:
-#             return add_return([], f"You can't end a game that hasn't started yet, {player.name}. Use !unjoin to leave queue.")
-        
-#     return []
-
+async def run_commands(player, message, game):
+    for command in game.commands:
+        if re.search(command, message) != None:
+            func_list = game.commands[command]
+            if len(func_list) > 1:
+                return await func_list[0](player, *func_list[1])
+            else:
+                return await func_list[0](player)
+                
+    return None
+    

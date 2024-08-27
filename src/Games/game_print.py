@@ -1,10 +1,13 @@
-import Games.game as game
-from Games.Prints.default_print import Default_Print
+import discord
 
-class game_print():
+import Games.game as game
+from Games.Prints.standard_print import Standard_Print
+
+class Game_Print():
     def __init__(self):
         self.game = game.Game()
-        self.deck_print = Default_Print()
+        self.deck_look = Standard_Print()
+        self.hand_messages = [] #Variable to hold most recent hand message for each player. leave blank 
         self.commands = {
             "^!join$": [self.join],
             "^!jion$": [self.join],
@@ -24,32 +27,35 @@ class game_print():
 
         return return_list
 
-    def join(self, player):
+    async def join(self, player):
         if(self.game.game_started == False):
             #Add person to player list and send confirmation message
-            if(player not in self.game.players):
-                if(len(self.game.players) < 8):
-                    self.game.players.append(player)
-                    return self.add_return([], f"Welcome to the game, {player.name}! Type !start to begin game with {len(self.game.players)} players.")
+            if(player not in self.game.get_players()):
+                if(len(self.game.get_players()) < self.game.max_player_count):
+                    self.game.add_player(player)
+                    return self.add_return([], f"Welcome to the game, {player.name}! Type !start to begin game with {len(self.game.get_players())} players.")
                 else:
-                    return self.add_return([], f"Sorry, {player.name}. This game already has 8 players {[player.name for player in self.game.players]}. If this is wrong, type !unjoinall.")
+                    return self.add_return([], f"Sorry, {player.name}. This game already has 8 players {[player.name for player in self.game.get_players()]}. If this is wrong, type !unjoinall.")
             else:
-                return self.add_return([], f"You've already queued for this game, {player.name}. Type !start to begin game with {len(self.game.players)} players.")
+                return self.add_return([], f"You've already queued for this game, {player.name}. Type !start to begin game with {len(self.game.get_players())} players.")
         return []
 
-    def unjoin(self, player):
+    async def unjoin(self, player):
         if(self.game.game_started == False):
             #Remove person from player list and send confirmation message
-            if(player in self.game.players):
-                self.game.players.remove(player)
+            if(player in self.game.get_players()):
+                self.game.remove_player(player)
                 return self.add_return([], f"So long, {player.name}.")
             else:
                 return self.add_return([], f"You can't start a game you aren't queued for, {player.name}. Use !join to join the game.")
         return []
 
-    def start(self, player):
-        if player in self.game.players:
+    async def start(self, player):
+        if player in self.game.get_players():
             if self.game.start_game():
+                #Initialize local vars
+                for _ in self.game.get_players():
+                    self.hand_messages.append(None)
                 return self.add_return([], "Game started by " + str(player))
             else:
                 return self.add_return([], "Something went wrong when starting the game.")
@@ -58,11 +64,29 @@ class game_print():
         
     #Get list of players in game
     def get_players(self):
-        return self.game.players
+        return self.game.get_players()
+    
+    #Returns True if game is started (running), or False if game is not active
+    def is_started(self) -> bool:
+        return self.game.game_started
+    
+    #Updates a player's hand if applicable. Does nothing if get_hnd_pic isn't defined
+    async def update_hand(self, player):
+        if player in self.game.get_players():
+            if self.hand_messages[self.game.get_player_index(player)] != None:
+                hand_pic = await self.deck_look.get_hand_pic(self.game.get_hand(player))
+                await self.hand_messages[self.game.get_player_index(player)].edit_original_response(attachments=[discord.File(hand_pic)])
+
+    #Deletes a player's hand display if applicable. Does nothing if no hand is displayed in discord
+    async def delete_last_hand(self, player, replacement=None):
+        if player in self.game.get_players():
+            if self.hand_messages[self.game.get_player_index(player)] != None:
+                await self.hand_messages[self.game.get_player_index(player)].delete_original_response()
+            self.hand_messages[self.game.get_player_index(player)] = replacement
     
 ###############################################################################
-# Implement below functions as needed
+# List of common functions that may be implemented
 ###############################################################################
-    #Creates teams based on the team_count, the player, and 
-    def create_teams(self, player, team_count:int):
-        return self.add_return([], "Teams not implemented for this game.")
+    #Returns the hand image if applicable, or None
+    async def get_hand_pic(self, player, show_index:bool=True):
+        return None
