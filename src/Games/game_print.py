@@ -1,12 +1,12 @@
 import discord
 
 import Games.game as game
-from Games.Prints.standard_print import Standard_Print
+from Games.print import Print
 
 class Game_Print():
     def __init__(self):
         self.game = game.Game()
-        self.deck_look = Standard_Print()
+        self.deck_look = Print(Print.CLASSIC)
         self.hand_messages = [] #Variable to hold most recent hand message for each player. leave blank 
         self.commands = {
             "^!join$": [self.join],

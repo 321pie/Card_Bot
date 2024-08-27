@@ -5,14 +5,16 @@ import deck
 import copy
 
 class Print():
-    def __init__(self):
+    CLASSIC = "Classic"
+    GENSHIN = "Genshin"
+    CATS = "Cats"
+    STARWARS = "Starwars"
+    
+    def __init__(self, custom_deck):
         #The size of the sprites
         self.card_width = 157 #Width of each card
         self.card_height = 221 #Height of each card
-        self.CLASSIC = "Classic"
-        self.GENSHIN = "Genshin"
-        self.CATS = "Cats"
-        self.STARWARS = "Starwars"
+        self.custom_deck = custom_deck
 
         #This one can change as needed
         self.sprite_scalar = 1 #Multiplier to zoom by to make hand a good size
@@ -29,12 +31,12 @@ class Print():
     def pil_image_to_surface(self, pil_image:Image) -> pg.Surface:
         return pg.image.fromstring(pil_image.tobytes(), pil_image.size, pil_image.mode)
     
-    def surface_to_pil_image(self, surface:pg.Surface) -> Image:
+    def surface_to_pil_image(self, surface:pg.Surface) -> Image.Image:
         pil_string_image = pg.image.tobytes(surface, "RGBA", False)
         return Image.frombytes("RGBA", (surface.get_width(), surface.get_height()), pil_string_image)
     
     #Get single picture with all hands in it
-    def get_hand_pic(self, hands:list[list[deck.Card]], customDeck:str="Classic", show_index=True) -> Image:
+    def get_hand_pic(self, hands:list[list[deck.Card]], show_index=True) -> Image.Image:
         #Stores index number
         hand_index = 0
         max_hand_len = 0
@@ -58,17 +60,16 @@ class Print():
                 handCopy = sorted(copy.copy(hand), key=lambda c: c.to_int_runs())
                 #For each card in hand
                 for card_index in range(len(hand)):
-                    hands_img.paste(self.get_card(handCopy[card_index], hand.index(handCopy[card_index]), customDeck, show_index), (card_index * self.card_width, hand_index * card_height))
+                    hands_img.paste(self.get_card(handCopy[card_index], hand.index(handCopy[card_index]), show_index), (card_index * self.card_width, hand_index * card_height))
                     
         #Return image path
-        hands_img.show()
         return self.surface_to_pil_image(pg.transform.rotozoom(self.pil_image_to_surface(hands_img), 0, self.sprite_scalar))
     
 #Returns an Image of the selected card
-    def get_card(self, card:deck.Card, index:int, customDeck:str="Classic", showIndex:bool=False) -> Image:
+    def get_card(self, card:deck.Card, index:int, showIndex:bool=False) -> Image.Image:
         #Define path to assets
         try:
-            asset_file_path = self.get_path(f'src\\card_art\\{customDeck}_Deck.png')
+            asset_file_path = self.get_path(f'src\\card_art\\{self.custom_deck}_Deck.png')
         except:
             return None
 
@@ -115,7 +116,7 @@ class Print():
 
             draw = ImageDraw.Draw(index_card)
             try:
-                font = ImageFont.truetype(f"src\\Font\\{customDeck}_Font.ttf", 40)
+                font = ImageFont.truetype(f"src\\Font\\{self.custom_deck}_Font.ttf", 40)
             except:
                 return None
 
