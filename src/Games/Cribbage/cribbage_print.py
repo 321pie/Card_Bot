@@ -12,7 +12,7 @@ class Cribbage_Print(Game_Print):
         super().__init__()
         self.game = Cribbage()
         self.commands["^![0-9]+$"] = [self.select_card, self.select_card_parse]
-        self.commands["^![a2-9jqk]|10 [hdcs]$"] = [self.make_joker, self.make_joker_parse]
+        self.commands["^!([a2-9jqk]|10) [hdcs]$"] = [self.make_joker, self.make_joker_parse]
         self.commands["^!standard$"] = [self.play_standard]
         self.commands["^!mega$"] = [self.play_mega]
         self.commands["^!joker$"] = [self.play_joker]
@@ -25,29 +25,33 @@ class Cribbage_Print(Game_Print):
     #Input: command string as defined in message.py for command helper functions
     #Output: the integer goal number passed by the player
     def change_goal_parse(self, parse_str):
-        return [parse_str[6:]]
+        return [int(parse_str[6:])]
 
     #Input: player as defined in message.py for commands and integer goal_num from change_goal_parse
     #Output: add_return print for message handler
     async def change_goal(self, player, goal_num):
         if player in self.game.get_players():
-            self.game.point_goal = int(goal_num)
-            return self.add_return([], f"{player.name} has changed the goal to {goal_num} points. Use **!start** to begin.")
-        
+            if goal_num != 0:
+                self.game.point_goal = goal_num
+                return self.add_return([], f"{player.name} has changed the goal to {goal_num} points. Use **!start** to begin.")
+            else:
+                return self.add_return([], f"Don't input 0. I better not catch you doing it again. :eyes:")
         return self.add_return([], f"You can't edit a game you're not in, {player.name}. Use **!join** to join.")
 
     #Input: command string as defined in message.py for command helper functions
     #Output: the integer goal number passed by the player
     def change_skunk_parse(self, parse_str):
-        return [parse_str[7:]]
+        return [int(parse_str[7:])]
 
     #Input: player as defined in message.py for commands and integer goal_num from change_skunk_parse
     #Output: add_return print for message handler
     async def change_skunk(self, player, skunk_num):
         if player in self.game.get_players():
-            self.game.skunk_length = int(skunk_num)
-            return self.add_return([], f"{player.name} has changed the skunk interval to {skunk_num} points. Use **!start** to begin.")
-        
+            if skunk_num != 0:
+                self.game.skunk_length = skunk_num
+                return self.add_return([], f"{player.name} has changed the skunk interval to {skunk_num} points. Use **!start** to begin.")
+            else:
+                return self.add_return([], f"Don't input 0. I better not catch you doing it again. :eyes:")
         return self.add_return([], f"You can't edit a game you're not in, {player.name}. Use **!join** to join.")
 
     #Input: player as defined in message.py for commands
@@ -263,38 +267,38 @@ class Cribbage_Print(Game_Print):
     
     def make_joker_parse(self, parse_str):
         #Split message into number and suit letter
-            try:
-                value_list = parse_str[1:].split()
-                value = ''
-                suit = ''
+        try:
+            value_list = parse_str[1:].split()
+            value = ''
+            suit = ''
 
-                #Get value of card
-                match value_list[0]:
-                    case 'a':
-                        value = dk.ACE
-                    case 'j':
-                        value = dk.JACK
-                    case 'q':
-                        value = dk.QUEEN
-                    case 'k':
-                        value = dk.KING
-                    case _:
-                        value = value_list[0]
+            #Get value of card
+            match value_list[0]:
+                case 'a':
+                    value = dk.ACE
+                case 'j':
+                    value = dk.JACK
+                case 'q':
+                    value = dk.QUEEN
+                case 'k':
+                    value = dk.KING
+                case _:
+                    value = value_list[0]
 
-                #Get suit of card
-                match value_list[1]:
-                    case 'h':
-                        suit = dk.HEART
-                    case 'd':
-                        suit = dk.DIAMOND
-                    case 'c':
-                        suit = dk.CLUB
-                    case 's':
-                        suit = dk.SPADE
+            #Get suit of card
+            match value_list[1]:
+                case 'h':
+                    suit = dk.HEART
+                case 'd':
+                    suit = dk.DIAMOND
+                case 'c':
+                    suit = dk.CLUB
+                case 's':
+                    suit = dk.SPADE
 
-                return [value, suit]
-            except:
-                return [None, None]
+            return [value, suit]
+        except:
+            return [None, None]
 
     #Function to turn joker into another card
     async def make_joker(self, player, value, suit):
