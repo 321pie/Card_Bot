@@ -17,35 +17,65 @@ class Cribbage_Print(Game_Print):
         self.commands["^!mega$"] = [self.play_mega]
         self.commands["^!joker$"] = [self.play_joker]
         self.commands["^!teams [0-9]+$"] = [self.create_teams, self.create_team_parse]
+        self.commands["^!goal [0-9]+$"] = [self.change_goal, self.change_goal_parse]
+        self.commands["^!skunk [0-9]+$"] = [self.change_skunk, self.change_skunk_parse]
 
         self.calc_string = "" #Saves most recent hand calculations
 
-    #Input: player and str as defined in message.py for commands
+    #Input: command string as defined in message.py for command helper functions
+    #Output: the integer goal number passed by the player
+    def change_goal_parse(self, parse_str):
+        return [parse_str[6:]]
+
+    #Input: player as defined in message.py for commands and integer goal_num from change_goal_parse
     #Output: add_return print for message handler
-    async def play_standard(self, player, _sent_str):
+    async def change_goal(self, player, goal_num):
+        if player in self.game.get_players():
+            self.game.point_goal = int(goal_num)
+            return self.add_return([], f"{player.name} has changed the goal to {goal_num} points. Use **!start** to begin.")
+        
+        return self.add_return([], f"You can't edit a game you're not in, {player.name}. Use **!join** to join.")
+
+    #Input: command string as defined in message.py for command helper functions
+    #Output: the integer goal number passed by the player
+    def change_skunk_parse(self, parse_str):
+        return [parse_str[7:]]
+
+    #Input: player as defined in message.py for commands and integer goal_num from change_skunk_parse
+    #Output: add_return print for message handler
+    async def change_skunk(self, player, skunk_num):
+        if player in self.game.get_players():
+            self.game.skunk_length = int(skunk_num)
+            return self.add_return([], f"{player.name} has changed the skunk interval to {skunk_num} points. Use **!start** to begin.")
+        
+        return self.add_return([], f"You can't edit a game you're not in, {player.name}. Use **!join** to join.")
+
+    #Input: player as defined in message.py for commands
+    #Output: add_return print for message handler
+    async def play_standard(self, player):
         if player in self.game.get_players():
             self.game.standard_mode()
-            return self.add_return([], player.name + f"{player.name} has changed the game to standard mode. Use !start to begin.")
+            return self.add_return([], f"{player.name} has changed the game to standard mode. Use **!start** to begin.")
         else:
-            return self.add_return([], player.name + f"You can't change a game mode you aren't queued for, {player.name}. Use !join to join the game.")
+            return self.add_return([], f"You can't change a game mode you aren't queued for, {player.name}. Use **!join** to join the game.")
         
-    #Input: player and str as defined in message.py for commands
+    #Input: player as defined in message.py for commands
     #Output: add_return print for message handler
-    async def play_mega(self, player, _sent_str):
+    async def play_mega(self, player):
         if player in self.game.get_players():
             self.game.mega_hand()
-            return self.add_return([], player.name + f"{player.name} has changed the game to mega hand mode. Use !standard to swap back or !start to begin.")
+            return self.add_return([], f"{player.name} has changed the game to mega hand mode. Use !standard to swap back or **!start** to begin.")
         else:
-            return self.add_return([], player.name + f"You can't change a game mode you aren't queued for, {player.name}. Use !join to join the game.")
+            return self.add_return([], f"You can't change a game mode you aren't queued for, {player.name}. Use **!join** to join the game.")
         
-    #Input: player and str as defined in message.py for commands
+    #Input: player as defined in message.py for commands
     #Output: add_return print for message handler
-    async def play_joker(self, player, _sent_str):
+    async def play_joker(self, player):
         if player in self.game.get_players():
             self.game.joker_mode()
-            return self.add_return([], player.name + f"{player.name} has changed the game to joker mode. Use !standard to swap back or !start to begin.")
+            return self.add_return([], f"{player.name} has changed the game to joker mode. Use !standard to swap back or **!start** to begin.")
         else:
-            return self.add_return([], player.name + f"You can't change a game mode you aren't queued for, {player.name}. Use !join to join the game.")
+            return self.add_return([], f"You can't change a game mode you aren't queued for, {player.name}. Use **!join** to join the game.")
         
     #Input: parse string of form "^!teams [0-9]+$"
     #Output: integer team count parsed from the string

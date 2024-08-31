@@ -38,11 +38,11 @@ class Game_Print():
             if(player not in self.game.get_players()):
                 if(len(self.game.get_players()) < self.game.max_player_count):
                     self.game.add_player(player)
-                    return self.add_return([], f"Welcome to the game, {player.name}! Type !start to begin game with {len(self.game.get_players())} players.")
+                    return self.add_return([], f"Welcome to the game, {player.name}! Type **!start** to begin game with {len(self.game.get_players())} players.")
                 else:
-                    return self.add_return([], f"Sorry, {player.name}. This game already has 8 players {[player.name for player in self.game.get_players()]}. If this is wrong, type !unjoinall.")
+                    return self.add_return([], f"Sorry, {player.name}. This game already has 8 players {[player.name for player in self.game.get_players()]}.")
             else:
-                return self.add_return([], f"You've already queued for this game, {player.name}. Type !start to begin game with {len(self.game.get_players())} players.")
+                return self.add_return([], f"You've already queued for this game, {player.name}. Type **!start** to begin game with {len(self.game.get_players())} players.")
         return []
 
     async def unjoin(self, player):
@@ -66,7 +66,7 @@ class Game_Print():
             else:
                 return self.add_return([], "Something went wrong when starting the game.")
         else:
-            return self.add_return([], f"You can't start a game you aren't queued for, {player.name}. Use !join to join the game.")
+            return self.add_return([], f"You can't start a game you aren't queued for, {player.name}. Use **!join** to join the game.")
         
     #Input: player and str as defined in message.py for commands
     #Output: add_return print for message handler
@@ -77,7 +77,7 @@ class Game_Print():
             #If end list (game started) initiated
             if (len(self.end) > 0) and (self.game.game_started):
                 self.end[self.game.get_players().index(player)] = True
-                self.add_return(return_list, f"{player.name} has voted to end the game early. Use !end to agree. Must be unanimous.")
+                self.add_return(return_list, f"{player.name} has voted to end the game early. Use **!end** to agree. Must be unanimous.")
                 
                 #If everyone has voted, end game
                 if self.end.count(True) == len(self.end):
@@ -100,9 +100,9 @@ class Game_Print():
     async def change_look(self, player, look):
         if player in self.game.get_players():
             self.deck_look = Print(look)
-            return self.add_return([], f"Appearance of deck has been changed to {look}! Use !start to try it out!")
+            return self.add_return([], f"Appearance of deck has been changed to {look}! Use **!start** to try it out!")
         else:
-            return self.add_return([], f"You can't edit a game you aren't queued for, {player.name}. Use !join to join the game.")
+            return self.add_return([], f"You can't edit a game you aren't queued for, {player.name}. Use **!join** to join the game.")
         
     #Get list of players in game
     def get_players(self):

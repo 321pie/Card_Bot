@@ -15,11 +15,12 @@ HELP_MESSAGE = '''The bot knows the following commands:
       Start Game:
         '**!join**': Let the bot know that you'd like to play cribbage.
         '**!unjoin**': Let the bot know that you changed your mind and don't want to play.
-        '**!start**': Starts a game with all players who have done !join
+        '**!start**': Starts a game with all players who have done !join.
+        '**!end**': Ends a game once all players have entered the command.
         '**![0-9]+**': Plays the card with the given index.
 
       Private Commands:
-        '**/hand**', '**/h**': View your hand.
+        '**/hand**': View your hand.
 
       Public Commands:
         '**/spectate**': View hands of all players (only works if not participating in the game).
@@ -41,6 +42,8 @@ HELP_MESSAGE = '''The bot knows the following commands:
         '**!joker**': Play a game of joker mode (2 wild cards).
         '**![A2-9JQK]|10 [HDCS]**': Used to transform the joker into the desired card.
         '**!teams [0-9]+**': Splits players into teams with the specified number of players on each team. Will automatically start the game.
+        '**!goal [0-9]+**': Set the amount of points needed to reach the goal to the provided number.
+        '**!skunk [0-9]+**': Set the skunk interval (default=30) to the provided number.
 
       Private Commands:
         '**/thrown**': View the cards you've most recently thrown away.'''
@@ -123,7 +126,7 @@ def make_cribbage(player):
     
     if cur_game == None:
         cur_game = Cribbage_Print()
-        return add_return([], f"{player.name} has created a cribbage game. Use !join to join it!")
+        return add_return([], f"{player.name} has created a cribbage game. Use **!join** to join it!")
     else:
         return add_return([], f"Sorry, {player.name}. You need to wait until the current game is created.")
 
