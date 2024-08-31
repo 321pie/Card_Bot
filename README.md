@@ -56,7 +56,7 @@ If you would like to enter the token manually, create a file called credentials.
 Replace YOUR_API_TOKEN_HERE with your discord bot's token.
 
 ### Creating Bot, Getting Token, and Inviting to Server:
-[Link to create a bot](https://discord.com/developers/applications).
+[Link to create a bot](https://discord.com/developers/applications)
 
 1) Select the "Applications" tab on the left and click the "New Application" button in the top right.
 
