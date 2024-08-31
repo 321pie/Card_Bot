@@ -16,6 +16,7 @@ class Game_Print():
             "^!unjion$": [self.unjoin],
             "^!start$": [self.start],
             "^!end$": [self.end_game],
+            "^!cats$": [self.change_look, self.change_look_parse],
             "^!classic$": [self.change_look, self.change_look_parse],
             "^!genshin$": [self.change_look, self.change_look_parse],
             "^!starwars$": [self.change_look, self.change_look_parse]
@@ -90,7 +91,9 @@ class Game_Print():
         return return_list
     
     def change_look_parse(self, parse_str):
-        if parse_str == "!genshin":
+        if parse_str == "!cats":
+            return [Print.CATS]
+        elif parse_str == "!genshin":
             return [Print.GENSHIN]
         elif parse_str == "!starwars":
             return [Print.STARWARS]

@@ -19,7 +19,7 @@ spectators = []
 spectator_messages = []
 
 #Gets the path for the images
-def get_path(self, limited_path):
+def get_path(limited_path):
     # if(EXECUTABLE_MODE):
     #     return sys.executable.rsplit('\\', 2)[0] + '\\' + limited_path
     # else:
@@ -67,7 +67,7 @@ def run_bot():
     #Sends the rules of cribbage
     @tree.command(name="rules", description='''See the rules.''')
     async def rules_command(interaction):
-        await interaction.response.send_message(content="Rules outlined below.", file=discord.File(get_path("rules.txt")), ephemeral=True)
+        await interaction.response.send_message(content="Rules outlined below.", file=discord.File(get_path("src\\rules.txt")), ephemeral=True)
 
     # #Sends each player's point total regardless of teams
     # @tree.command(name="points", description="See each player's point totals.")
@@ -150,17 +150,6 @@ def run_bot():
             return
         
         await message.process_message(msg)
-
-        # #If spectators, update hands
-        # if len(spectators) > 0:
-        #     hand_pic = await game.get_all_hand_pics()
-        #     player_text = ""
-        #     for player in game.players:
-        #         player_text += player.name + ", "
-        #     player_text = player_text[:-2] #Remove ", " from end
-
-        #     for spectator_message in spectator_messages:
-        #         await spectator_message.edit_original_response(content=player_text, attachments=[discord.File(hand_pic)])
 
     #On startup, sync command tree
     @client.event
