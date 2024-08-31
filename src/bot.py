@@ -44,17 +44,17 @@ def run_bot():
     #Sends picture of hand to user and adds hand to message.hand_messages for later reference
     @tree.command(name="hand", description="Get your current hand")
     async def hand_command(interaction):
-            hand_pic = None
-            for active_game in message.active_games:
-                if interaction.user in active_game.get_players():
-                    hand_pic = active_game.get_hand_pic(interaction.user) #Get hand pic to display (or None if invalid)
-                    active_game.delete_last_hand(interaction.user, interaction) #Delete old ephemeral message and create new one
-                    break
+        hand_pic = None
+        for active_game in message.active_games:
+            if interaction.user in active_game.get_players():
+                hand_pic = active_game.get_hand_pic(interaction.user) #Get hand pic to display (or None if invalid)
+                await active_game.delete_last_hand(interaction.user, interaction) #Delete old ephemeral message and create new one
+                break
 
-            if hand_pic == None:
-                await interaction.response.send_message("Failed to retrieve hand.", ephemeral=True)
-            else:
-                await interaction.response.send_message(content="Use command below card to play it.", file=discord.File(hand_pic), ephemeral=True)
+        if hand_pic == None:
+            await interaction.response.send_message("Failed to retrieve hand.", ephemeral=True)
+        else:
+            await interaction.response.send_message(content="Use command below card to play it.", file=discord.File(fp=hand_pic, filename="HandPic.png"), ephemeral=True)
 
     # #Sends calculations of most recent hand(s)/crib
     # @tree.command(name="calcs", description="Get the most recent hand calcs")

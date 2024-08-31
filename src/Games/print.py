@@ -1,8 +1,11 @@
+import copy
+import io
+import os
 from PIL import Image, ImageDraw, ImageFont
 import pygame as pg
-import os
-import deck
-import copy
+
+import Games.deck as deck
+
 
 class Print():
     CLASSIC = "Classic"
@@ -36,7 +39,7 @@ class Print():
         return Image.frombytes("RGBA", (surface.get_width(), surface.get_height()), pil_string_image)
     
     #Get single picture with all hands in it
-    def get_hand_pic(self, hands:list[list[deck.Card]], show_index=True) -> Image.Image:
+    def get_hand_pic(self, hands:list[list[deck.Card]], show_index=True):
         #Stores index number
         hand_index = 0
         max_hand_len = 0
@@ -61,11 +64,16 @@ class Print():
                 #For each card in hand
                 for card_index in range(len(hand)):
                     hands_img.paste(self.get_card(handCopy[card_index], hand.index(handCopy[card_index]), show_index), (card_index * self.card_width, hand_index * card_height))
-                    
-        #Return image path
-        return self.surface_to_pil_image(pg.transform.rotozoom(self.pil_image_to_surface(hands_img), 0, self.sprite_scalar))
+        
+        hands_img = self.surface_to_pil_image(pg.transform.rotozoom(self.pil_image_to_surface(hands_img), 0, self.sprite_scalar))
+        byte_image = io.BytesIO()
+        hands_img.save(byte_image, format='PNG')
+        byte_image.seek(0)
+
+        #return image as byte array
+        return byte_image
     
-#Returns an Image of the selected card
+    #Returns an Image of the selected card
     def get_card(self, card:deck.Card, index:int, showIndex:bool=False) -> Image.Image:
         #Define path to assets
         try:

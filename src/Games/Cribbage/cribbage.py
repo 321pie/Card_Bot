@@ -8,23 +8,23 @@ class Cribbage(game.Game):
     def __init__(self):
         super().__init__()
 
-        self.points = [] #Number of points, indexed same as players
-        self.backup_hands = [] #Hands that always have hand_size cards, indexed same as players
-        self.thrown_cards = [] #Cards that each player has thrown away, indexed same as players
-        self.crib = [] #Crib cards
+        self.points:list[int] = [] #Number of points, indexed same as players
+        self.backup_hands:list[list[deck.Card]] = [] #Hands that always have hand_size cards, indexed same as players
+        self.thrown_cards:list[deck.Card] = [] #Cards that each player has thrown away, indexed same as players
+        self.crib:list[deck.Card] = [] #Crib cards
         
-        self.num_thrown = [] #Number of cards thrown in crib, indexed same as players
-        self.pegging_list = [] #List of cards in pegging round
-        self.point_goal = 121 #Number of points to win
-        self.skunk_length = 30 #Number of points from skunk line to end -1
-        self.crib_count = 4 #Number of cards in crib
-        self.hand_size = 4 #Number of cards in a hand after throwing to crib
-        self.crib_index = 0 #crib_index++ each round. Crib belongs to players[crib_index%len(players)]
-        self.pegging_index = 0 #(crib_index + 1) % len(players)
-        self.throw_count = 0 #How many cards each player throws, initialized upon starting game
-        self.throw_away_phase = False #True if players still need to throw cards away
-        self.pegging_phase = False #True if players are in the pegging phase
-        self.team_count = 1 #Variable to hold number of players per team (combine points)
+        self.num_thrown:list[int] = [] #Number of cards thrown in crib, indexed same as players
+        self.pegging_list:list[deck.Card] = [] #List of cards in pegging round
+        self.point_goal:int = 121 #Number of points to win
+        self.skunk_length:int = 30 #Number of points from skunk line to end -1
+        self.crib_count:int = 4 #Number of cards in crib
+        self.hand_size:int = 4 #Number of cards in a hand after throwing to crib
+        self.crib_index:int = 0 #crib_index++ each round. Crib belongs to players[crib_index%len(players)]
+        self.pegging_index:int = 0 #(crib_index + 1) % len(players)
+        self.throw_count:int = 0 #How many cards each player throws, initialized upon starting game
+        self.throw_away_phase:bool = False #True if players still need to throw cards away
+        self.pegging_phase:bool = False #True if players are in the pegging phase
+        self.team_count:int = 1 #Variable to hold number of players per team (combine points)
 
     #Initializes the game on start
     #Returns 0 on success, -1 on failure
@@ -56,7 +56,6 @@ class Cribbage(game.Game):
         #Initiate player variables
         for _ in range(len(self.players)):
             self.points.append(0)
-            self.end.append(False)
             self.num_thrown.append(0)
             self.thrown_cards.append([])
 
@@ -198,9 +197,11 @@ class Cribbage(game.Game):
 
     #Checks if there is a joker in the crib. Returns True if there is. Else, returns False.
     def check_crib_joker(self) -> bool:
+        print("permission to choke")
         for card in self.crib:
             if card.value == deck.JOKER:
                 return True
+        print("Permission granted")
         
         return False
 
@@ -208,7 +209,7 @@ class Cribbage(game.Game):
     #NOTE: Card gets deleted, so don't modify self.hands. See self.card_select() for more details.
     def process_card_select(self, player_index:int, card_index:int) -> bool:
         #Make sure player isn't throwing extra away
-        if not self.is_finished_throwing(self.players(player_index)):
+        if not self.is_finished_throwing(self.players[player_index]):
             #Add card to crib and remove from hand
             card = self.hands[player_index][card_index]
             self.crib.append(card)
@@ -229,7 +230,7 @@ class Cribbage(game.Game):
             return False
 
         #If player hasn't thrown enough cards away, return False.
-        if(self.num_thrown[player_index] < self.throw_count):
+        if self.num_thrown[player_index] < self.throw_count:
             return False
 
         #If player has thrown enough cards away, return True.
@@ -356,7 +357,6 @@ class Cribbage(game.Game):
         self.hands = []
         self.backup_hands = []
         self.crib = []
-        self.end = []
         self.num_thrown = []
         self.pegging_list = []
         self.point_goal = 121
@@ -383,7 +383,7 @@ class Cribbage(game.Game):
             self.deck = deck.JokerDeck()
 
     #Finding Nibs  
-    def nibs(flipped):
+    def nibs(self, flipped):
         points = 0
 
         #For Nibs (flipping a jack)
@@ -433,3 +433,21 @@ class Cribbage(game.Game):
             points += 2
 
         return points
+    
+    #Returns the player whose crib it is
+    def get_crib_player(self):
+        return self.players[self.crib_index % len(self.players)]
+
+    #Returns the player whose turn it is to peg
+    def get_peg_player(self):
+        return self.players[self.pegging_index]
+
+    #Returns the hand of the specified player
+    def get_player_hand(self, player_index=None, player=None):
+        #Get based on index
+        if (player_index != None) and (player_index in range(len(self.players))):
+            return self.hands[player_index]
+
+        #Get based on player
+        if (player != None) and (player in self.players):
+            return self.hands[self.players.index(player)]

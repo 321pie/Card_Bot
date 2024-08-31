@@ -1,5 +1,8 @@
 # Card Bot
 
+This project is a rework of the [old Cribbage bot](https://github.com/AbbeyRDuBois/Cribbage_Counter).<br>
+Card Bot allows for multiple games to be added, and will likely grow with time.
+
 ### Requirements:
 * python 3
 * pip 3
@@ -53,7 +56,7 @@ If you would like to enter the token manually, create a file called credentials.
 Replace YOUR_API_TOKEN_HERE with your discord bot's token.
 
 ### Creating Bot, Getting Token, and Inviting to Server:
-You can create a bot here: https://discord.com/developers/applications.
+[Link to create a bot](https://discord.com/developers/applications).
 
 1) Select the "Applications" tab on the left and click the "New Application" button in the top right.
 
@@ -65,20 +68,20 @@ You can create a bot here: https://discord.com/developers/applications.
 
 5) In the Bot Permissions section, select the following (not all are used in current version of Cribbage Bot):
 
- - Manage Roles
- - Send Messages
- - Create Public Threads
- - Create Private Threads
- - Send Messages in Threads
- - Manage Messages
- - Manage Threads
- - Embed Links
- - Attach Files
- - Read Mesage History
- - Mention Everyone
- - Add Reactions
- - Use Slash Commands
- - Use Embedded Activities (x2)
+    * Manage Roles
+    * Send Messages
+    * Create Public Threads
+    * Create Private Threads
+    * Send Messages in Threads
+    * Manage Messages
+    * Manage Threads
+    * Embed Links
+    * Attach Files
+    * Read Mesage History
+    * Mention Everyone
+    * Add Reactions
+    * Use Slash Commands
+    * Use Embedded Activities (x2)
 
 6) Use the generated url at the bottom of the page to invite the bot to a server you have administrator access to.
 

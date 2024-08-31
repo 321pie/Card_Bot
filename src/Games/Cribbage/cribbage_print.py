@@ -17,51 +17,35 @@ class Cribbage_Print(Game_Print):
         self.commands["^!mega$"] = [self.play_mega]
         self.commands["^!joker$"] = [self.play_joker]
         self.commands["^!teams [0-9]+$"] = [self.create_teams, self.create_team_parse]
-        self.commands["^!end$"] = [self.end_game]
 
         self.calc_string = "" #Saves most recent hand calculations
-
-    #Input: player and str as defined in message.py for commands
-    #Output: add_return print for message handler
-    async def end_game(self, player, _sent_str):
-        return_list = []
-
-        if player in self.game.get_players():
-            if self.game.end_game(player) == True:
-                self.add_return(return_list, f"{player.name} has voted to end the game early. Use !end to agree. Must be unanimous.")
-                if self.game.game_started == False:
-                    self.add_return(return_list, "Game has been ended early.")
-                    self.add_return(return_list, self.get_winner_string(self.game.get_winner()))
-            else:
-                self.add_return(return_list, f"You've already voted to end the game early, {player.name}.")
-        else:
-            self.add_return(return_list, f"You're not in the game, {player.name}.")
-
-        return return_list
 
     #Input: player and str as defined in message.py for commands
     #Output: add_return print for message handler
     async def play_standard(self, player, _sent_str):
         if player in self.game.get_players():
             self.game.standard_mode()
+            return self.add_return([], player.name + f"{player.name} has changed the game to standard mode. Use !start to begin.")
         else:
-            return self.add_return([], player.name + f"You can't start a game you aren't queued for, {player.name}. Use !join to join the game.")
+            return self.add_return([], player.name + f"You can't change a game mode you aren't queued for, {player.name}. Use !join to join the game.")
         
     #Input: player and str as defined in message.py for commands
     #Output: add_return print for message handler
     async def play_mega(self, player, _sent_str):
         if player in self.game.get_players():
             self.game.mega_hand()
+            return self.add_return([], player.name + f"{player.name} has changed the game to mega hand mode. Use !standard to swap back or !start to begin.")
         else:
-            return self.add_return([], player.name + f"You can't start a game you aren't queued for, {player.name}. Use !join to join the game.")
+            return self.add_return([], player.name + f"You can't change a game mode you aren't queued for, {player.name}. Use !join to join the game.")
         
     #Input: player and str as defined in message.py for commands
     #Output: add_return print for message handler
     async def play_joker(self, player, _sent_str):
         if player in self.game.get_players():
             self.game.joker_mode()
+            return self.add_return([], player.name + f"{player.name} has changed the game to joker mode. Use !standard to swap back or !start to begin.")
         else:
-            return self.add_return([], player.name + f"You can't start a game you aren't queued for, {player.name}. Use !join to join the game.")
+            return self.add_return([], player.name + f"You can't change a game mode you aren't queued for, {player.name}. Use !join to join the game.")
         
     #Input: parse string of form "^!teams [0-9]+$"
     #Output: integer team count parsed from the string
@@ -74,7 +58,7 @@ class Cribbage_Print(Game_Print):
         #If teams are even, start game
         if (self.game.create_teams(team_count) == True):
             #Add the teams to be printed before the start returns (index=0)
-            self.game.create_teams()
+            self.game.create_teams(team_count)
             self.game.start_game()
             return self.add_return([], f"Teams of {team_count} have been formed:\n{self.get_teams_string()}", index=0)
         else:
@@ -101,11 +85,11 @@ class Cribbage_Print(Game_Print):
 
         return []
 
-    async def throw_away_phase_func(self, author, card_index):
+    async def throw_away_phase_func(self, player, card_index):
         return_list = []
 
         #Don't do anything if player not in game.
-        if(author not in self.game.get_players()):
+        if(player not in self.game.get_players()):
             return return_list
         
         #If player has joker card (joker mode), force them to make joker something before anybody throws.
@@ -113,16 +97,16 @@ class Cribbage_Print(Game_Print):
             return self.add_return(return_list, f"You can't throw away cards until {self.game.check_hand_joker().name} has chosen which card to turn their joker into.")
 
         #If throwing away a card fails, alert player.
-        if(self.game.throw_away_card(author, card_index) == False):
-            return self.add_return(return_list, f"You have already thrown away the required number of cards, {author.name}.")
+        if(self.game.card_select(player, card_index) == False):
+            return self.add_return(return_list, f"You have already thrown away the required number of cards, {player.name}.")
 
         #Update hand if applicable.
-        await self.update_hand(author)
+        await self.update_hand(player)
 
         #Check if everyone is done. If not, return. Else, get flipped card and begin pegging round.
-        if(self.game.is_finished_throwing(author)):
+        if(self.game.is_finished_throwing(player)):
             if(not self.game.everyone_is_finished_throwing()):
-                self.add_return(return_list, f'''{author.name} has finished putting cards in the crib.''')
+                self.add_return(return_list, f'''{player.name} has finished putting cards in the crib.''')
                 return return_list
             else:
                 self.game.prepare_pegging()
@@ -131,9 +115,9 @@ class Cribbage_Print(Game_Print):
                 #Add display text
                 flipped = self.game.deck.get_flipped()
                 if(flipped.value != dk.JACK):
-                    self.add_return(return_list, f'''{author.name} has finished putting cards in the crib.\nFlipped card is: {flipped.display()}.''')
+                    self.add_return(return_list, f'''{player.name} has finished putting cards in the crib.\nFlipped card is: {flipped.display()}.''')
                 else:
-                    self.add_return(return_list, f'''{author.name} has finished putting cards in the crib.\nFlipped card is: {flipped.display()}.\n{self.game.get_players()[self.game.crib_index % len(self.game.get_players())]} gets nibs for 2.''')
+                    self.add_return(return_list, f'''{player.name} has finished putting cards in the crib.\nFlipped card is: {flipped.display()}.\n{self.game.get_crib_player().name} gets nibs for 2.''')
                 
                 #Check for winner
                 if(self.game.get_winner() != None):
@@ -141,16 +125,16 @@ class Cribbage_Print(Game_Print):
                 
                 #Check for flipped joker
                 if(flipped.value == dk.JOKER):
-                    self.add_return(return_list, f"***{self.game.get_players()[self.game.crib_index % len(self.game.get_players())].name} must choose which card to turn the flipped joker into before game can proceed.***")
+                    self.add_return(return_list, f"***{self.game.get_crib_player().name} must choose which card to turn the flipped joker into before game can proceed.***")
                 else:
-                    self.add_return(return_list, f"Pegging will now begin with **{self.game.get_players()[self.game.pegging_index]}**.")
+                    self.add_return(return_list, f"Pegging will now begin with **{self.game.get_peg_player()}**.")
             
         return return_list
     
-    async def pegging_phase_func(self, author, card_index):
+    async def pegging_phase_func(self, player, card_index):
         return_list = []
 
-        peg_vars = self.game.peg(author, card_index)
+        peg_vars = self.game.peg(player, card_index)
         if(peg_vars == None):
             #If pegged out, end game
             if(self.game.get_winner() != None):
@@ -171,36 +155,36 @@ class Cribbage_Print(Game_Print):
             #Display data
             if(last_sum == cur_sum): #If no reset
                 if(points > 0):
-                    self.add_return(return_list, f'''{author.name} played {card.display()}, gaining {points} points and bringing the total to {cur_sum}.\nIt is now **{next_player}**'s turn to play.''')
+                    self.add_return(return_list, f'''{player.name} played {card.display()}, gaining {points} points and bringing the total to {cur_sum}.\nIt is now **{next_player}**'s turn to play.''')
                 else:
-                    self.add_return(return_list, f'''{author.name} played {card.display()}, bringing the total to {cur_sum}.\nIt is now **{next_player}**'s turn to play.''')
+                    self.add_return(return_list, f'''{player.name} played {card.display()}, bringing the total to {cur_sum}.\nIt is now **{next_player}**'s turn to play.''')
             else:
                 if(last_sum == 31):
-                    self.add_return(return_list, f'''{author.name} played {card.display()}, got {points} points and reached 31. Total is reset to 0.\nIt is now **{next_player}**'s turn to play.''')
+                    self.add_return(return_list, f'''{player.name} played {card.display()}, got {points} points and reached 31. Total is reset to 0.\nIt is now **{next_player}**'s turn to play.''')
                 else:
-                    self.add_return(return_list, f'''{author.name} played {card.display()}, got {points} point(s) including last card. Total is reset to 0.\nIt is now **{next_player}**'s turn to play.''')
+                    self.add_return(return_list, f'''{player.name} played {card.display()}, got {points} point(s) including last card. Total is reset to 0.\nIt is now **{next_player}**'s turn to play.''')
 
             #If player is out of cards, add message to print. Else, update hand.
             if(cur_player_hand_size != 0):
-                await self.update_hand(author)
+                await self.update_hand(player)
             else:
-                self.add_return(return_list, f"{author.name} has played their last card.", index=0)
+                self.add_return(return_list, f"{player.name} has played their last card.", index=0)
         else:
             #Prepare for next round
             my_sum = self.game.pegging_done()
 
             #Add last card data to 
             if(my_sum != 31):
-                self.add_return(return_list, f'''{author.name} played {card.display()}, got {points} point(s) including last card. Total is reset to 0.\n''')
+                self.add_return(return_list, f'''{player.name} played {card.display()}, got {points} point(s) including last card. Total is reset to 0.\n''')
             else:
-                self.add_return(return_list, f'''{author.name} played {card.display()}, got {points} points and reached 31. Total is reset to 0.\n''')
+                self.add_return(return_list, f'''{player.name} played {card.display()}, got {points} points and reached 31. Total is reset to 0.\n''')
                 
             self.add_return(return_list, f"Everyone is done pegging.\n")
-            
+
             if(self.game.check_crib_joker() == False):
                 await self.finished_pegging(return_list)
             else:
-                self.add_return(return_list, f"***{self.game.get_players()[self.game.crib_index % len(self.game.get_players())].name} must choose which card to turn the joker in their crib into before game can proceed.***")
+                self.add_return(return_list, f"***{self.game.get_players()[self.game.pegging_index].name} must choose which card to turn the joker in their crib into before game can proceed.***")
                 hand_pic = await self.game.get_hand_pic(-1)
                 self.add_return(return_list, hand_pic, isFile=True)
 
@@ -216,15 +200,15 @@ class Cribbage_Print(Game_Print):
         output_string = f"Flipped card: {self.game.deck.get_flipped().display()}\n"
 
         #Calculate points
-        for player_index in range(len(self.game.get_players())):
-            output_string += self.game.count_hand(self.game.get_players()[player_index])
+        for player in self.game.get_players():
+            output_string += self.count_hand(player)
             
             #Check for winner
             if(self.game.get_winner() != None):
                 return self.add_return(return_list, self.get_winner_string(self.game.get_winner()))
 
         #Calculate crib
-        output_string += self.game.count_crib()
+        output_string += self.count_crib()
 
         #Check for winner
         if(self.game.get_winner() != None):
@@ -238,15 +222,15 @@ class Cribbage_Print(Game_Print):
             await self.update_hand(self.game.get_players()[player_index])
 
         #Finalize and send output_string to group chat
-        output_string += f'''\nThrow {self.game.throw_count} cards into **{self.game.get_players()[self.game.crib_index % len(self.game.get_players())]}**'s crib.\n*Use "/h" or "/hand" to see your hand.*'''
+        output_string += self.get_start_string(player)
 
         return self.add_return(return_list, output_string)
 
     #Function to turn joker into another card
-    async def make_joker(self, author, message):
+    async def make_joker(self, player, message):
         return_list = []
 
-        if author in self.game.get_players():
+        if player in self.game.get_players():
             value = ''
             suit = ''
 
@@ -283,16 +267,16 @@ class Cribbage_Print(Game_Print):
             #Create card and get player index
             card = dk.Card(value, suit)
 
-            if self.game.change_hand_joker(card, author) == True:
+            if self.game.change_hand_joker(card, player) == True:
                 #Update hand if applicable
-                await self.update_hand(author)
+                await self.update_hand(player)
 
                 return self.add_return(return_list, f"Joker in hand has been made into {card.display()}.")
                 
             #Change flipped joker to specified card
-            elif self.game.change_flipped_joker(card, author) == True:
+            elif self.game.change_flipped_joker(card, player) == True:
                 if(card.value == dk.JACK):
-                    self.add_return(return_list, f"Flipped joker has been made into {card.display()}.\n{self.game.get_players()[self.game.crib_index % len(self.game.get_players())]} gets nibs for 2.\nPegging will now begin with **{self.game.get_players()[self.game.pegging_index]}**")
+                    self.add_return(return_list, f"Flipped joker has been made into {card.display()}.\n{self.game.get_players()[self.game.pegging_index].name} gets nibs for 2.\nPegging will now begin with **{self.game.get_players()[self.game.pegging_index]}**")
                     
                     #Check for winner
                     if(self.game.get_winner() != None):
@@ -303,14 +287,14 @@ class Cribbage_Print(Game_Print):
                     return self.add_return(return_list, f"Flipped joker has been made into {card.display()}.\nPegging will now begin with **{self.game.get_players()[self.game.pegging_index]}**")
                 
             #Change joker in crib to specified card
-            elif self.game.change_crib_joker(card, author) == True:
+            elif self.game.change_crib_joker(card, player) == True:
                 self.add_return(return_list, f"Joker in crib has been made into {card.display()}.")
                 await self.finished_pegging(return_list)
                 return return_list
 
-            return self.add_return(return_list, f"You need to have a joker in order to use this command, {author.name}.")
+            return self.add_return(return_list, f"You need to have a joker in order to use this command, {player.name}.")
         
-        return self.add_return(return_list, f"You need to be in the game to play, {author.name}. Use !join between games to join.")
+        return self.add_return(return_list, f"You need to be in the game to play, {player.name}. Use !join between games to join.")
     
     #Calculate hands, add points, and return a string with the details.
     def count_hand(self, player):
@@ -323,8 +307,9 @@ class Cribbage_Print(Game_Print):
         output_string = ""
 
         #Add points from hand
-        [get_points, get_output] = self.calculate_hand(self.game.hands[(player_index + self.game.crib_index + 1) % len(self.game.get_players())], self.game.deck.get_flipped())
-        self.game.points[(player_index + self.game.crib_index + 1) % len(self.game.get_players())] += get_points
+        [get_points, get_output] = self.calculate_hand(self.game.get_player_hand((player_index + self.game.get_players().index(self.game.get_crib_player()) + 1) % len(self.game.get_players())), self.game.deck.get_flipped())
+
+        self.game.points[(player_index + self.game.get_players().index(self.game.get_crib_player()) + 1) % len(self.game.get_players())] += get_points
 
         #Send calculation to variable in game.py
         self.calc_string += f"**{self.game.get_players()[(player_index + self.game.crib_index + 1) % len(self.game.get_players())]}'s Hand**:\n" + get_output + "\n\n"
@@ -336,7 +321,7 @@ class Cribbage_Print(Game_Print):
 
     def count_crib(self):
         #Calculate crib
-        [get_points, get_output] = self.game.calculate_crib(self.game.crib, self.game.deck.flipped)
+        [get_points, get_output] = self.calculate_crib(self.game.crib, self.game.deck.flipped)
         self.game.points[self.game.crib_index % len(self.game.get_players())] += get_points
         output_string = f"{self.game.get_players()[self.game.crib_index % len(self.game.get_players())].name}'s crib: {[crib_card.display() for crib_card in sorted(self.game.crib, key=lambda x: x.to_int_runs())]} for {get_points} points."
         
@@ -452,7 +437,7 @@ class Cribbage_Print(Game_Print):
     def nobs(self, hand, flipped, points=0, output_string=''):
         #For Nobs (suit of jack in hand matches the flipped suit)
         for card in hand:
-            if (card.suit == flipped.suit) and (card.value == self.game.deck.JACK):
+            if (card.suit == flipped.suit) and (card.value == dk.JACK):
                 output_string += "Nobs for 1\n"
                 points += 1
                 break
@@ -611,14 +596,21 @@ class Cribbage_Print(Game_Print):
         output_string += f"Total points: {points}"
 
         return points, output_string
-
-    #Returns the hand image if applicable, or None
+        
+    #Returns the string to be displayed when the game is started
     #NOTE: This function overrides the one defined in Game_Print
-    def get_hand_pic(self, player, show_index:bool=True):
-        if player in self.game.get_players():
-            hand_pic = self.deck_look.get_hand_pic([self.game.get_hand(player)], show_index)
+    def get_start_string(self, _player) -> str:
+        return f'''\nThrow {self.game.throw_count} cards into **{self.game.get_crib_player().name}**'s crib.\n*Use "/h" or "/hand" to see your hand.*'''
+    
+    #Returns the string to be displayed when the game is ended
+    #NOTE: This function overrides the one defined in Game_Print
+    def get_end_string(self, _player) -> str:
+        #Find winner based on number of points
+        winner = 0
+        for point_index in range(1, len(self.game.get_players())):
+            if(self.game.points[point_index] > self.game.points[winner]):
+                winner = point_index
+        winner = self.game.get_players()[winner]
 
-            #Convert image to bytes
-            byte_image = io.BytesIO()
-            hand_pic.save(byte_image, format='JPG')
-            return byte_image.getvalue()
+        #Get string based on current winner
+        return self.get_winner_string(winner)
