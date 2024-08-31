@@ -128,7 +128,7 @@ def make_cribbage(player):
         cur_game = Cribbage_Print()
         return add_return([], f"{player.name} has created a cribbage game. Use **!join** to join it!")
     else:
-        return add_return([], f"Sorry, {player.name}. You need to wait until the current game is created.")
+        return add_return([], f"Sorry, {player.name}. You need to wait until the current game is started to create another one.")
 
 #Give role to user
 async def give_role(member, role):
