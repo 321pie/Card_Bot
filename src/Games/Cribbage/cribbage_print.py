@@ -58,9 +58,14 @@ class Cribbage_Print(Game_Print):
         #If teams are even, start game
         if (self.game.create_teams(team_count) == True):
             #Add the teams to be printed before the start returns (index=0)
-            self.game.create_teams(team_count)
             self.game.start_game()
-            return self.add_return([], f"Teams of {team_count} have been formed:\n{self.get_teams_string()}", index=0)
+
+            #Initialize local vars
+            for _ in self.game.get_players():
+                self.end.append(False)
+                self.hand_messages.append(None)
+
+            return self.add_return([], f"Teams of {team_count} have been formed:\n{self.get_teams_string()}{self.get_start_string(_player)}", index=0)
         else:
             return False, self.add_return([], "There must be an equal number of players on each team in order to form teams.")
 

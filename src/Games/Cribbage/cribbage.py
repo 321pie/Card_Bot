@@ -197,11 +197,9 @@ class Cribbage(game.Game):
 
     #Checks if there is a joker in the crib. Returns True if there is. Else, returns False.
     def check_crib_joker(self) -> bool:
-        print("permission to choke")
         for card in self.crib:
             if card.value == deck.JOKER:
                 return True
-        print("Permission granted")
         
         return False
 
