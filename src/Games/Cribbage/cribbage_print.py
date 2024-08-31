@@ -12,7 +12,7 @@ class Cribbage_Print(Game_Print):
         super().__init__()
         self.game = Cribbage()
         self.commands["^![0-9]+$"] = [self.select_card, self.select_card_parse]
-        self.commands["^![a2-9jqk]|10 [hdcs]$"] = [self.make_joker]
+        self.commands["^![a2-9jqk]|10 [hdcs]$"] = [self.make_joker, self.make_joker_parse]
         self.commands["^!standard$"] = [self.play_standard]
         self.commands["^!mega$"] = [self.play_mega]
         self.commands["^!joker$"] = [self.play_joker]
@@ -260,18 +260,13 @@ class Cribbage_Print(Game_Print):
         output_string += self.get_start_string(player)
 
         return self.add_return(return_list, output_string)
-
-    #Function to turn joker into another card
-    async def make_joker(self, player, message):
-        return_list = []
-
-        if player in self.game.get_players():
-            value = ''
-            suit = ''
-
-            #Split message into number and suit letter
+    
+    def make_joker_parse(self, parse_str):
+        #Split message into number and suit letter
             try:
-                value_list = message[1:].split()
+                value_list = parse_str[1:].split()
+                value = ''
+                suit = ''
 
                 #Get value of card
                 match value_list[0]:
@@ -296,7 +291,18 @@ class Cribbage_Print(Game_Print):
                         suit = dk.CLUB
                     case 's':
                         suit = dk.SPADE
+
+                return [value, suit]
             except:
+                return [None, None]
+
+    #Function to turn joker into another card
+    async def make_joker(self, player, value, suit):
+        return_list = []
+
+        if player in self.game.get_players():
+            #Split message into number and suit letter
+            if (value == None) or (suit == None):
                 return self.add_return(return_list, "Failed to parse joker message.")
             
             #Create card and get player index

@@ -137,7 +137,7 @@ async def give_role(member, role):
 
 async def run_commands(player, message, game):
     for command in game.commands:
-        if re.search(command, message) != None:
+        if re.fullmatch(command, message) != None:
             func_list = game.commands[command]
             if len(func_list) > 1:
                 return await func_list[0](player, *(func_list[1](message)))
