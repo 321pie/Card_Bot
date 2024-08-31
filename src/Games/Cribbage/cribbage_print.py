@@ -606,11 +606,10 @@ class Cribbage_Print(Game_Print):
     #NOTE: This function overrides the one defined in Game_Print
     def get_end_string(self, _player) -> str:
         #Find winner based on number of points
-        winner = 0
+        winner_index = 0
         for point_index in range(1, len(self.game.get_players())):
-            if(self.game.points[point_index] > self.game.points[winner]):
-                winner = point_index
-        winner = self.game.get_players()[winner]
-
+            if(self.game.points[point_index] > self.game.points[winner_index]):
+                winner_index = point_index
+        
         #Get string based on current winner
-        return self.get_winner_string(winner)
+        return self.get_winner_string(self.game.get_players()[winner_index])
