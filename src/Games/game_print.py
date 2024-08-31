@@ -100,9 +100,9 @@ class Game_Print():
     async def change_look(self, player, look):
         if player in self.game.get_players():
             self.deck_look = Print(look)
-            return self.add_return([], f"Appearance of deck has been changed to {look}! Use **!start** to try it out!")
+            return self.add_return([], f"Appearance of deck has been changed to {look}!")
         else:
-            return self.add_return([], f"You can't edit a game you aren't queued for, {player.name}. Use **!join** to join the game.")
+            return self.add_return([], f"You can't edit a game you aren't a part of, {player.name}. Use **!join** to join an unstarted game.")
         
     #Get list of players in game
     def get_players(self):
