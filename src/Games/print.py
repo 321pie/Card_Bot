@@ -4,7 +4,7 @@ import os
 from PIL import Image, ImageDraw, ImageFont
 import pygame as pg
 
-import Games.deck as deck
+import deck as deck
 
 
 class Print():
@@ -15,8 +15,8 @@ class Print():
     
     def __init__(self, custom_deck):
         #The size of the sprites
-        self.card_width = 157 #Width of each card
-        self.card_height = 221 #Height of each card
+        self.card_width = 315 #Width of each card
+        self.card_height = 441 #Height of each card
         self.custom_deck = custom_deck
 
         #This one can change as needed
@@ -65,7 +65,6 @@ class Print():
                 for card_index in range(len(hand)):
                     hands_img.paste(self.get_card(handCopy[card_index], hand.index(handCopy[card_index]), show_index), (card_index * self.card_width, hand_index * card_height))
         
-        hands_img = self.surface_to_pil_image(pg.transform.rotozoom(self.pil_image_to_surface(hands_img), 0, self.sprite_scalar))
         byte_image = io.BytesIO()
         hands_img.save(byte_image, format='PNG')
         byte_image.seek(0)
@@ -78,6 +77,7 @@ class Print():
         #Define path to assets
         try:
             asset_file_path = self.get_path(f'src\\card_art\\{self.custom_deck}_Deck.png')
+            sprite_sheet = Image.open(asset_file_path)
         except:
             return None
 
@@ -104,14 +104,13 @@ class Print():
             else:
                 column = 3
 
-        x_coord = self.card_width * (column - 1) 
-        y_coord = self.card_height * row
+        left = self.card_width * (column - 1)
+        top = self.card_height * row
+        right = left + self.card_width
+        bottom = top + self.card_height
 
         #Grab card from sprite sheet and save it
-        sheet = pg.image.load(asset_file_path)
-        card_image = sheet.subsurface((x_coord, y_coord, self.card_width, self.card_height))
-
-        card_image = self.surface_to_pil_image(card_image)
+        card = sprite_sheet.crop((left, top, right, bottom))
 
         #Add index (![0-9]) to card
         if showIndex:
@@ -120,7 +119,7 @@ class Print():
             index_card = Image.new('RGB', (self.card_width, self.card_height + bar_height), color=(0,0,0))
 
             #Paste card image so there is a bar under the card now
-            index_card.paste(card_image, (0,0))
+            index_card.paste(card, (0,0))
 
             draw = ImageDraw.Draw(index_card)
             try:
@@ -134,4 +133,4 @@ class Print():
             return index_card
 
         #Return image path
-        return card_image
+        return card
