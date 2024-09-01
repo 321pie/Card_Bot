@@ -207,14 +207,17 @@ class Cribbage_Print(Game_Print):
             #Display data
             if(last_sum == cur_sum): #If no reset
                 if(points > 0):
-                    self.add_return(return_list, f'''{player} played {card.display()}, gaining {points} points and bringing the total to {cur_sum}.\nIt is now **{next_player}**'s turn to play.''', self.deck_look.get_hand_pic([[card]], show_index=False))
+                    self.add_return(return_list, f'''{player} played {card.display()}, gaining {points} points and bringing the total to {cur_sum}.''', self.deck_look.get_hand_pic([[card]], show_index=False))
                 else:
-                    self.add_return(return_list, f'''{player} played {card.display()}, bringing the total to {cur_sum}.\nIt is now **{next_player}**'s turn to play.''', self.deck_look.get_hand_pic([[card]], show_index=False))
+                    self.add_return(return_list, f'''{player} played {card.display()}, bringing the total to {cur_sum}.''', self.deck_look.get_hand_pic([[card]], show_index=False))
             else:
                 if(last_sum == 31):
-                    self.add_return(return_list, f'''{player} played {card.display()}, got {points} points and reached 31. Total is reset to 0.\nIt is now **{next_player}**'s turn to play.''', self.deck_look.get_hand_pic([[card]], show_index=False))
+                    self.add_return(return_list, f'''{player} played {card.display()}, got {points} points and reached 31. Total is reset to 0.''', self.deck_look.get_hand_pic([[card]], show_index=False))
                 else:
-                    self.add_return(return_list, f'''{player} played {card.display()}, got {points} point(s) including last card. Total is reset to 0.\nIt is now **{next_player}**'s turn to play.''', self.deck_look.get_hand_pic([[card]], show_index=False))
+                    self.add_return(return_list, f'''{player} played {card.display()}, got {points} point(s) including last card. Total is reset to 0.''', self.deck_look.get_hand_pic([[card]], show_index=False))
+            
+            #Add player's turn below card played
+            self.add_return(return_list, f"It is now **{next_player}**'s turn to play.")
 
             #If player is out of cards, add message to print. Else, update hand.
             if(cur_player_hand_size != 0):
@@ -253,9 +256,10 @@ class Cribbage_Print(Game_Print):
         output_string = f"Flipped card: {self.game.deck.get_flipped().display()}\n"
 
         #Calculate points
+        all_hands = self.game.get_hands()
         for player in self.game.get_players():
             output_string += self.count_hand(player)
-            pic_list += [copy.copy(self.game.hands[self.game.get_players().index(player)])]
+            pic_list += [all_hands[self.game.get_players().index(player)]]
             
             #Check for winner
             if(self.game.get_winner() != None):
@@ -263,7 +267,8 @@ class Cribbage_Print(Game_Print):
 
         #Calculate crib
         output_string += self.count_crib()
-        pic_list += [copy.copy(self.game.crib)]
+        pic_list += [self.game.get_crib()]
+        self.add_return(return_list, output_string, self.deck_look.get_hand_pic(pic_list, show_index=False))
 
         #Check for winner
         if(self.game.get_winner() != None):
@@ -277,9 +282,7 @@ class Cribbage_Print(Game_Print):
             await self.update_hand(self.game.get_players()[player_index])
 
         #Finalize and send output_string to group chat
-        output_string += "\n" + self.get_start_string(player)
-
-        return self.add_return(return_list, output_string, self.deck_look.get_hand_pic(pic_list, show_index=False))
+        return self.add_return(return_list, f"**Total Points**:\n{self.get_point_string()}\n" + self.get_start_string(player))
     
     def make_joker_parse(self, parse_str):
         #Split message into number and suit letter
@@ -389,9 +392,6 @@ class Cribbage_Print(Game_Print):
         #Send calculation to variable in game.py
         self.calc_string += f"**{self.game.get_players()[self.game.crib_index % len(self.game.get_players())]}'s Crib**:\n" + get_output + "\n\n"
 
-        #Add total points for each person to the group chat variable
-        output_string += f"\nTotal Points:\n{self.get_point_string()}"
-
         return output_string
 
     #Get string of hand to print for player at given index
@@ -479,16 +479,16 @@ class Cribbage_Print(Game_Print):
         #Else, print out teams and points for team
         if self.game.team_count == 1 or always_solo == True:
             for player_index in range(len(self.game.get_players())):
-                output_string += f"{self.game.get_players()[player_index]} has {self.game.points[player_index]} points.\n"
+                output_string += f"**{self.game.get_players()[player_index]}** has {self.game.points[player_index]} points.\n"
         else:
             point_count = 0
             num_teams = len(self.game.get_players()) // self.game.team_count
 
             for team_num in range(num_teams):
-                output_string += f"Team {team_num} ("
+                output_string += f"**Team {team_num}** ("
                 for player in range(self.game.team_count):
                     point_count += self.game.points[player*num_teams + team_num]
-                    output_string += f"{self.game.get_players()[player*num_teams + team_num]}, "
+                    output_string += f"*{self.game.get_players()[player*num_teams + team_num]}*, "
                 output_string = output_string[:-2] + f") has {point_count} points.\n"
                 point_count = 0
 

@@ -449,3 +449,11 @@ class Cribbage(game.Game):
         #Get based on player
         if (player != None) and (player in self.players):
             return self.hands[self.players.index(player)]
+        
+    #Returns all hands
+    def get_hands(self) -> list[list[deck.Card]]:
+        return copy.copy(self.hands)
+    
+    #Returns crib
+    def get_crib(self) -> list[deck.Card]:
+        return copy.copy(self.crib)

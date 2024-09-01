@@ -96,7 +96,7 @@ async def handle_user_messages(msg):
             return return_var
     
     #Commands to add a game
-    if message == "!cribbage":
+    if message == "!cribbage" or message == "!cr":
         return make_cribbage(player)
     
     #Roles
