@@ -97,7 +97,7 @@ class Print():
                 row = 3
         #Jokers are in a different place, so get those
         else:
-            row = 5 #5th row
+            row = 4
 
             if card.suit == deck.RED:
                 column = 1
