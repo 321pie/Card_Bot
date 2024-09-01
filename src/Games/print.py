@@ -15,8 +15,9 @@ class Print():
     
     def __init__(self, custom_deck):
         #The size of the sprites
-        self.card_width = 157 #Width of each card
-        self.card_height = 221 #Height of each card
+        self.card_width = 315 #Width of each card
+        self.card_height = 438 #Height of each card
+        self.bar_height = 75 #Height of the bar that holds the index
         self.custom_deck = custom_deck
 
         #This one can change as needed
@@ -46,7 +47,7 @@ class Print():
         card_height = self.card_height
 
         if show_index:
-            card_height += 50
+            card_height += self.bar_height
 
         for hand in hands:
             if len(hand) > max_hand_len:
@@ -64,8 +65,9 @@ class Print():
                 #For each card in hand
                 for card_index in range(len(hand)):
                     hands_img.paste(self.get_card(handCopy[card_index], hand.index(handCopy[card_index]), show_index), (card_index * self.card_width, hand_index * card_height))
-        
-        hands_img = self.surface_to_pil_image(pg.transform.rotozoom(self.pil_image_to_surface(hands_img), 0, self.sprite_scalar))
+
+        new_size = (int(self.card_width * max_hand_len * self.sprite_scalar), int(card_height*len(hands) * self.sprite_scalar))
+        hands_img = hands_img.resize(new_size, Image.Resampling.LANCZOS)
         byte_image = io.BytesIO()
         hands_img.save(byte_image, format='PNG')
         byte_image.seek(0)
@@ -78,6 +80,7 @@ class Print():
         #Define path to assets
         try:
             asset_file_path = self.get_path(f'src\\card_art\\{self.custom_deck}_Deck.png')
+            sprite_sheet = Image.open(asset_file_path)
         except:
             return None
 
@@ -104,34 +107,32 @@ class Print():
             else:
                 column = 3
 
-        x_coord = self.card_width * (column - 1) 
-        y_coord = self.card_height * row
+        left = self.card_width * (column - 1)
+        top = self.card_height * row
+        right = left + self.card_width
+        bottom = top + self.card_height
 
         #Grab card from sprite sheet and save it
-        sheet = pg.image.load(asset_file_path)
-        card_image = sheet.subsurface((x_coord, y_coord, self.card_width, self.card_height))
-
-        card_image = self.surface_to_pil_image(card_image)
+        card_img = sprite_sheet.crop((left, top, right, bottom))
 
         #Add index (![0-9]) to card
         if showIndex:
-            bar_height = 50
             #Create black rectangle that is slightly taller than card height
-            index_card = Image.new('RGB', (self.card_width, self.card_height + bar_height), color=(0,0,0))
+            index_card = Image.new('RGB', (self.card_width, self.card_height + self.bar_height), color=(0,0,0))
 
             #Paste card image so there is a bar under the card now
-            index_card.paste(card_image, (0,0))
+            index_card.paste(card_img, (0,0))
 
             draw = ImageDraw.Draw(index_card)
             try:
-                font = ImageFont.truetype(f"src\\Font\\{self.custom_deck}_Font.ttf", 40)
+                font = ImageFont.truetype(f"src\\Font\\{self.custom_deck}_Font.ttf", 55)
             except:
                 return None
 
             #Adding the text to bar
             text = "!" + str(index)
-            draw.text((self.card_width / 2.5, self.card_height - 5), text, font=font, fill=(255, 255,255))
+            draw.text((self.card_width / 2.2, self.card_height), text, font=font, fill=(255, 255,255))
             return index_card
 
         #Return image path
-        return card_image
+        return card_img
