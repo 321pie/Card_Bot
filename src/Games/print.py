@@ -4,7 +4,7 @@ import os
 from PIL import Image, ImageDraw, ImageFont
 import pygame as pg
 
-import deck as deck
+import Games.deck as deck
 
 
 class Print():
@@ -17,6 +17,7 @@ class Print():
         #The size of the sprites
         self.card_width = 315 #Width of each card
         self.card_height = 438 #Height of each card
+        self.bar_height = 75 #Height of the bar that holds the index
         self.custom_deck = custom_deck
 
         #This one can change as needed
@@ -46,7 +47,7 @@ class Print():
         card_height = self.card_height
 
         if show_index:
-            card_height += 50
+            card_height += self.bar_height
 
         for hand in hands:
             if len(hand) > max_hand_len:
@@ -114,22 +115,21 @@ class Print():
 
         #Add index (![0-9]) to card
         if showIndex:
-            bar_height = 50
             #Create black rectangle that is slightly taller than card height
-            index_card = Image.new('RGB', (self.card_width, self.card_height + bar_height), color=(0,0,0))
+            index_card = Image.new('RGB', (self.card_width, self.card_height + self.bar_height), color=(0,0,0))
 
             #Paste card image so there is a bar under the card now
             index_card.paste(card, (0,0))
 
             draw = ImageDraw.Draw(index_card)
             try:
-                font = ImageFont.truetype(f"src\\Font\\{self.custom_deck}_Font.ttf", 40)
+                font = ImageFont.truetype(f"src\\Font\\{self.custom_deck}_Font.ttf", 55)
             except:
                 return None
 
             #Adding the text to bar
             text = "!" + str(index)
-            draw.text((self.card_width / 2.5, self.card_height - 5), text, font=font, fill=(255, 255,255))
+            draw.text((self.card_width / 2.2, self.card_height), text, font=font, fill=(255, 255,255))
             return index_card
 
         #Return image path
