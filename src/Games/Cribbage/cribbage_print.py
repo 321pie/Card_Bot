@@ -258,8 +258,9 @@ class Cribbage_Print(Game_Print):
         #Calculate points
         all_hands = self.game.get_hands()
         for player in self.game.get_players():
-            output_string += self.count_hand(player)
-            pic_list += [all_hands[self.game.get_players().index(player)]]
+            index = (self.game.get_player_index(player) + self.game.get_players().index(self.game.get_crib_player()) + 1) % len(self.game.get_players())
+            output_string += self.count_hand(self.game.get_players()[index])
+            pic_list += [all_hands[index]]
             
             #Check for winner
             if(self.game.get_winner() != None):
@@ -363,23 +364,22 @@ class Cribbage_Print(Game_Print):
     #Calculate hands, add points, and return a string with the details.
     def count_hand(self, player):
         #Get player index
-        player_index = self.game.get_player_index(player)
-        if player_index == None:
-            return ""
+        if player not in self.game.get_players():
+            return False
 
         #Variable to hold output
         output_string = ""
 
         #Add points from hand
-        [get_points, get_output] = self.calculate_hand(self.game.get_player_hand((player_index + self.game.get_players().index(self.game.get_crib_player()) + 1) % len(self.game.get_players())), self.game.deck.get_flipped())
+        [get_points, get_output] = self.calculate_hand(self.game.get_player_hand(player=player), self.game.deck.get_flipped())
 
-        self.game.points[(player_index + self.game.get_players().index(self.game.get_crib_player()) + 1) % len(self.game.get_players())] += get_points
+        self.game.points[self.game.get_player_index(player)] += get_points
 
         #Send calculation to variable in game.py
-        self.calc_string += f"**{self.game.get_players()[(player_index + self.game.crib_index + 1) % len(self.game.get_players())]}'s Hand**:\n" + get_output + "\n\n"
+        self.calc_string += f"**{player}'s Hand**:\n" + get_output + "\n\n"
 
         #Add data to group output
-        output_string += f"{self.game.get_players()[(player_index + self.game.crib_index + 1) % len(self.game.get_players())]}'s hand: {[hand_card.display() for hand_card in sorted(self.game.hands[(player_index + self.game.crib_index + 1) % len(self.game.get_players())], key=lambda x: x.to_int_runs())]} for {get_points} points.\n"
+        output_string += f"{player}'s hand: {[hand_card.display() for hand_card in sorted(self.game.hands[self.game.get_player_index(player)], key=lambda x: x.to_int_runs())]} for {get_points} points.\n"
 
         return output_string
 
@@ -414,9 +414,9 @@ class Cribbage_Print(Game_Print):
         team_list = ""
         num_teams = num_players // self.game.team_count
         for team_num in range(num_teams):
-            team_list += f"Team {team_num}: "
+            team_list += f"**Team {team_num}**: "
             for player in range(self.game.team_count):
-                team_list += f"{self.game.get_players()[player*num_teams + team_num]}, "
+                team_list += f"*{self.game.get_players()[player*num_teams + team_num]}*, "
             team_list = team_list[:-2] + "\n"
 
         return team_list
