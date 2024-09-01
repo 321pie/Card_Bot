@@ -65,7 +65,9 @@ class Print():
                 #For each card in hand
                 for card_index in range(len(hand)):
                     hands_img.paste(self.get_card(handCopy[card_index], hand.index(handCopy[card_index]), show_index), (card_index * self.card_width, hand_index * card_height))
-        
+
+        new_size = (int(self.card_width * max_hand_len * self.sprite_scalar), int(card_height*len(hands) * self.sprite_scalar))
+        hands_img = hands_img.resize(new_size, Image.Resampling.LANCZOS)
         byte_image = io.BytesIO()
         hands_img.save(byte_image, format='PNG')
         byte_image.seek(0)
