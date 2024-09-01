@@ -111,7 +111,7 @@ class Print():
         bottom = top + self.card_height
 
         #Grab card from sprite sheet and save it
-        card = sprite_sheet.crop((left, top, right, bottom))
+        card_img = sprite_sheet.crop((left, top, right, bottom))
 
         #Add index (![0-9]) to card
         if showIndex:
@@ -119,7 +119,7 @@ class Print():
             index_card = Image.new('RGB', (self.card_width, self.card_height + self.bar_height), color=(0,0,0))
 
             #Paste card image so there is a bar under the card now
-            index_card.paste(card, (0,0))
+            index_card.paste(card_img, (0,0))
 
             draw = ImageDraw.Draw(index_card)
             try:
@@ -133,4 +133,4 @@ class Print():
             return index_card
 
         #Return image path
-        return card
+        return card_img
