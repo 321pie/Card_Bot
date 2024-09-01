@@ -23,10 +23,8 @@ HELP_MESSAGE = '''The bot knows the following commands:
         '**/hand**': View your hand.
 
       Public Commands:
-        '**/spectate**': View hands of all players (only works if not participating in the game).
+        '**/spectate**': View hands of all players (only works if not participating in the game). TODO: NOT IMPLEMENTED
         '**/calcs**': View how points were obtained in the previous round (hands and crib).
-        '**/points**': View current number of points each PLAYER has at current point in time.
-        '**/team_points**': View current number of points each team has at current point in time.
         '**/help**': Display orders that the bot can execute.
         '**/rules**': Show the rules of cribbage.
 
@@ -44,9 +42,8 @@ HELP_MESSAGE = '''The bot knows the following commands:
         '**!teams [0-9]+**': Splits players into teams with the specified number of players on each team. Will automatically start the game.
         '**!goal [0-9]+**': Set the amount of points needed to reach the goal to the provided number.
         '**!skunk [0-9]+**': Set the skunk interval (default=30) to the provided number.
-
-      Private Commands:
-        '**/thrown**': View the cards you've most recently thrown away.'''
+        '**!points**': View current number of points each PLAYER has at current point in time.
+        '**!team_points**': View current number of points each team has at current point in time.'''
 
 async def process_message(msg):
     try:
@@ -59,17 +56,6 @@ async def process_message(msg):
                     await msg.channel.send(content=item[0], file=discord.File(item[1]))
     except Exception as error:
         print(error)
-
-def add_return(return_list, return_string, file=None, index=None):
-    if(index == None):
-        index = len(return_list)
-
-    if(index >= len(return_list)):
-        return_list.append([return_string, file])
-    elif(index < len(return_list)):
-        return_list.insert(index, [return_string, file])
-
-    return return_list
 
 async def handle_user_messages(msg):
     global active_games
@@ -130,14 +116,14 @@ def make_cribbage(player):
     
     if cur_game == None:
         cur_game = Cribbage_Print()
-        return add_return([], f"{player.name} has created a cribbage game. Use **!join** to join it!")
+        return gp().add_return([], f"{player.name} has created a cribbage game. Use **!join** to join it!")
     else:
-        return add_return([], f"Sorry, {player.name}. You need to wait until the current game is started to create another one.")
+        return gp().add_return([], f"Sorry, {player.name}. You need to wait until the current game is started to create another one.")
 
 #Give role to user
 async def give_role(member, role):
     await member.edit(roles=[discord.utils.get(member.guild.roles, name=role)])
-    return add_return([], member.name + ' is now a ' + role + '!')
+    return gp().add_return([], member.name + ' is now a ' + role + '!')
 
 async def run_commands(player, message, game):
     for command in game.commands:

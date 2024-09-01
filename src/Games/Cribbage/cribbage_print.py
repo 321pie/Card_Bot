@@ -19,8 +19,20 @@ class Cribbage_Print(Game_Print):
         self.commands["^!teams [0-9]+$"] = [self.create_teams, self.create_team_parse]
         self.commands["^!goal [0-9]+$"] = [self.change_goal, self.change_goal_parse]
         self.commands["^!skunk [0-9]+$"] = [self.change_skunk, self.change_skunk_parse]
+        self.commands["^!points$"] = [self.get_points]
+        self.commands["^!tpoints$"] = [self.get_team_points]
 
         self.calc_string = "" #Saves most recent hand calculations
+
+    #Input: player as defined in message.py for commands
+    #Output: add_return print for message handler
+    async def get_team_points(self, _player):
+        return self.add_return([], self.get_point_string())
+    
+    #Input: player as defined in message.py for commands
+    #Output: add_return print for message handler
+    async def get_points(self, _player):
+        return self.add_return([], self.get_point_string(True))
 
     #Input: command string as defined in message.py for command helper functions
     #Output: the integer goal number passed by the player
@@ -33,7 +45,8 @@ class Cribbage_Print(Game_Print):
         if player in self.game.get_players():
             if goal_num != 0:
                 self.game.point_goal = goal_num
-                return self.add_return([], f"{player.name} has changed the goal to {goal_num} points. Use **!start** to begin.")
+
+                return self.add_return([] if goal_num<1000 else self.add_return([], f"You've messed up, hun. Use **end** to surrender if you even dare to **!start** in the first place."), f"{player.name} has changed the goal to {goal_num} points. Use **!start** to begin.")
             else:
                 return self.add_return([], f"Don't input 0. I better not catch you doing it again. :eyes:")
         return self.add_return([], f"You can't edit a game you're not in, {player.name}. Use **!join** to join.")

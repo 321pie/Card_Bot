@@ -137,6 +137,7 @@ class Game_Print():
                 return self.deck_look.get_hand_pic([hand], show_index)
         
         return None
+    
 ###############################################################################
 # List of common functions that may be implemented
 ###############################################################################
