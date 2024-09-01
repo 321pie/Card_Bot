@@ -479,7 +479,7 @@ class Cribbage_Print(Game_Print):
         #Else, print out teams and points for team
         if self.game.team_count == 1 or always_solo == True:
             for player_index in range(len(self.game.get_players())):
-                output_string += f"**{self.game.get_players()[player_index]}** has {self.game.points[player_index]} points.\n"
+                output_string += f"*{self.game.get_players()[player_index]}* has {self.game.points[player_index]} points.\n"
         else:
             point_count = 0
             num_teams = len(self.game.get_players()) // self.game.team_count
