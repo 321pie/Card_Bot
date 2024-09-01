@@ -34,7 +34,7 @@ HELP_MESSAGE = '''The bot knows the following commands:
 
     ***Cribbage***:
       Start Game:
-        '**!cribbage**': Create a game of Cribbage.
+        '**!cribbage**', '**!cr**': Create a game of Cribbage.
         '**!standard**': Play a regular game of cribbage (default).
         '**!mega**': Play a game of mega hand (8 cards, twice as many points to win).
         '**!joker**': Play a game of joker mode (2 wild cards).
