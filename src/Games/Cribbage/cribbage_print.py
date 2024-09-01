@@ -46,7 +46,7 @@ class Cribbage_Print(Game_Print):
             if goal_num != 0:
                 self.game.point_goal = goal_num
 
-                return self.add_return([] if goal_num<1000 else self.add_return([], f"You've messed up, hun. Use **end** to surrender if you even dare to **!start** in the first place."), f"{player.name} has changed the goal to {goal_num} points. Use **!start** to begin.")
+                return self.add_return([] if goal_num<1000 else self.add_return([], f"You've messed up, hun. Use **!end** to surrender if you even dare to **!start** in the first place."), f"{player.name} has changed the goal to {goal_num} points. Use **!start** to begin.")
             else:
                 return self.add_return([], f"Don't input 0. I better not catch you doing it again. :eyes:")
         return self.add_return([], f"You can't edit a game you're not in, {player.name}. Use **!join** to join.")
