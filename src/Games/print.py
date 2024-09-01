@@ -16,7 +16,7 @@ class Print():
     def __init__(self, custom_deck):
         #The size of the sprites
         self.card_width = 315 #Width of each card
-        self.card_height = 441 #Height of each card
+        self.card_height = 438 #Height of each card
         self.custom_deck = custom_deck
 
         #This one can change as needed
