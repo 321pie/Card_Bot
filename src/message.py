@@ -53,7 +53,7 @@ async def process_message(msg):
                 if(item[1] == None): #Not a file
                     await msg.channel.send(item[0])
                 else:
-                    await msg.channel.send(content=item[0], file=discord.File(item[1]))
+                    await msg.channel.send(content=item[0], file=discord.File(fp=item[1], filename="Pic.png"))
     except Exception as error:
         print(error)
 
@@ -69,12 +69,13 @@ async def handle_user_messages(msg):
         return return_list
     
     player_in_game:bool = False
+    player = msg.author.name
     
     #Commands from an active game
     for active_game in active_games:
-        if msg.author in active_game.get_players():
+        if player in active_game.get_players():
             player_in_game = True
-            return_var = await run_commands(msg.author, message, active_game)
+            return_var = await run_commands(player, message, active_game)
             if return_var != None:
                 #Remove game from list if ended
                 if active_game.is_started() == False:
@@ -86,7 +87,7 @@ async def handle_user_messages(msg):
                     
     #Commands from game that is being created (don't allow people already in a game)
     if (cur_game != None) and (player_in_game == False):
-        return_var = await run_commands(msg.author, message, cur_game)
+        return_var = await run_commands(player, message, cur_game)
         if return_var != None:
             if cur_game.is_started():
                 active_games.append(cur_game)
@@ -96,7 +97,7 @@ async def handle_user_messages(msg):
     
     #Commands to add a game
     if message == "!cribbage":
-        return make_cribbage(msg.author)
+        return make_cribbage(player)
     
     #Roles
     elif(message == '!db' or message == '!dumpsterboy'):
@@ -116,9 +117,9 @@ def make_cribbage(player):
     
     if cur_game == None:
         cur_game = Cribbage_Print()
-        return gp().add_return([], f"{player.name} has created a cribbage game. Use **!join** to join it!")
+        return gp().add_return([], f"{player} has created a cribbage game. Use **!join** to join it!")
     else:
-        return gp().add_return([], f"Sorry, {player.name}. You need to wait until the current game is started to create another one.")
+        return gp().add_return([], f"Sorry, {player}. You need to wait until the current game is started to create another one.")
 
 #Give role to user
 async def give_role(member, role):

@@ -20,7 +20,7 @@ class Print():
         self.custom_deck = custom_deck
 
         #This one can change as needed
-        self.sprite_scalar = 1 #Multiplier to zoom by to make hand a good size
+        self.sprite_scalar = .5 #Multiplier to zoom by to make hand a good size
 
     #Gets the path for the images
     def get_path(self, limited_path):

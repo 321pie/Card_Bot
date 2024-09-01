@@ -45,10 +45,11 @@ def run_bot():
     @tree.command(name="hand", description="Get your current hand")
     async def hand_command(interaction):
         hand_pic = None
+        player = interaction.user.name
         for active_game in message.active_games:
-            if interaction.user in active_game.get_players():
-                hand_pic = active_game.get_hand_pic(interaction.user) #Get hand pic to display (or None if invalid)
-                await active_game.delete_last_hand(interaction.user, interaction) #Delete old ephemeral message and create new one
+            if player in active_game.get_players():
+                hand_pic = active_game.get_hand_pic(player) #Get hand pic to display (or None if invalid)
+                await active_game.delete_last_hand(player, interaction) #Delete old ephemeral message and create new one
                 break
 
         if hand_pic == None:
@@ -60,7 +61,7 @@ def run_bot():
     @tree.command(name="calcs", description="Get the most recent hand calcs")
     async def calc_command(interaction):
         for active_game in message.active_games:
-            if interaction.user in active_game.get_players():
+            if interaction.user.name in active_game.get_players():
                 if active_game.calc_string == "":
                     await interaction.response.send_message("You need to finish a round before you can see the hand values.", ephemeral=True)
                     return None
