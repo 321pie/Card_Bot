@@ -109,13 +109,13 @@ async def handle_user_messages(msg):
         return make_juiced(player)
     
     #Roles
-    elif(message == '!db' or message == '!dumpsterboy'):
+    elif message == '!db' or message == '!dumpsterboy':
         return await give_role(msg.author, "Dumpster Boy")
-    elif(message == '!gg' or message == '!glamourgirl'):
+    elif message == '!gg' or message == '!glamourgirl':
         return await give_role(msg.author, "Glamour Girl")
-    elif(message == '!gm' or message == '!garbageman'):
+    elif message == '!gm' or message == '!garbageman':
         return await give_role(msg.author, "Garbage Man")
-    elif(message == '!tl' or message == '!treasurelady'):
+    elif message == '!tl' or message == '!treasurelady':
         return await give_role(msg.author, "Treasure Lady")
     
     #Default case (orders bot doesn't understand)
