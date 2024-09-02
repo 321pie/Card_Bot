@@ -45,31 +45,24 @@ def run_bot():
     @tree.command(name="hand", description="Get your current hand")
     async def hand_command(interaction:discord.Interaction):
         await interaction.response.defer(ephemeral=True)
-        hand_pic = None
         player = interaction.user.name
-        for active_game in message.active_games:
-            if player in active_game.get_players():
-                hand_pic = active_game.get_hand_pic(player) #Get hand pic to display (or None if invalid)
-                await active_game.delete_last_hand(player, interaction) #Delete old ephemeral message and create new one
-                break
 
-        if hand_pic == None:
-            await interaction.followup.send(content="Failed to retrieve hand.", ephemeral=True)
-        else:
-            await interaction.followup.send(content="Use command below card to play it.", file=discord.File(fp=hand_pic, filename="HandPic.png"), ephemeral=True)
-
-    #Sends calculations of most recent hand(s)/crib
-    @tree.command(name="calcs", description="Get the most recent hand calcs")
-    async def calc_command(interaction:discord.Interaction):
-        for active_game in message.active_games:
-            if interaction.user.name in active_game.get_players():
-                if active_game.calc_string == "":
-                    await interaction.response.send_message("You need to finish a round before you can see the hand values.", ephemeral=True)
-                    return None
-                else:
-                    await interaction.response.send_message(active_game.calc_string, ephemeral=True)
-                    return None
-        return await interaction.response.send_message("You need to be in a game to see calcs.", ephemeral=True)
+        for active_game in message.active_games:            
+            if active_game.HAND_PIC == True:
+                if player in active_game.get_players():
+                    hand_pic = active_game.get_hand_pic(player) #Get hand pic to display (or None if invalid)
+                    await active_game.delete_last_hand(player, interaction) #Delete old ephemeral message and create new one
+                    if hand_pic == None:
+                        await interaction.followup.send(content="Failed to retrieve hand.", ephemeral=True)
+                    else:
+                        await interaction.followup.send(content="Use command below card to play it.", file=discord.File(fp=hand_pic, filename="HandPic.png"), ephemeral=True)
+                    break
+            elif active_game.HAND_PIC == False:
+                if player in active_game.get_players():
+                    hand_str = active_game.get_hand_string(player) #Get hand pic to display (or None if invalid)
+                    await active_game.delete_last_hand(player, interaction) #Delete old ephemeral message and create new one
+                    await interaction.followup.send(content=hand_str, ephemeral=True)
+                    break
 
     #Sends the rules of cribbage
     @tree.command(name="rules", description='''See the rules.''')
@@ -144,7 +137,7 @@ def run_bot():
     @client.event
     async def on_ready():
         await tree.sync()
-        print("Cribbage Bot is ready!")
+        print("Card Bot is ready!")
 
     # Try to run the bot
     try:

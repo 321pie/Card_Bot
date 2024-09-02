@@ -7,7 +7,7 @@ import pygame as pg
 import Games.deck as deck
 
 
-class Print():
+class Pics():
     CLASSIC = "Classic"
     GENSHIN = "Genshin"
     CATS = "Cats"

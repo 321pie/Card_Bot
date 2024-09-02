@@ -8,10 +8,11 @@ from Games.game_print import Game_Print
 import Games.deck as dk
 
 class Cribbage_Print(Game_Print):
+    HAND_PIC = True
+
     def __init__(self):
         super().__init__()
         self.game = Cribbage()
-        self.commands["^![0-9]+$"] = [self.select_card, self.select_card_parse]
         self.commands["^!([a2-9jqk]|10) [hdcs]$"] = [self.make_joker, self.make_joker_parse]
         self.commands["^!standard$"] = [self.play_standard]
         self.commands["^!mega$"] = [self.play_mega]
@@ -21,6 +22,7 @@ class Cribbage_Print(Game_Print):
         self.commands["^!skunk [0-9]+$"] = [self.change_skunk, self.change_skunk_parse]
         self.commands["^!points$"] = [self.get_points]
         self.commands["^!tpoints$"] = [self.get_team_points]
+        self.commands["^!calcs$"] = [self.get_calcs]
 
         self.calc_string = "" #Saves most recent hand calculations
 
@@ -94,6 +96,14 @@ class Cribbage_Print(Game_Print):
         else:
             return self.add_return([], f"You can't change a game mode you aren't queued for, {player}. Use **!join** to join the game.")
         
+    #Input: player as defined in message.py for commands
+    #Output: add_return print for message handler
+    async def get_calcs(self, player):
+        if self.calc_string == "":
+            return self.add_return(f"You need to finish a round before you can see the hand values, {player}.")
+        else:
+            return self.add_return(self.calc_string)
+        
     #Input: parse string of form "^!teams [0-9]+$"
     #Output: integer team count parsed from the string
     def create_team_parse(self, parse_str):
@@ -116,24 +126,19 @@ class Cribbage_Print(Game_Print):
         else:
             return False, self.add_return([], "There must be an equal number of players on each team in order to form teams.")
 
-    #Input: parse string of form "^![0-9]+$"
-    #Output: integer index parsed from string in list
-    def select_card_parse(self, parse_str):
-        return [int(parse_str[1:])]
-
     #Input: integer index parsed from string
     #Output: list of return statements using add_return
-    async def select_card(self, player, index):
+    async def select_card(self, player, card_index):
         if(player in self.game.get_players()):
             #Check for valid index or return
-            if(index >= len(self.game.hands[self.game.get_player_index(player)]) or index < 0):
+            if(card_index >= len(self.game.hands[self.game.get_player_index(player)]) or card_index < 0):
                 return []
 
             if(self.game.game_started == True):
                 if(self.game.throw_away_phase == True):
-                    return await self.throw_away_phase_func(player, index)
+                    return await self.throw_away_phase_func(player, card_index)
                 elif(self.game.pegging_phase == True):
-                    return await self.pegging_phase_func(player, index)
+                    return await self.pegging_phase_func(player, card_index)
 
         return []
 
@@ -157,7 +162,7 @@ class Cribbage_Print(Game_Print):
 
         #Check if everyone is done. If not, return. Else, get flipped card and begin pegging round.
         if(self.game.is_finished_throwing(player)):
-            if(not self.game.everyone_is_finished_throwing()):
+            if not self.game.everyone_is_finished_throwing():
                 self.add_return(return_list, f'''{player} has finished putting cards in the crib.''')
                 return return_list
             else:
@@ -173,7 +178,7 @@ class Cribbage_Print(Game_Print):
                 
                 #Check for winner
                 if(self.game.get_winner() != None):
-                    return self.add_return(return_list, self.get_winner_string(self.game.get_winner()))
+                    return self.get_winner_string(self.game.get_winner(), return_list=return_list)
                 
                 #Check for flipped joker
                 if(flipped.value == dk.JOKER):
@@ -190,7 +195,7 @@ class Cribbage_Print(Game_Print):
         if(peg_vars == None):
             #If pegged out, end game
             if(self.game.get_winner() != None):
-                return self.add_return(return_list, self.get_winner_string(self.game.get_winner()))
+                return self.get_winner_string(self.game.get_winner(), return_list=return_list)
             return return_list
 
         points = peg_vars[0]
@@ -245,7 +250,7 @@ class Cribbage_Print(Game_Print):
 
         #If pegged out, end game
         if(self.game.get_winner() != None):
-            return self.add_return(return_list, self.get_winner_string(self.game.get_winner()))
+            return self.get_winner_string(self.game.get_winner(), return_list=return_list)
 
         return return_list
     
@@ -264,7 +269,7 @@ class Cribbage_Print(Game_Print):
             
             #Check for winner
             if(self.game.get_winner() != None):
-                return self.add_return(return_list, self.get_winner_string(self.game.get_winner()))
+                return self.get_winner_string(self.game.get_winner(), return_list=return_list)
 
         #Calculate crib
         output_string += self.count_crib()
@@ -273,7 +278,7 @@ class Cribbage_Print(Game_Print):
 
         #Check for winner
         if(self.game.get_winner() != None):
-            return self.add_return(return_list, self.get_winner_string(self.game.get_winner()))
+            return self.get_winner_string(self.game.get_winner(), return_list=return_list)
 
         #Reset variables for the next round
         self.game.reset_round()
@@ -345,7 +350,7 @@ class Cribbage_Print(Game_Print):
                     
                     #Check for winner
                     if(self.game.get_winner() != None):
-                        return self.add_return(return_list, self.get_winner_string(self.game.get_winner()))
+                        return self.get_winner_string(self.game.get_winner(), return_list=return_list)
                 
                     return return_list
                 else:
@@ -422,7 +427,7 @@ class Cribbage_Print(Game_Print):
         return team_list
 
     #Ends the game and returns a string with point details.
-    def get_winner_string(self, winner, show_hands=True):
+    def get_winner_string(self, winner, show_hands=True, return_list=None):
         player_scores = ""
         player_hands = ""
         winner_string = winner
@@ -468,8 +473,13 @@ class Cribbage_Print(Game_Print):
                     #Add team and point data to output string player_scores
                     player_scores += team + f" ended with {point_array[point_index]} points.\n"
 
-        self.game.end_game()
-        return player_hands + player_scores + f"{winner_string} has won the game! Everything will now be reset."
+        if return_list != None:
+            self.add_return(return_list, player_hands, self.deck_look.get_hand_pic(self.game.backup_hands + [self.game.get_crib()], show_index=False))
+            self.game.end_game()
+            return self.add_return(return_list, player_scores + f"{winner_string} has won the game! Everything will now be reset.")
+        else:
+            self.game.end_game()
+            return player_hands + player_scores + f"{winner_string} has won the game! Everything will now be reset."
 
     #Returns a string with each team and the number of points they have
     def get_point_string(self, always_solo=False):
