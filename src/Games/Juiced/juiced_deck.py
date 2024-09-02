@@ -8,7 +8,7 @@ class White_Deck(dk.Deck):
 		self.deck = []
 		self.flipped = None #Card that gets flipped after throwing cards away
 
-		for card_text, color in WHITE_CARDS.items():\
+		for card_text, color in WHITE_CARDS.items():
 			self.deck.append(dk.Card(card_text, color))
 
 class Black_Deck(dk.Deck):
