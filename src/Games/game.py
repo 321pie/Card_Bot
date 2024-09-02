@@ -65,7 +65,7 @@ class Game():
     #Starts the game
     #Returns True on success, False on failure
     def start_game(self):
-        if len(self.players) < self.max_player_count:
+        if (len(self.players) < self.min_player_count) or (len(self.players) > self.max_player_count):
             return False
         if self.game_started == True:
             return False
