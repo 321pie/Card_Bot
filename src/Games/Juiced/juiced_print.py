@@ -7,16 +7,19 @@ class Juiced_Print(Game_Print):
     HAND_PIC = False
 
     def __init__(self):
+        super().__init__()
+
         self.deck_look = None
         self.game = Juiced()
         
         #Add commands
         self.commands["^!insult$"] = [self.insult]
+        self.commands["^!goal [0-9]+$"] = [self.change_goal, self.change_goal_parse]
     
     # OVERRIDE #
     async def change_look(self, player, _look):
         if player in self.game.get_players():
-            return self.add_return([], f"Feature not yet available for this game. Sorry! <3")
+            return self.add_return([], f"Feature not available for this game. Sorry! <3")
         else:
             return self.add_return([], f"You can't edit a game you aren't a part of, {player}. Use **!join** to join an unstarted game.")
         
@@ -89,6 +92,23 @@ class Juiced_Print(Game_Print):
     #Gets the string that allows the judge to choose a card
     def get_judge_string(self):
         return f"**{self.get_card_string(self.game.get_judge_card())}**\n{self.get_hand_string_helper(self.game.get_unholy_actions())}"
+    
+    #Input: command string as defined in message.py for command helper functions
+    #Output: the integer goal number passed by the player
+    def change_goal_parse(self, parse_str):
+        return [int(parse_str[6:])]
+
+    #Input: player as defined in message.py for commands and integer goal_num from change_goal_parse
+    #Output: add_return print for message handler
+    async def change_goal(self, player, goal_num):
+        if player in self.game.get_players():
+            if goal_num != 0:
+                self.game.win_points = goal_num
+
+                return self.add_return([] if goal_num<1000 else self.add_return([], f"You've messed up, hun. Use **!end** to surrender if you even dare to **!start** in the first place."), f"{player} has changed the goal to {goal_num} points. Use **!start** to begin.")
+            else:
+                return self.add_return([], f"Don't input 0. I better not catch you doing it again. :eyes:")
+        return self.add_return([], f"You can't edit a game you're not in, {player}. Use **!join** to join.")
 
     #Procures an insult from a hand-crafted list of premium rudeness
     async def insult(self, _player):

@@ -5,7 +5,7 @@ from Games.pics import Pics
 
 class Game_Print():
     #If your game doesn't have a hand pic, then set to False and optionally implement get_hand_string (found at bottom of file)
-    HAND_PIC = True
+    HAND_PIC = False
 
     def __init__(self):
         self.game = game.Game()
@@ -43,7 +43,11 @@ class Game_Print():
             if(player not in self.game.get_players()):
                 if(len(self.game.get_players()) < self.game.max_player_count):
                     self.game.add_player(player)
-                    return self.add_return([], f"Welcome to the game, {player}! Type **!start** to begin game with {len(self.game.get_players())} players.")
+                    more_players = self.game.min_player_count - len(self.game.get_players())
+                    if more_players <= 0:
+                        return self.add_return([], f"Welcome to the game, {player}! Type **!start** to begin game with {len(self.game.get_players())} players.")
+                    else:
+                        return self.add_return([], f"Welcome to the game, {player}! You need {more_players} more players to start the game.")
                 else:
                     return self.add_return([], f"Sorry, {player}. This game already has 8 players {[player for player in self.game.get_players()]}.")
             else:

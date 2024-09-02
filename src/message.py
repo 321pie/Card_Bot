@@ -5,6 +5,7 @@ import discord
 #Local imports
 from Games.game_print import Game_Print as gp
 from Games.Cribbage.cribbage_print import Cribbage_Print
+from Games.Juiced.juiced_print import Juiced_Print
 
 active_games:list[gp] = []
 
@@ -12,7 +13,7 @@ cur_game:gp = None
 
 HELP_MESSAGE = '''The bot knows the following commands:
     ***General***:
-      Start Game:
+      Game:
         '**!join**': Let the bot know that you'd like to play cribbage.
         '**!unjoin**': Let the bot know that you changed your mind and don't want to play.
         '**!start**': Starts a game with all players who have done !join.
@@ -23,7 +24,7 @@ HELP_MESSAGE = '''The bot knows the following commands:
         '**/hand**': View your hand.
 
       Public Commands:
-        '**/spectate**': View hands of all players (only works if not participating in the game). TODO: NOT IMPLEMENTED
+        #'**/spectate**': View hands of all players (only works if not participating in the game). TODO: NOT IMPLEMENTED
         '**/calcs**': View how points were obtained in the previous round (hands and crib).
         '**/help**': Display orders that the bot can execute.
         '**/rules**': Show the rules of cribbage.
@@ -33,7 +34,7 @@ HELP_MESSAGE = '''The bot knows the following commands:
         '**!garbageman**', '**!gm**': Change role to Garbage Man.
 
     ***Cribbage***:
-      Start Game:
+      Game:
         '**!cribbage**', '**!cr**': Create a game of Cribbage.
         '**!standard**': Play a regular game of cribbage (default).
         '**!mega**': Play a game of mega hand (8 cards, twice as many points to win).
@@ -43,7 +44,13 @@ HELP_MESSAGE = '''The bot knows the following commands:
         '**!goal [0-9]+**': Set the amount of points needed to reach the goal to the provided number.
         '**!skunk [0-9]+**': Set the skunk interval (default=30) to the provided number.
         '**!points**': View current number of points each PLAYER has at current point in time.
-        '**!team_points**': View current number of points each team has at current point in time.'''
+        '**!team_points**': View current number of points each team has at current point in time.
+    ***Juiced (Cards Against Humanity/Apples to Apples)***:
+      Game:
+        '**!juiced**', '**jc**':: Create a game of Juiced.
+        '**!goal [0-9]+**': Set the amount of points needed to win to the provided number.
+        '**!insult**': Hurl a random insult into the chat.
+    '''
 
 async def process_message(msg):
     try:
@@ -98,6 +105,8 @@ async def handle_user_messages(msg):
     #Commands to add a game
     if message == "!cribbage" or message == "!cr":
         return make_cribbage(player)
+    if message == "!juiced" or message == "!jc":
+        return make_juiced(player)
     
     #Roles
     elif(message == '!db' or message == '!dumpsterboy'):
@@ -112,12 +121,23 @@ async def handle_user_messages(msg):
     #Default case (orders bot doesn't understand)
     return return_list
 
+#Makes a game of Cribbage to be joined
 def make_cribbage(player):
     global cur_game
     
     if cur_game == None:
         cur_game = Cribbage_Print()
-        return gp().add_return([], f"{player} has created a cribbage game. Use **!join** to join it!")
+        return gp().add_return([], f"{player} has created a Cribbage game. Use **!join** to join it!")
+    else:
+        return gp().add_return([], f"Sorry, {player}. You need to wait until the current game is started to create another one.")
+    
+#Makes a game of Juiced to be joined
+def make_juiced(player):
+    global cur_game
+    
+    if cur_game == None:
+        cur_game = Juiced_Print()
+        return gp().add_return([], f"{player} has created a Juiced game. Use **!join** to join it!")
     else:
         return gp().add_return([], f"Sorry, {player}. You need to wait until the current game is started to create another one.")
 

@@ -64,19 +64,6 @@ def run_bot():
                     await interaction.followup.send(content=hand_str, ephemeral=True)
                     break
 
-    #Sends calculations of most recent hand(s)/crib
-    @tree.command(name="calcs", description="Get the most recent hand calcs")
-    async def calc_command(interaction:discord.Interaction):
-        for active_game in message.active_games:
-            if interaction.user.name in active_game.get_players():
-                if active_game.calc_string == "":
-                    await interaction.response.send_message("You need to finish a round before you can see the hand values.", ephemeral=True)
-                    return None
-                else:
-                    await interaction.response.send_message(active_game.calc_string, ephemeral=True)
-                    return None
-        return await interaction.response.send_message("You need to be in a game to see calcs.", ephemeral=True)
-
     #Sends the rules of cribbage
     @tree.command(name="rules", description='''See the rules.''')
     async def rules_command(interaction:discord.Interaction):
@@ -150,7 +137,7 @@ def run_bot():
     @client.event
     async def on_ready():
         await tree.sync()
-        print("Cribbage Bot is ready!")
+        print("Card Bot is ready!")
 
     # Try to run the bot
     try:

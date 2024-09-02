@@ -8,6 +8,8 @@ from Games.game_print import Game_Print
 import Games.deck as dk
 
 class Cribbage_Print(Game_Print):
+    HAND_PIC = True
+
     def __init__(self):
         super().__init__()
         self.game = Cribbage()
@@ -20,6 +22,7 @@ class Cribbage_Print(Game_Print):
         self.commands["^!skunk [0-9]+$"] = [self.change_skunk, self.change_skunk_parse]
         self.commands["^!points$"] = [self.get_points]
         self.commands["^!tpoints$"] = [self.get_team_points]
+        self.commands["^!calcs$"] = [self.get_calcs]
 
         self.calc_string = "" #Saves most recent hand calculations
 
@@ -92,6 +95,14 @@ class Cribbage_Print(Game_Print):
             return self.add_return([], f"{player} has changed the game to joker mode. Use !standard to swap back or **!start** to begin.")
         else:
             return self.add_return([], f"You can't change a game mode you aren't queued for, {player}. Use **!join** to join the game.")
+        
+    #Input: player as defined in message.py for commands
+    #Output: add_return print for message handler
+    async def get_calcs(self, player):
+        if self.calc_string == "":
+            return self.add_return(f"You need to finish a round before you can see the hand values, {player}.")
+        else:
+            return self.add_return(self.calc_string)
         
     #Input: parse string of form "^!teams [0-9]+$"
     #Output: integer team count parsed from the string
