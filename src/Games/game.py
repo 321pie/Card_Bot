@@ -7,8 +7,9 @@ class Game():
         self.deck:deck.Deck = deck.Deck() #The deck that the game is played with
         self.players:list = [] #The master list of players (whatever the external app uses as an identifier)
         self.hands:list[list[deck.Card]] = [] #The hands of each player, indexed the same as the players
-        self.game_started = False #True if the game has begun, else False
-        self.max_player_count = 8 #Defines the maximum number of players
+        self.game_started:bool = False #True if the game has begun, else False
+        self.min_player_count:int = 1 #Defines the minimum number of players that have to !join before the game cans start
+        self.max_player_count:int = 8 #Defines the maximum number of players
 
     #Adds a player to the game
     #Returns True on success, False on failure
@@ -64,7 +65,7 @@ class Game():
     #Starts the game
     #Returns True on success, False on failure
     def start_game(self):
-        if len(self.players) == 0:
+        if len(self.players) < self.max_player_count:
             return False
         if self.game_started == True:
             return False
@@ -92,6 +93,20 @@ class Game():
             return self.players.index(player)
         except:
             return None
+        
+    #Returns the hand of the specified player (index or name)
+    def get_player_hand(self, player_index=None, player=None):
+        #Get based on index
+        if (player_index != None) and (player_index in range(len(self.players))):
+            return self.hands[player_index]
+
+        #Get based on player
+        if (player != None) and (player in self.players):
+            return self.hands[self.players.index(player)]
+        
+    #Returns all hands
+    def get_hands(self) -> list[list[deck.Card]]:
+        return copy.copy(self.hands)
     
 ###############################################################################
 # List of common functions that must be implemented

@@ -439,20 +439,6 @@ class Cribbage(game.Game):
     #Returns the player whose turn it is to peg
     def get_peg_player(self):
         return self.players[self.pegging_index]
-
-    #Returns the hand of the specified player
-    def get_player_hand(self, player_index=None, player=None):
-        #Get based on index
-        if (player_index != None) and (player_index in range(len(self.players))):
-            return self.hands[player_index]
-
-        #Get based on player
-        if (player != None) and (player in self.players):
-            return self.hands[self.players.index(player)]
-        
-    #Returns all hands
-    def get_hands(self) -> list[list[deck.Card]]:
-        return copy.copy(self.hands)
     
     #Returns crib
     def get_crib(self) -> list[deck.Card]:

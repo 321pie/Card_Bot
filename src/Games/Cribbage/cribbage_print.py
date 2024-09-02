@@ -11,7 +11,6 @@ class Cribbage_Print(Game_Print):
     def __init__(self):
         super().__init__()
         self.game = Cribbage()
-        self.commands["^![0-9]+$"] = [self.select_card, self.select_card_parse]
         self.commands["^!([a2-9jqk]|10) [hdcs]$"] = [self.make_joker, self.make_joker_parse]
         self.commands["^!standard$"] = [self.play_standard]
         self.commands["^!mega$"] = [self.play_mega]
@@ -116,24 +115,19 @@ class Cribbage_Print(Game_Print):
         else:
             return False, self.add_return([], "There must be an equal number of players on each team in order to form teams.")
 
-    #Input: parse string of form "^![0-9]+$"
-    #Output: integer index parsed from string in list
-    def select_card_parse(self, parse_str):
-        return [int(parse_str[1:])]
-
     #Input: integer index parsed from string
     #Output: list of return statements using add_return
-    async def select_card(self, player, index):
+    async def select_card(self, player, card_index):
         if(player in self.game.get_players()):
             #Check for valid index or return
-            if(index >= len(self.game.hands[self.game.get_player_index(player)]) or index < 0):
+            if(card_index >= len(self.game.hands[self.game.get_player_index(player)]) or card_index < 0):
                 return []
 
             if(self.game.game_started == True):
                 if(self.game.throw_away_phase == True):
-                    return await self.throw_away_phase_func(player, index)
+                    return await self.throw_away_phase_func(player, card_index)
                 elif(self.game.pegging_phase == True):
-                    return await self.pegging_phase_func(player, index)
+                    return await self.pegging_phase_func(player, card_index)
 
         return []
 

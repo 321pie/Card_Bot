@@ -1,12 +1,15 @@
 import discord
 
 import Games.game as game
-from Games.print import Print
+from Games.pics import Pics
 
 class Game_Print():
+    #If your game doesn't have a hand pic, then set to False and optionally implement get_hand_string (found at bottom of file)
+    HAND_PIC = True
+
     def __init__(self):
         self.game = game.Game()
-        self.deck_look = Print(Print.CLASSIC)
+        self.deck_look = Pics(Pics.CLASSIC)
         self.hand_messages = [] #Variable to hold most recent hand message for each player. leave blank 
         self.end = []
         self.commands = {
@@ -16,6 +19,7 @@ class Game_Print():
             "^!unjion$": [self.unjoin],
             "^!start$": [self.start],
             "^!end$": [self.end_game],
+            "^![0-9]+$": [self.select_card, self.select_card_parse],
             "^!cats$": [self.change_look, self.change_look_parse],
             "^!classic$": [self.change_look, self.change_look_parse],
             "^!genshin$": [self.change_look, self.change_look_parse],
@@ -90,19 +94,24 @@ class Game_Print():
 
         return return_list
     
+    #Input: parse string of form "^![0-9]+$"
+    #Output: integer index parsed from string in list
+    def select_card_parse(self, parse_str) -> list[int]:
+        return [int(parse_str[1:])]
+    
     def change_look_parse(self, parse_str):
         if parse_str == "!cats":
-            return [Print.CATS]
+            return [Pics.CATS]
         elif parse_str == "!genshin":
-            return [Print.GENSHIN]
+            return [Pics.GENSHIN]
         elif parse_str == "!starwars":
-            return [Print.STARWARS]
+            return [Pics.STARWARS]
         else:
-            return [Print.CLASSIC]
+            return [Pics.CLASSIC]
     
     async def change_look(self, player, look):
         if player in self.game.get_players():
-            self.deck_look = Print(look)
+            self.deck_look = Pics(look)
             return self.add_return([], f"Appearance of deck has been changed to {look}!")
         else:
             return self.add_return([], f"You can't edit a game you aren't a part of, {player}. Use **!join** to join an unstarted game.")
@@ -118,9 +127,14 @@ class Game_Print():
     #Updates a player's hand if applicable. Does nothing if get_hnd_pic isn't defined
     async def update_hand(self, player):
         if player in self.game.get_players():
-            if self.hand_messages[self.game.get_player_index(player)] != None:
-                hand_pic = self.deck_look.get_hand_pic([self.game.get_hand(player)])
-                await self.hand_messages[self.game.get_player_index(player)].edit_original_response(attachments=[discord.File(fp=hand_pic, filename="HandPic.png")])
+            if self.HAND_PIC == True:
+                if self.hand_messages[self.game.get_player_index(player)] != None:
+                    hand_pic = self.deck_look.get_hand_pic([self.game.get_hand(player)])
+                    await self.hand_messages[self.game.get_player_index(player)].edit_original_response(attachments=[discord.File(fp=hand_pic, filename="HandPic.png")])
+            else:
+                if self.hand_messages[self.game.get_player_index(player)] != None:
+                    hand_str = self.get_hand_string(player)
+                    await self.hand_messages[self.game.get_player_index(player)].edit_original_response(content=hand_str)
 
     #Deletes a player's hand display if applicable. Does nothing if no hand is displayed in discord
     async def delete_last_hand(self, player, replacement=None):
@@ -137,6 +151,14 @@ class Game_Print():
                 return self.deck_look.get_hand_pic([hand], show_index)
         
         return None
+
+###############################################################################
+# List of common functions that MUST be implemented
+###############################################################################
+    #Input: integer index parsed from string
+    #Output: list of return statements using add_return
+    async def select_card(self, player, card_index:int):
+        return []
     
 ###############################################################################
 # List of common functions that may be implemented
@@ -148,3 +170,7 @@ class Game_Print():
     #Returns the string to be displayed when the game is ended
     def get_end_string(self, player) -> str:
         return ""
+    
+    #Returns the hand string
+    def get_hand_string(self, player):
+        return "No hands implemented into game."

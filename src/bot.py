@@ -45,18 +45,24 @@ def run_bot():
     @tree.command(name="hand", description="Get your current hand")
     async def hand_command(interaction:discord.Interaction):
         await interaction.response.defer(ephemeral=True)
-        hand_pic = None
         player = interaction.user.name
-        for active_game in message.active_games:
-            if player in active_game.get_players():
-                hand_pic = active_game.get_hand_pic(player) #Get hand pic to display (or None if invalid)
-                await active_game.delete_last_hand(player, interaction) #Delete old ephemeral message and create new one
-                break
 
-        if hand_pic == None:
-            await interaction.followup.send(content="Failed to retrieve hand.", ephemeral=True)
-        else:
-            await interaction.followup.send(content="Use command below card to play it.", file=discord.File(fp=hand_pic, filename="HandPic.png"), ephemeral=True)
+        for active_game in message.active_games:            
+            if active_game.HAND_PIC == True:
+                if player in active_game.get_players():
+                    hand_pic = active_game.get_hand_pic(player) #Get hand pic to display (or None if invalid)
+                    await active_game.delete_last_hand(player, interaction) #Delete old ephemeral message and create new one
+                    if hand_pic == None:
+                        await interaction.followup.send(content="Failed to retrieve hand.", ephemeral=True)
+                    else:
+                        await interaction.followup.send(content="Use command below card to play it.", file=discord.File(fp=hand_pic, filename="HandPic.png"), ephemeral=True)
+                    break
+            elif active_game.HAND_PIC == False:
+                if player in active_game.get_players():
+                    hand_str = active_game.get_hand_string(player) #Get hand pic to display (or None if invalid)
+                    await active_game.delete_last_hand(player, interaction) #Delete old ephemeral message and create new one
+                    await interaction.followup.send(content=hand_str, ephemeral=True)
+                    break
 
     #Sends calculations of most recent hand(s)/crib
     @tree.command(name="calcs", description="Get the most recent hand calcs")
