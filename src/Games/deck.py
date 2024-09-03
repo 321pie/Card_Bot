@@ -93,6 +93,9 @@ class Deck:
             return extra
         return None
     
+    def get_length(self):
+        return len(self.deck)
+    
 class JokerDeck(Deck):
     def reset_deck(self):
         super().reset_deck()

@@ -10,7 +10,7 @@ class Game_Print():
     def __init__(self):
         self.game = game.Game()
         self.deck_look = Pics(Pics.CLASSIC)
-        self.hand_messages = [] #Variable to hold most recent hand message for each player. leave blank 
+        self.hand_messages:list[discord.Interaction] = [] #Variable to hold most recent hand message for each player. leave blank 
         self.end = []
         self.commands = {
             "^!join$": [self.join],

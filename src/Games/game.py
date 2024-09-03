@@ -35,8 +35,8 @@ class Game():
         if player in self.players:
             player_index = self.players.index(player)
             if (card_index < len(self.hands[player_index])) and (card_index >= 0):
-                self.process_card_select(player_index, card_index)
-                return self.hands[player_index].pop(card_index)
+                if self.process_card_select(player_index, card_index) != False:
+                    return self.hands[player_index].pop(card_index)
             
         return False
         
@@ -120,6 +120,6 @@ class Game():
 # List of common functions that may be implemented
 ###############################################################################
     #Optionally used to modify variables on card select
-    #NOTE: Card gets deleted, so don't modify self.hands. See self.card_select() for more details.
+    #NOTE: Card gets deleted, so don't modify self.hands. Returning False won't delete the card. See self.card_select() for more details.
     def process_card_select(self, player_index:int, card_index:int) -> bool:
-        False
+        return False
