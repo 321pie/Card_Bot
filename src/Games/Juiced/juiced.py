@@ -10,7 +10,7 @@ class Juiced(Game):
         super().__init__()
         self.deck:deck.White_Deck = deck.White_Deck() #The deck that holds the players' cards
         self.judge_deck:deck.Black_Deck = deck.Black_Deck() #The deck that holds the cards that the judge wields
-        self.min_player_count:int = 3 #Defines the minimum number of players that have to !join before the game cans start
+        self.min_player_count:int =  #Defines the minimum number of players that have to !join before the game cans start
         self.max_player_count:int = 16 #Defines the maximum number of players
         self.judge_index:int = 0 #Index of the current judge
         self.judge_card:Card = None
@@ -35,17 +35,16 @@ class Juiced(Game):
     #card_index needs to be indexed based on: (judge -> self.unholy_actions) (player -> self.hands[player_index])
     #NOTE: Card gets deleted, so don't modify self.hands. See self.card_select() for more details.
     def process_card_select(self, player_index:int, card_index:int) -> bool:
-        # OVERRIDE #
-        super().process_card_select(player_index, card_index)
-
         #Judge can't play during unholy actions, and players can't play while Judge Judy is going at it
         if self.judging:
             if player_index != self.judge_index:
                 return False
-            
-            #Add proxy that will get deleted, revoke judging permissions, and assign a new Judge Judy
+            if card_index == self.judge_index:
+                return False
+            #Add proxy that will get deleted, assign a new Judge Judy, and give a point
             self.hands[self.judge_index].insert(card_index, None)
             self.judge_index = card_index
+            self.points[card_index] += 1
 
             self.reset_round()
         else:
@@ -58,7 +57,7 @@ class Juiced(Game):
             self.hands[player_index].append(self.deck.get_card())
 
             #Check to see if it's judging time
-            if self.unholy_actions.count(self.unholy_actions[0]) == len(self.unholy_actions):
+            if self.unholy_actions.count(self.unholy_actions[0]) == (len(self.unholy_actions)-1):
                 self.judging = True
 
         return True
@@ -69,12 +68,13 @@ class Juiced(Game):
         self.judge_card = self.judge_deck.get_card()
 
         #Reset deck if low
-        if len(self.deck.deck) < len(self.players) + 10:
+        if self.deck.get_length() < len(self.players) + 10:
             self.deck.reset_deck()
-        if len(self.judge_deck) < len(self.players) + 10:
+        if self.judge_deck.get_length() < len(self.players) + 10:
             self.judge_deck.reset_deck()
 
         for player_index in range(len(self.players)):
+            self.unholy_actions[player_index] = None
             if self.points[player_index] >= self.win_points:
                 self.end_game()
                 return self.players[player_index]
@@ -105,7 +105,7 @@ class Juiced(Game):
             return copy.copy(self.points)
         else:
             if player in self.players:
-                return self.players[self.players.index(player)]
+                return self.points[self.players.index(player)]
             
         return None
     
