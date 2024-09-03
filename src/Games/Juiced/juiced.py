@@ -10,7 +10,7 @@ class Juiced(Game):
         super().__init__()
         self.deck:deck.White_Deck = deck.White_Deck() #The deck that holds the players' cards
         self.judge_deck:deck.Black_Deck = deck.Black_Deck() #The deck that holds the cards that the judge wields
-        self.min_player_count:int =  #Defines the minimum number of players that have to !join before the game cans start
+        self.min_player_count:int = 3 #Defines the minimum number of players that have to !join before the game cans start
         self.max_player_count:int = 16 #Defines the maximum number of players
         self.judge_index:int = 0 #Index of the current judge
         self.judge_card:Card = None
