@@ -35,7 +35,7 @@ class Juiced_Print(Game_Print):
 
     #Returns a string that has a list each player and their corresponding point totals
     def get_point_string(self):
-        output_string = "**Total Points:**"
+        output_string = "**Total Points:**\n"
         for player in self.game.get_players():
             output_string += f"*{player}*: {self.game.get_points(player)}\n"
 
@@ -48,15 +48,18 @@ class Juiced_Print(Game_Print):
     #Gets a hand
     def get_hand_string(self, player):
         if player in self.game.get_players():
-            return self.add_return([], self.get_hand_string_helper(self.game.get_hand(player)))
+            return self.get_hand_string_helper(self.game.get_hand(player))
         else:
-            return self.add_return([], f"You aren't in the game {player}, so you don't have a hand.")
+            return f"You aren't in the game {player}, so you don't have a hand."
         
     #Returns the string for someone's hand
     def get_hand_string_helper(self, hand):
         output_string = ""
         for card_index in range(len(hand)):
-            output_string += str(card_index) + ": " + self.get_card_string(hand[card_index]) + "\n"
+            try:
+                output_string += "!" + str(card_index) + ": " + self.get_card_string(hand[card_index]) + "\n"
+            except:
+                pass
 
         return output_string
     
@@ -65,33 +68,33 @@ class Juiced_Print(Game_Print):
     async def select_card(self, player, card_index:int):
         output_list = []
 
-        #If valid index for hands submit card and ot judge, elif valid index for judge to select winner
+        #If valid index for hands and mot judge, elif valid index for judge to select winner and judge plays valid card
         if (card_index >= 0) and (card_index < len(self.game.get_hand(player))) and (player != self.game.get_judge()):
             #If not judge
             if (self.game.judging == False):
-                self.game.card_select(player, card_index)
+                if self.game.card_select(player, card_index) == False:
+                    return output_list
                 self.add_return(output_list, f"Card submitted.")
+                await self.update_hand(player)
 
                 if self.game.judging == True:
                     self.add_return(output_list, f"All cards have been submitted. Please select the winner, {self.game.get_judge()}.\n{self.get_judge_string()}")
             else:
                 self.add_return(output_list, f"Please wait your turn, {player}. **Judge {self.game.get_judge()}** is deciding the winner of this round.")
 
-        elif (self.game.judging == True) and (player == self.game.get_judge()) and ((card_index >= 0) and (card_index < len(self.game.get_unholy_actions()))):
-            #If judge plays valid card
-            if self.game.card_select(player, card_index) != False:
-                winner = self.game.get_winner()
-                if winner == None:
-                    self.add_return(output_list, f"Congratulations, **{self.game.get_judge()}**.\n{self.get_point_string()}\n{self.get_start_string()}")
-                else:
-                    self.add_return(output_list, f"Congratulations, **{winner}**. You've won the game!\n{self.get_point_string()}")
-                    self.game.end_game()
+        elif (self.game.judging == True) and (player == self.game.get_judge()) and ((card_index >= 0) and (card_index < len(self.game.get_unholy_actions())) and (self.game.card_select(player, card_index) != False)):
+            winner = self.game.get_winner()
+            if winner == None:
+                self.add_return(output_list, f"Congratulations, **{self.game.get_judge()}**.\n{self.get_point_string()}\n{self.get_start_string(player)}")
+            else:
+                self.add_return(output_list, f"Congratulations, **{winner}**. You've won the game!\n{self.get_point_string()}")
+                self.game.end_game()
 
         return output_list
 
     #Gets the string that allows the judge to choose a card
     def get_judge_string(self):
-        return f"**{self.get_card_string(self.game.get_judge_card())}**\n{self.get_hand_string_helper(self.game.get_unholy_actions())}"
+        return f"**{self.get_card_string(self.game.get_judge_card())}**\n{self.get_hand_string_helper(self.game.get_unholy_actions())}"#[card for card in self.game.get_unholy_actions() if card != None])}"
     
     #Input: command string as defined in message.py for command helper functions
     #Output: the integer goal number passed by the player
@@ -112,7 +115,7 @@ class Juiced_Print(Game_Print):
 
     #Procures an insult from a hand-crafted list of premium rudeness
     async def insult(self, _player):
-        return self.INSULT_LIST[randint(0, len(self.INSULT_LIST)-1)]
+        return self.add_return([], self.INSULT_LIST[randint(0, len(self.INSULT_LIST)-1)])
     
     INSULT_LIST = [
         "You could do better.",

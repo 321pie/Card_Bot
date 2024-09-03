@@ -657,7 +657,7 @@ BLACK_CARDS = {
 	"What's the most emo?" : 1,
 	"What's the new fad diet?" : 1,
 	"What's the next Happy Meal toy?" : 1,
-	"What's the next superhero/sidekick duo?" : 1,
+#	"What's the next superhero/sidekick duo?" : 1,
 	"What's there a ton of in heaven?" : 1,
 	"When I am President of the United States, I will create the Department of _____." : 1,
 	"When I am a billionaire, I shall erect a 50-foot statue to commemorate _____." : 1,
