@@ -1,4 +1,4 @@
-from random import randint
+from random import randint, shuffle
 
 from Games.game_print import Game_Print
 from Games.Juiced.juiced import Juiced
@@ -11,6 +11,7 @@ class Juiced_Print(Game_Print):
 
         self.deck_look = None
         self.game = Juiced()
+        self.scrambled_unholy_actions:list = []
         
         #Add commands
         self.commands["^!insult$"] = [self.insult]
@@ -68,7 +69,7 @@ class Juiced_Print(Game_Print):
     async def select_card(self, player, card_index:int):
         output_list = []
 
-        #If valid index for hands and mot judge, elif valid index for judge to select winner and judge plays valid card
+        #If valid index for hands and mot judge, elif valid index for judge to select winner
         if (card_index >= 0) and (card_index < len(self.game.get_hand(player))) and (player != self.game.get_judge()):
             #If not judge
             if (self.game.judging == False):
@@ -78,23 +79,29 @@ class Juiced_Print(Game_Print):
                 await self.update_hand(player)
 
                 if self.game.judging == True:
+                    self.scrambled_unholy_actions = shuffle([action for action in self.game.get_unholy_actions() if action != None])
                     self.add_return(output_list, f"All cards have been submitted. Please select the winner, {self.game.get_judge()}.\n{self.get_judge_string()}")
             else:
                 self.add_return(output_list, f"Please wait your turn, {player}. **Judge {self.game.get_judge()}** is deciding the winner of this round.")
 
-        elif (self.game.judging == True) and (player == self.game.get_judge()) and ((card_index >= 0) and (card_index < len(self.game.get_unholy_actions())) and (self.game.card_select(player, card_index) != False)):
-            winner = self.game.get_winner()
-            if winner == None:
-                self.add_return(output_list, f"Congratulations, **{self.game.get_judge()}**.\n{self.get_point_string()}\n{self.get_start_string(player)}")
-            else:
-                self.add_return(output_list, f"Congratulations, **{winner}**. You've won the game!\n{self.get_point_string()}")
-                self.game.end_game()
+        elif (self.game.judging == True) and (player == self.game.get_judge()) and (card_index >= 0) and (card_index < len(self.scrambled_unholy_actions)):
+            #Decode index since we scrambled the array
+            card_index = self.game.get_unholy_actions().index(self.scrambled_unholy_actions[card_index])
+
+            if self.game.card_select(player, card_index) != False:
+                winner = self.game.get_winner()
+                if winner == None:
+                    self.add_return(output_list, f"Congratulations, **{self.game.get_judge()}**.\n{self.get_point_string()}\n{self.get_start_string(player)}")
+                    self.scrambled_unholy_actions = []
+                else:
+                    self.add_return(output_list, f"Congratulations, **{winner}**. You've won the game!\n{self.get_point_string()}")
+                    self.game.end_game()
 
         return output_list
 
     #Gets the string that allows the judge to choose a card
     def get_judge_string(self):
-        return f"**{self.get_card_string(self.game.get_judge_card())}**\n{self.get_hand_string_helper(self.game.get_unholy_actions())}"#[card for card in self.game.get_unholy_actions() if card != None])}"
+        return f"**{self.get_card_string(self.game.get_judge_card())}**\n{self.get_hand_string_helper(self.scrambled_unholy_actions)}"
     
     #Input: command string as defined in message.py for command helper functions
     #Output: the integer goal number passed by the player

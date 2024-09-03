@@ -13,7 +13,7 @@ class Juiced(Game):
         self.min_player_count:int = 3 #Defines the minimum number of players that have to !join before the game cans start
         self.max_player_count:int = 16 #Defines the maximum number of players
         self.judge_index:int = 0 #Index of the current judge
-        self.judge_card:Card = None
+        self.judge_card:Card = None #The card that players are playing for
         self.judging:bool = False #Determines whether or not we are in the judging phase
         self.unholy_actions:list = [] #List to hold the cards that players have thrown to be judged
         self.points:list[int] = [] #List to hold point totals (indexed same as players)
