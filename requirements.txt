@@ -1,4 +1,5 @@
 discord
 colorama
 pytest
+pygame
 pillow
