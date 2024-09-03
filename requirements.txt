@@ -1,5 +1,5 @@
 discord
-PyQt6
 colorama
 pytest
+pygame
 pillow
