@@ -67,6 +67,7 @@ class Juiced_Print(Game_Print):
     #Input: integer index parsed from string
     #Output: list of return statements using add_return
     async def select_card(self, player, card_index:int):
+        print(player, card_index)
         output_list = []
 
         #If valid index for hands and mot judge, elif valid index for judge to select winner
@@ -74,9 +75,12 @@ class Juiced_Print(Game_Print):
             #If not judge
             if (self.game.judging == False):
                 if self.game.card_select(player, card_index) == False:
+                    print("oops, failure")
                     return output_list
+                print("oops, add_return")
                 self.add_return(output_list, f"Card submitted.")
                 await self.update_hand(player)
+                print("oops, hand")
 
                 if self.game.judging == True:
                     self.scrambled_unholy_actions = shuffle([action for action in self.game.get_unholy_actions() if action != None])
@@ -97,6 +101,7 @@ class Juiced_Print(Game_Print):
                     self.add_return(output_list, f"Congratulations, **{winner}**. You've won the game!\n{self.get_point_string()}")
                     self.game.end_game()
 
+        print("Here:", output_list)
         return output_list
 
     #Gets the string that allows the judge to choose a card

@@ -6,6 +6,7 @@ import discord
 from Games.game_print import Game_Print as gp
 from Games.Cribbage.cribbage_print import Cribbage_Print
 from Games.Juiced.juiced_print import Juiced_Print
+from Games.Test.test_print import Test_Print
 
 active_games:list[gp] = []
 
@@ -45,11 +46,20 @@ HELP_MESSAGE = '''The bot knows the following commands:
         '**!skunk [0-9]+**': Set the skunk interval (default=30) to the provided number.
         '**!points**': View current number of points each PLAYER has at current point in time.
         '**!team_points**': View current number of points each team has at current point in time.
+
     ***Juiced (Cards Against Humanity/Apples to Apples)***:
       Game:
         '**!juiced**', '**jc**':: Create a game of Juiced.
         '**!goal [0-9]+**': Set the amount of points needed to win to the provided number.
         '**!insult**': Hurl a random insult into the chat.
+
+    ***Test (Used for development, no safeguards to prevent cheating)***:
+      Game:
+        '**!cribbage**', '**!cr**': Create a game of Cribbage.
+        '**!juiced**', '**jc**':: Create a game of Juiced.
+        '**!add .***': Adds the provided string as a player to the game.
+        '**!player command**': For any player in the game and any command in the game.
+        '**!player !hand**': For any player in the game to print their hand.
     '''
 
 async def process_message(msg):
@@ -105,8 +115,10 @@ async def handle_user_messages(msg):
     #Commands to add a game
     if message == "!cribbage" or message == "!cr":
         return make_cribbage(player)
-    if message == "!juiced" or message == "!jc":
+    elif message == "!juiced" or message == "!jc":
         return make_juiced(player)
+    elif message == "!test" or message == "!jc":
+        return make_test(player)
     
     #Roles
     elif message == '!db' or message == '!dumpsterboy':
@@ -140,12 +152,23 @@ def make_juiced(player):
         return gp().add_return([], f"{player} has created a Juiced game. Use **!join** to join it!")
     else:
         return gp().add_return([], f"Sorry, {player}. You need to wait until the current game is started to create another one.")
+    
+#Makes a game of Test to be joined
+def make_test(player):
+    global cur_game
+    
+    if cur_game == None:
+        cur_game = Test_Print()
+        return gp().add_return([], f"{player} has created a Test game. Use **!join** to join it!")
+    else:
+        return gp().add_return([], f"Sorry, {player}. You need to wait until the current game is started to create another one.")
 
 #Give role to user
 async def give_role(member, role):
     await member.edit(roles=[discord.utils.get(member.guild.roles, name=role)])
     return gp().add_return([], member.name + ' is now a ' + role + '!')
 
+#Runs the command if needed or returns None
 async def run_commands(player, message, game):
     for command in game.commands:
         if re.fullmatch(command, message) != None:
