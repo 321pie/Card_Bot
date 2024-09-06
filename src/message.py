@@ -53,6 +53,7 @@ HELP_MESSAGE = '''The bot knows the following commands:
         '**!goal [0-9]+**': Set the amount of points needed to win to the provided number.
         '**!insult**': Hurl a random insult into the chat.
         '**!shuffle**': Reset all players' hands after each round.
+        '**!coders**': Adds the CODERS expansion!
 
     ***Test (Used for development, no safeguards to prevent cheating)***:
       Game:
