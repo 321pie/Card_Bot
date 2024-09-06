@@ -84,7 +84,7 @@ class Juiced_Print(Game_Print):
                 if self.game.judging == True:
                     self.scrambled_unholy_actions = [action for action in self.game.get_unholy_actions() if action != None]
                     shuffle(self.scrambled_unholy_actions)
-                    self.add_return(output_list, f"All cards have been submitted. Please select the winner, **{self.game.get_judge()}.\n{self.get_judge_string()}**")
+                    self.add_return(output_list, f"All cards have been submitted. Please select the winner, **{self.game.get_judge()}**.\n{self.get_judge_string()}")
             else:
                 self.add_return(output_list, f"Please wait your turn, {player}. **Judge {self.game.get_judge()}** is deciding the winner of this round.")
 
