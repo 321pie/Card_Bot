@@ -90,8 +90,9 @@ class Game_Print():
                 
                 #If everyone has voted, end game
                 if self.end.count(True) == len(self.end):
+                    end_string = self.get_end_string(player)
                     self.game.end_game()
-                    self.add_return(return_list, f"Game has been ended early.\n{self.get_end_string(player)}")
+                    self.add_return(return_list, f"Game has been ended early.\n{end_string}")
             else:
                 self.add_return(return_list, f"You can't end a game that hasn't started yet, {player}.")
         else:
