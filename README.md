@@ -3,6 +3,8 @@
 This project is a rework of the [old Cribbage bot](https://github.com/AbbeyRDuBois/Cribbage_Counter).<br>
 Card Bot allows for multiple games to be added, and will likely grow with time.
 
+[Non-Programmer Friendly Instructions](https://docs.google.com/document/d/1ZA37ccEDgdsJG2t4bXch4cNlkp_BOfKMuwSogXjJ1p8/edit?usp=sharing)
+
 ### Requirements:
 * python 3
 * pip 3
