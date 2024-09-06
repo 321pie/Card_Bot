@@ -59,7 +59,7 @@ HELP_MESSAGE = '''The bot knows the following commands:
         '**!juiced**', '**jc**':: Create a game of Juiced.
         '**!add .***': Adds the provided string as a player to the game.
         '**!player command**': For any player in the game and any command in the game.
-        '**!player !hand**': For any player in the game to print their hand.
+        '**!player hand**': For any player in the game to print their hand.
     '''
 
 async def process_message(msg):

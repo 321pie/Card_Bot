@@ -15,6 +15,7 @@ class Juiced_Print(Game_Print):
         
         #Add commands
         self.commands["^!insult$"] = [self.insult]
+        self.commands["^!shuffle$"] = [self.shuffle]
         self.commands["^!goal [0-9]+$"] = [self.change_goal, self.change_goal_parse]
     
     # OVERRIDE #
@@ -67,7 +68,6 @@ class Juiced_Print(Game_Print):
     #Input: integer index parsed from string
     #Output: list of return statements using add_return
     async def select_card(self, player, card_index:int):
-        print(player, card_index)
         output_list = []
 
         #If valid index for hands and mot judge, elif valid index for judge to select winner
@@ -75,16 +75,14 @@ class Juiced_Print(Game_Print):
             #If not judge
             if (self.game.judging == False):
                 if self.game.card_select(player, card_index) == False:
-                    print("oops, failure")
                     return output_list
-                print("oops, add_return")
                 self.add_return(output_list, f"Card submitted.")
                 await self.update_hand(player)
-                print("oops, hand")
 
                 if self.game.judging == True:
-                    self.scrambled_unholy_actions = shuffle([action for action in self.game.get_unholy_actions() if action != None])
-                    self.add_return(output_list, f"All cards have been submitted. Please select the winner, {self.game.get_judge()}.\n{self.get_judge_string()}")
+                    self.scrambled_unholy_actions = [action for action in self.game.get_unholy_actions() if action != None]
+                    shuffle(self.scrambled_unholy_actions)
+                    self.add_return(output_list, f"All cards have been submitted. Please select the winner, **{self.game.get_judge()}.\n{self.get_judge_string()}**")
             else:
                 self.add_return(output_list, f"Please wait your turn, {player}. **Judge {self.game.get_judge()}** is deciding the winner of this round.")
 
@@ -101,7 +99,6 @@ class Juiced_Print(Game_Print):
                     self.add_return(output_list, f"Congratulations, **{winner}**. You've won the game!\n{self.get_point_string()}")
                     self.game.end_game()
 
-        print("Here:", output_list)
         return output_list
 
     #Gets the string that allows the judge to choose a card
@@ -125,6 +122,11 @@ class Juiced_Print(Game_Print):
                 return self.add_return([], f"Don't input 0. I better not catch you doing it again. :eyes:")
         return self.add_return([], f"You can't edit a game you're not in, {player}. Use **!join** to join.")
 
+    #Sets the game to get new hands for every player every round
+    async def shuffle(self, _player):
+        self.game.shuffle = not self.game.shuffle
+        return self.add_return([], "Hands will be reset every round." if self.game.shuffle==True else "Hands will not be reset every round.")
+    
     #Procures an insult from a hand-crafted list of premium rudeness
     async def insult(self, _player):
         return self.add_return([], self.INSULT_LIST[randint(0, len(self.INSULT_LIST)-1)])

@@ -18,7 +18,6 @@ class Test_Print(Game_Print):
         self.commands = {
             "^!start$": [self.start],
             "^!end$": [self.end_game],
-            "^![0-9]+$": [self.select_card, self.select_card_parse],
             "^!join$": [self.explain_rules],
             "^!jion$": [self.explain_rules],
         }
@@ -83,7 +82,7 @@ class Test_Print(Game_Print):
             #Add command for new player and return
             self.commands[f"^!{new_player} .*$"] = [self.handle_command, self.handle_command_parse]
             more_players = self.game_print.game.min_player_count-len(self.game_print.get_players())
-            return self.add_return([], f"Added {new_player} to the game! Use '!{new_player} *command*' to play as them, and '!{new_player} !hand' to print their hand.\n{more_players if more_players>0 else "No"} more players are needed to start the game.")
+            return self.add_return([], f"Added {new_player} to the game! Use '!{new_player} *command*' to play as them, and '!{new_player} hand' to print their hand.\n{more_players if more_players>0 else "No"} more player(s) are needed to start the game.")
         
         return self.add_return([], f"Failed to add player to the game.")
     
@@ -97,7 +96,7 @@ class Test_Print(Game_Print):
     async def handle_command(self, _actual_player, player, message):
         if player in self.game_print.game.get_players():
             #If they want the hand, give it to them
-            if message == "!hand":
+            if message == "hand":
                 if self.game_print.HAND_PIC == False:
                     return self.add_return([], self.game_print.get_hand_string(player))
                 else:
