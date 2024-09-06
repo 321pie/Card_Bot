@@ -559,26 +559,7 @@ WHITE_CARDS = {
 	"World peace" : 1,
 	"YOU MUST CONSTRUCT ADDITIONAL PYLONS" : 1,
 	"Yeast" : 1,
-	"Zeus's sexual appetites" : 1,
-
-    #Custom
-    "Phil's gauntlet": 1,
-    "Root sitting in a dark corner": 1,
-    "Phil Howard": 1,
-    "Rust Guy": 1,
-    "Root": 1,
-    "Seg Fault": 1,
-    "The Fancy French Lady": 1,
-    "The Cake Lady": 1,
-    "The Problem Child": 1,
-    "Python": 1,
-    "C": 1,
-    "C#": 1,
-    "C++": 1,
-    "JavaScript": 1,
-    "ReactJS": 1,
-    "Java": 1,
-    "Rust": 1
+	"Zeus's sexual appetites" : 1
 }
 
 BLACK_CARDS = {
@@ -695,9 +676,30 @@ BLACK_CARDS = {
 	"_____. That's how I want to die." : 1,
 	"_____: Good to the last drop." : 1,
 	"_____: Kid-tested, mother-approved." : 1,
-	"_____? There's an app for that." : 1,
+	"_____? There's an app for that." : 1
+}
 
-    #Custom
+WHITE_CODERS = {
+    "Phil's gauntlet": 1,
+    "Root sitting in a dark corner": 1,
+    "Phil Howard": 1,
+    "Rust Guy": 1,
+    "Root": 1,
+    "Seg Fault": 1,
+    "The Fancy French Lady": 1,
+    "The Cake Lady": 1,
+    "The Problem Child": 1,
+    "Python": 1,
+    "C": 1,
+    "C#": 1,
+    "C++": 1,
+    "JavaScript": 1,
+    "ReactJS": 1,
+    "Java": 1,
+    "Rust": 1
+}
+
+BLACK_CODERS = {
     "I wouldn't have struggled in Phil's gauntlet if I'd had _____." : 1,
     "_____ was the only thing that could stop my emotional breakdown after not being able to find that bug.": 1,
     "You're presenting your code to a small crowd, and you totally forgot you used _____ as a placeholder variable name.": 1,

@@ -2,6 +2,7 @@ from random import randint, shuffle
 
 from Games.game_print import Game_Print
 from Games.Juiced.juiced import Juiced
+import Games.Juiced.juiced_deck as jd
 
 class Juiced_Print(Game_Print):
     HAND_PIC = False
@@ -16,6 +17,7 @@ class Juiced_Print(Game_Print):
         #Add commands
         self.commands["^!insult$"] = [self.insult]
         self.commands["^!shuffle$"] = [self.shuffle]
+        self.commands["^!coders$"] = [self.coders]
         self.commands["^!goal [0-9]+$"] = [self.change_goal, self.change_goal_parse]
     
     # OVERRIDE #
@@ -122,10 +124,16 @@ class Juiced_Print(Game_Print):
                 return self.add_return([], f"Don't input 0. I better not catch you doing it again. :eyes:")
         return self.add_return([], f"You can't edit a game you're not in, {player}. Use **!join** to join.")
 
-    #Sets the game to get new hands for every player every round
+    #Toggles the game to get new hands for every player every round
     async def shuffle(self, _player):
         self.game.shuffle = not self.game.shuffle
         return self.add_return([], "Hands will be reset every round." if self.game.shuffle==True else "Hands will not be reset every round.")
+    
+    #Sets the game to get new hands for every player every round
+    async def coders(self, _player):
+        jd.WHITE_CARDS |= jd.WHITE_CODERS
+        jd.BLACK_CARDS |= jd.BLACK_CODERS
+        return self.add_return([], "Added CODERS expansion.")
     
     #Procures an insult from a hand-crafted list of premium rudeness
     async def insult(self, _player):
