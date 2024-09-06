@@ -52,6 +52,7 @@ HELP_MESSAGE = '''The bot knows the following commands:
         '**!juiced**', '**jc**':: Create a game of Juiced.
         '**!goal [0-9]+**': Set the amount of points needed to win to the provided number.
         '**!insult**': Hurl a random insult into the chat.
+        '**!shuffle**': Reset all players' hands after each round.
 
     ***Test (Used for development, no safeguards to prevent cheating)***:
       Game:
