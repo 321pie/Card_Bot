@@ -13,11 +13,12 @@ class Juiced(Game):
         self.min_player_count:int = 3 #Defines the minimum number of players that have to !join before the game cans start
         self.max_player_count:int = 16 #Defines the maximum number of players
         self.judge_index:int = 0 #Index of the current judge
-        self.judge_card:Card = None
+        self.judge_card:Card = None #The card that players are playing for
         self.judging:bool = False #Determines whether or not we are in the judging phase
         self.unholy_actions:list = [] #List to hold the cards that players have thrown to be judged
         self.points:list[int] = [] #List to hold point totals (indexed same as players)
         self.win_points:int = 6 #Number of points needed to win a game
+        self.shuffle = False #If True, will always reset the deck and make new hands
 
     #Initializes the game on start
     #Returns True on success, False on failure
@@ -56,8 +57,8 @@ class Juiced(Game):
             self.unholy_actions[player_index] = copy.copy(self.hands[player_index][card_index])
             self.hands[player_index].append(self.deck.get_card())
 
-            #Check to see if it's judging time
-            if self.unholy_actions.count(self.unholy_actions[0]) == (len(self.unholy_actions)-1):
+            #Check to see if it's judging time (only judge hasn't played)
+            if self.unholy_actions.count(None) == (1):
                 self.judging = True
 
         return True
@@ -68,9 +69,11 @@ class Juiced(Game):
         self.judge_card = self.judge_deck.get_card()
 
         #Reset deck if low
-        if self.deck.get_length() < len(self.players) + 10:
+        if (self.deck.get_length() < len(self.players)+10) or (self.shuffle):
             self.deck.reset_deck()
-        if self.judge_deck.get_length() < len(self.players) + 10:
+            if self.shuffle:
+                self.hands = self.deck.get_hands(len(self.players), 10)
+        if self.judge_deck.get_length() < len(self.players)+10:
             self.judge_deck.reset_deck()
 
         for player_index in range(len(self.players)):

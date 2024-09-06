@@ -562,7 +562,23 @@ WHITE_CARDS = {
 	"Zeus's sexual appetites" : 1,
 
     #Custom
-    "Phil's gauntlet": 1
+    "Phil's gauntlet": 1,
+    "Root sitting in a dark corner": 1,
+    "Phil Howard": 1,
+    "Rust Guy": 1,
+    "Root": 1,
+    "Seg Fault": 1,
+    "The Fancy French Lady": 1,
+    "The Cake Lady": 1,
+    "The Problem Child": 1,
+    "Python": 1,
+    "C": 1,
+    "C#": 1,
+    "C++": 1,
+    "JavaScript": 1,
+    "ReactJS": 1,
+    "Java": 1,
+    "Rust": 1
 }
 
 BLACK_CARDS = {
@@ -682,7 +698,10 @@ BLACK_CARDS = {
 	"_____? There's an app for that." : 1,
 
     #Custom
-    "I wouldn't have struggled in Phil's gauntlet if I'd had _____." : 1
+    "I wouldn't have struggled in Phil's gauntlet if I'd had _____." : 1,
+    "_____ was the only thing that could stop my emotional breakdown after not being able to find that bug.": 1,
+    "You're presenting your code to a small crowd, and you totally forgot you used _____ as a placeholder variable name.": 1,
+    "There aren't a lot of things that scare me, but _____ is definitely one of them.": 1
 }
 
 # #This is how I yoinked the cards :)

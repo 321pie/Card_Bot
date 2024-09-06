@@ -90,7 +90,9 @@ class Game_Print():
                 
                 #If everyone has voted, end game
                 if self.end.count(True) == len(self.end):
-                    self.add_return(return_list, f"Game has been ended early.\n{self.get_end_string(player)}")
+                    end_string = self.get_end_string(player)
+                    self.game.end_game()
+                    self.add_return(return_list, f"Game has been ended early.\n{end_string}")
             else:
                 self.add_return(return_list, f"You can't end a game that hasn't started yet, {player}.")
         else:
@@ -155,18 +157,20 @@ class Game_Print():
                 return self.deck_look.get_hand_pic([hand], show_index)
         
         return None
-
+    
 ###############################################################################
-# List of common functions that MUST be implemented
+# List of common functions that likely need to be implemented
 ###############################################################################
     #Input: integer index parsed from string
     #Output: list of return statements using add_return
     async def select_card(self, player, card_index:int):
+        #If card gets played
+        if self.game.card_select(player, card_index):
+            return self.add_return([], f"{player} has played {self.game.get_hand(player)[card_index]}")
+        
+        #If card doesn't get played, output nothing
         return []
     
-###############################################################################
-# List of common functions that may be implemented
-###############################################################################
     #Returns the string to be displayed when the game is started
     def get_start_string(self, player) -> str:
         return ""
