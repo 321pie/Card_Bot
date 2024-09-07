@@ -12,13 +12,16 @@ class Juiced_Print(Game_Print):
 
         self.deck_look = None
         self.game = Juiced()
-        self.scrambled_unholy_actions:list = []
+        self.scrambled_unholy_actions:list[list] = []
         
         #Add commands
         self.commands["^!insult$"] = [self.insult]
         self.commands["^!shuffle$"] = [self.shuffle]
+        self.commands["^!apples$"] = [self.apples]
+        self.commands["^!cah$"] = [self.cah]
         self.commands["^!coders$"] = [self.coders]
         self.commands["^!goal [0-9]+$"] = [self.change_goal, self.change_goal_parse]
+        self.commands["^!hand [0-9]+$"] = [self.change_hand_length, self.change_hand_length_parse]
     
     # OVERRIDE #
     async def change_look(self, player, _look):
@@ -30,7 +33,7 @@ class Juiced_Print(Game_Print):
     # OVERRIDE #
     #Returns the string to be displayed when the game is started
     def get_start_string(self, _player) -> str:
-        return f"**{self.game.get_judge()}** is the judge. The card is:\n**{self.get_card_string(self.game.get_judge_card())}**"
+        return f"**{self.game.get_judge()}** is the judge. The card is:\n**{self.get_card_string(self.game.get_judge_card())}**\nPlease play **{self.game.get_judge_card().suit}** card(s).\nUse **/h** or **/hand** to see your hand."
     
     # OVERRIDE #
     #Returns the string to be displayed when the game is ended
@@ -60,29 +63,43 @@ class Juiced_Print(Game_Print):
     def get_hand_string_helper(self, hand):
         output_string = ""
         for card_index in range(len(hand)):
-            try:
-                output_string += "!" + str(card_index) + ": " + self.get_card_string(hand[card_index]) + "\n"
-            except:
-                pass
+            output_string += "!" + str(card_index) + ": " + self.get_card_string(hand[card_index]) + "\n"
 
         return output_string
+    
+    #Returns the string for judge's hand
+    def get_judge_hand_string(self, hand):
+        output_string = ""
+        for card_index in range(len(hand)):
+            output_string += "!" + str(card_index) + ": " + self.get_judge_hand_string_helper([self.get_card_string(hand[card_index][multiple_card_index]) for multiple_card_index in range(len(hand[card_index]))]) + "\n"
+
+        return output_string
+    
+    #Returns the string for a list of cards for the judge hand
+    def get_judge_hand_string_helper(self, cards):
+        output_string = ""
+        for card in cards:
+            output_string += card + ", "
+
+        return output_string[:-2]
     
     #Input: integer index parsed from string
     #Output: list of return statements using add_return
     async def select_card(self, player, card_index:int):
         output_list = []
 
-        #If valid index for hands and mot judge, elif valid index for judge to select winner
+        #If valid index for hands and not judge, elif valid index for judge to select winner
         if (card_index >= 0) and (card_index < len(self.game.get_hand(player))) and (player != self.game.get_judge()):
             #If not judge
             if (self.game.judging == False):
                 if self.game.card_select(player, card_index) == False:
                     return output_list
+                
                 self.add_return(output_list, f"Card submitted.")
                 await self.update_hand(player)
 
                 if self.game.judging == True:
-                    self.scrambled_unholy_actions = [action for action in self.game.get_unholy_actions() if action != None]
+                    self.scrambled_unholy_actions = [action_list for action_list in self.game.get_unholy_actions() if len(action_list) != 0]
                     shuffle(self.scrambled_unholy_actions)
                     self.add_return(output_list, f"All cards have been submitted. Please select the winner, **{self.game.get_judge()}**.\n{self.get_judge_string()}")
             else:
@@ -92,20 +109,20 @@ class Juiced_Print(Game_Print):
             #Decode index since we scrambled the array
             card_index = self.game.get_unholy_actions().index(self.scrambled_unholy_actions[card_index])
 
-            if self.game.card_select(player, card_index) != False:
-                winner = self.game.get_winner()
-                if winner == None:
-                    self.add_return(output_list, f"Congratulations, **{self.game.get_judge()}**.\n{self.get_point_string()}\n{self.get_start_string(player)}")
-                    self.scrambled_unholy_actions = []
-                else:
-                    self.add_return(output_list, f"Congratulations, **{winner}**. You've won the game!\n{self.get_point_string()}")
-                    self.game.end_game()
+            self.game.card_select(player, card_index)
+            winner = self.game.get_winner()
+            if winner == None:
+                self.add_return(output_list, f"Chosen card(s): **{self.get_judge_hand_string_helper([self.get_card_string(card) for card in self.scrambled_unholy_actions[card_index]])}**\nCongratulations, **{self.game.get_judge()}**!\n{self.get_point_string()}\n{self.get_start_string(player)}")
+                self.scrambled_unholy_actions = []
+            else:
+                self.add_return(output_list, f"Congratulations, **{winner}**! You've won the game!\n{self.get_point_string()}")
+                self.game.end_game()
 
         return output_list
 
     #Gets the string that allows the judge to choose a card
     def get_judge_string(self):
-        return f"**{self.get_card_string(self.game.get_judge_card())}**\n{self.get_hand_string_helper(self.scrambled_unholy_actions)}"
+        return f"**{self.get_card_string(self.game.get_judge_card())}**\n{self.get_judge_hand_string(self.scrambled_unholy_actions)}"
     
     #Input: command string as defined in message.py for command helper functions
     #Output: the integer goal number passed by the player
@@ -123,17 +140,56 @@ class Juiced_Print(Game_Print):
             else:
                 return self.add_return([], f"Don't input 0. I better not catch you doing it again. :eyes:")
         return self.add_return([], f"You can't edit a game you're not in, {player}. Use **!join** to join.")
+    
+    #Input: command string as defined in message.py for command helper functions
+    #Output: the integer goal number passed by the player
+    def change_hand_length_parse(self, parse_str):
+        return [int(parse_str[6:])]
+
+    #Input: player as defined in message.py for commands and integer goal_num from change_goal_parse
+    #Output: add_return print for message handler
+    async def change_hand_length(self, player, hand_len):
+        if player in self.game.get_players():
+            if (hand_len >= 5) and (hand_len <= 20):
+                self.game.hand_len = hand_len
+            else:
+                return self.add_return([], f"Invalid hand size. Please input a number between 5 and 20.")
+        return self.add_return([], f"You can't edit a game you're not in, {player}. Use **!join** to join.")
 
     #Toggles the game to get new hands for every player every round
     async def shuffle(self, _player):
         self.game.shuffle = not self.game.shuffle
         return self.add_return([], "Hands will be reset every round." if self.game.shuffle==True else "Hands will not be reset every round.")
     
-    #Sets the game to get new hands for every player every round
+    #Toggles CODERS expansion
     async def coders(self, _player):
-        jd.WHITE_CARDS |= jd.WHITE_CODERS
-        jd.BLACK_CARDS |= jd.BLACK_CODERS
-        return self.add_return([], "Added CODERS expansion.")
+        length = len(jd.WHITE_CARDS)
+        jd.WHITE_CARDS ^= jd.WHITE_CODERS
+        jd.BLACK_CARDS ^= jd.BLACK_CODERS
+        if length < len(jd.WHITE_CARDS):
+            return self.add_return([], "Added CODERS expansion.")
+        else:
+            return self.add_return([], "Removed CODERS expansion.")
+        
+    #Toggles CAH expansion
+    async def cah(self, _player):
+        length = len(jd.WHITE_CAH)
+        jd.WHITE_CARDS ^= jd.WHITE_CAH
+        jd.BLACK_CARDS ^= jd.BLACK_CAH
+        if length < len(jd.WHITE_CAH):
+            return self.add_return([], "Added CAH expansion.")
+        else:
+            return self.add_return([], "Removed CAH expansion.")
+        
+    #Toggles APPLES expansion
+    async def apples(self, _player):
+        length = len(jd.WHITE_APPLES)
+        jd.WHITE_CARDS ^= jd.WHITE_APPLES
+        jd.BLACK_CARDS ^= jd.BLACK_APPLES
+        if length < len(jd.WHITE_APPLES):
+            return self.add_return([], "Added APPLES expansion.")
+        else:
+            return self.add_return([], "Removed APPLES expansion.")
     
     #Procures an insult from a hand-crafted list of premium rudeness
     async def insult(self, _player):

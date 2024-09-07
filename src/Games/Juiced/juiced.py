@@ -15,20 +15,26 @@ class Juiced(Game):
         self.judge_index:int = 0 #Index of the current judge
         self.judge_card:Card = None #The card that players are playing for
         self.judging:bool = False #Determines whether or not we are in the judging phase
-        self.unholy_actions:list = [] #List to hold the cards that players have thrown to be judged
+        self.unholy_actions:list[list[Card]] = [] #List to hold the cards that players have thrown to be judged
         self.points:list[int] = [] #List to hold point totals (indexed same as players)
         self.win_points:int = 6 #Number of points needed to win a game
         self.shuffle = False #If True, will always reset the deck and make new hands
+        self.hand_len = 10 #Length of hands
 
     #Initializes the game on start
     #Returns True on success, False on failure
     def initialize_game(self) -> bool:
-        #Variable declared in base class
-        self.hands = self.deck.get_hands(len(self.players), 10)
+        #Make sure deck has cards
+        if (len(deck.WHITE_CARDS) == 0) or (len(deck.BLACK_CARDS) == 0):
+            deck.WHITE_CARDS = deck.WHITE_CAH
+            deck.BLACK_CARDS = deck.BLACK_CAH
+
+        #Init variables to initialize the game
+        self.hands = self.deck.get_hands(len(self.players), self.hand_len) #Variable declared in base class
 
         for _ in self.players:
             self.points.append(0)
-            self.unholy_actions.append(None)
+            self.unholy_actions.append([])
         
         self.judge_card = self.judge_deck.get_card()
 
@@ -42,44 +48,53 @@ class Juiced(Game):
                 return False
             if card_index == self.judge_index:
                 return False
-            #Add proxy that will get deleted, assign a new Judge Judy, and give a point
-            self.hands[self.judge_index].insert(card_index, None)
+            
+            #Assign a new Judge Judy, give a point, and reset round
             self.judge_index = card_index
             self.points[card_index] += 1
-
             self.reset_round()
+            return False
         else:
             #If Judge Judy is disrespecting the rules of the courtroom or the player has already played
-            if (player_index == self.judge_index) or (self.unholy_actions[player_index] != None):
+            if (player_index == self.judge_index) or (len(self.unholy_actions[player_index]) >= self.judge_card.suit): #suit is an int
                 return False
             
             #Add card to be judged and add new card to the player's hand
-            self.unholy_actions[player_index] = copy.copy(self.hands[player_index][card_index])
-            self.hands[player_index].append(self.deck.get_card())
+            self.unholy_actions[player_index].append(copy.copy(self.hands[player_index][card_index]))
+            if not self.shuffle:
+                while len(self.hands[player_index]) < self.hand_len+1: #+1 because card hasn't been removed yet
+                    self.hands[player_index].append(self.deck.get_card())
+            else:
+                self.hands[player_index] = self.deck.get_hands(1, self.hand_len)
 
-            #Check to see if it's judging time (only judge hasn't played)
-            if self.unholy_actions.count(None) == (1):
+            #Check to see if it's judging time (only judge hasn't played all cards)
+            players_unplayed = 0
+            for card_list in self.unholy_actions:
+                if len(card_list) < self.judge_card.suit:
+                    players_unplayed += 1
+
+            if players_unplayed == 1:
                 self.judging = True
 
         return True
     
     #Prepare for new round. Returns player that won if game has ended, else None
     def reset_round(self):
-        self.judging = False
         self.judge_card = self.judge_deck.get_card()
+        self.judging = False
 
         #Reset deck if low
-        if (self.deck.get_length() < len(self.players)+10) or (self.shuffle):
+        if (self.deck.get_length() < len(self.players)*self.hand_len+10) or (self.shuffle):
             self.deck.reset_deck()
-            if self.shuffle:
-                self.hands = self.deck.get_hands(len(self.players), 10)
         if self.judge_deck.get_length() < len(self.players)+10:
             self.judge_deck.reset_deck()
 
         for player_index in range(len(self.players)):
-            self.unholy_actions[player_index] = None
+            self.unholy_actions[player_index] = []
             if self.points[player_index] >= self.win_points:
                 self.end_game()
+                deck.WHITE_CARDS = {}
+                deck.BLACK_CARDS = {}
                 return self.players[player_index]
             
         return None

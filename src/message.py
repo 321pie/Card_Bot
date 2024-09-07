@@ -51,8 +51,11 @@ HELP_MESSAGE = '''The bot knows the following commands:
       Game:
         '**!juiced**', '**jc**':: Create a game of Juiced.
         '**!goal [0-9]+**': Set the amount of points needed to win to the provided number.
+        '**!hand [0-9]+**': Changes the number of cards in hand to the specified number.
         '**!insult**': Hurl a random insult into the chat.
         '**!shuffle**': Reset all players' hands after each round.
+        '**!apples**': Adds the APPLES expansion (Apples to Apples)!
+        '**!cah**': Adds the CAH expansion (Cards Against Humanity)!
         '**!coders**': Adds the CODERS expansion!
 
     ***Test (Used for development, no safeguards to prevent cheating)***:
