@@ -4899,7 +4899,8 @@ BLACK_CODERS = {
     "_____ just caused my program to seg fault. :skull:": 1,
     "I pushed ______ to production. What could go wrong?": 1,
     '''git commit -m "_____"''': 1,
-    "Janice from accounting isn't very good at her job. She didn't even think to account for the possibility of ______.": 1
+    "Janice from accounting isn't very good at her job. She didn't even think to account for the possibility of ______.": 1,
+    "Our sprint velocity would increase if we had ______.": 1
 }
 
 # STR = '''
