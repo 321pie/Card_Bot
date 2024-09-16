@@ -54,9 +54,10 @@ HELP_MESSAGE = '''The bot knows the following commands:
         '**!hand [0-9]+**': Changes the number of cards in hand to the specified number.
         '**!insult**': Hurl a random insult into the chat.
         '**!shuffle**': Reset all players' hands after each round.
-        '**!apples**': Adds the APPLES expansion (Apples to Apples)!
-        '**!cah**': Adds the CAH expansion (Cards Against Humanity)!
-        '**!coders**': Adds the CODERS expansion!
+        '**!all**': Toggles ALL expansions!
+        '**!apples**': Toggles the APPLES expansion (Apples to Apples)!
+        '**!cah**': Toggles the CAH expansion (Cards Against Humanity)!
+        '**!coders**': Toggles the CODERS expansion!
 
     ***Test (Used for development, no safeguards to prevent cheating)***:
       Game:

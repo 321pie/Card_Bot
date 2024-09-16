@@ -25,13 +25,16 @@ class Juiced(Game):
     #Returns True on success, False on failure
     def initialize_game(self) -> bool:
         #Make sure deck has cards
-        if (len(deck.WHITE_CARDS) == 0) or (len(deck.BLACK_CARDS) == 0):
+        if (len(deck.WHITE_CARDS) <= len(self.players)*self.hand_len*3 + 10) or (len(deck.BLACK_CARDS) <= 10):
             deck.WHITE_CARDS = deck.WHITE_CAH
             deck.BLACK_CARDS = deck.BLACK_CAH
 
+        #Reinitialize with updated values for available cards
+        self.deck = deck.White_Deck()
+        self.judge_deck = deck.Black_Deck()
+
         #Init variables to initialize the game
         self.hands = self.deck.get_hands(len(self.players), self.hand_len) #Variable declared in base class
-
         for _ in self.players:
             self.points.append(0)
             self.unholy_actions.append([])
@@ -65,7 +68,7 @@ class Juiced(Game):
                 while len(self.hands[player_index]) < self.hand_len+1: #+1 because card hasn't been removed yet
                     self.hands[player_index].append(self.deck.get_card())
             else:
-                self.hands[player_index] = self.deck.get_hands(1, self.hand_len)
+                self.hands[player_index] = self.deck.get_hands(1, self.hand_len)[0]
 
             #Check to see if it's judging time (only judge hasn't played all cards)
             players_unplayed = 0

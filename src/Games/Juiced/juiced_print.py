@@ -17,6 +17,7 @@ class Juiced_Print(Game_Print):
         #Add commands
         self.commands["^!insult$"] = [self.insult]
         self.commands["^!shuffle$"] = [self.shuffle]
+        self.commands["^!all$"] = [self.all]
         self.commands["^!apples$"] = [self.apples]
         self.commands["^!cah$"] = [self.cah]
         self.commands["^!coders$"] = [self.coders]
@@ -103,16 +104,17 @@ class Juiced_Print(Game_Print):
                     shuffle(self.scrambled_unholy_actions)
                     self.add_return(output_list, f"All cards have been submitted. Please select the winner, **{self.game.get_judge()}**.\n{self.get_judge_string()}")
             else:
-                self.add_return(output_list, f"Please wait your turn, {player}. **Judge {self.game.get_judge()}** is deciding the winner of this round.")
+                self.add_return(output_list, f"Please wait your turn, {player}. Judge **{self.game.get_judge()}** is deciding the winner of this round.")
 
         elif (self.game.judging == True) and (player == self.game.get_judge()) and (card_index >= 0) and (card_index < len(self.scrambled_unholy_actions)):
             #Decode index since we scrambled the array
+            unholy_card_index = card_index
             card_index = self.game.get_unholy_actions().index(self.scrambled_unholy_actions[card_index])
 
             self.game.card_select(player, card_index)
             winner = self.game.get_winner()
             if winner == None:
-                self.add_return(output_list, f"Chosen card(s): **{self.get_judge_hand_string_helper([self.get_card_string(card) for card in self.scrambled_unholy_actions[card_index]])}**\nCongratulations, **{self.game.get_judge()}**!\n{self.get_point_string()}\n{self.get_start_string(player)}")
+                self.add_return(output_list, f"Chosen card(s): **{self.get_judge_hand_string_helper([self.get_card_string(card) for card in self.scrambled_unholy_actions[unholy_card_index]])}**\nCongratulations, **{self.game.get_judge()}**!\n{self.get_point_string()}\n{self.get_start_string(player)}")
                 self.scrambled_unholy_actions = []
             else:
                 self.add_return(output_list, f"Congratulations, **{winner}**! You've won the game!\n{self.get_point_string()}")
@@ -161,35 +163,62 @@ class Juiced_Print(Game_Print):
         self.game.shuffle = not self.game.shuffle
         return self.add_return([], "Hands will be reset every round." if self.game.shuffle==True else "Hands will not be reset every round.")
     
+    #Adds all expansions
+    async def all(self, player):
+        output_str = ""
+        output_str += await self.coders(player, raw=True) + "\n"
+        output_str += await self.cah(player, raw=True) + "\n"
+        output_str += await self.apples(player, raw=True) + "\n"
+
+        return self.add_return([], output_str)
+    
     #Toggles CODERS expansion
-    async def coders(self, _player):
+    async def coders(self, _player, raw=False):
         length = len(jd.WHITE_CARDS)
-        jd.WHITE_CARDS ^= jd.WHITE_CODERS
-        jd.BLACK_CARDS ^= jd.BLACK_CODERS
-        if length < len(jd.WHITE_CARDS):
-            return self.add_return([], "Added CODERS expansion.")
+        jd.WHITE_CARDS = dict(set(jd.WHITE_CARDS.items()).symmetric_difference(set(jd.WHITE_CODERS.items())))
+        jd.BLACK_CARDS = dict(set(jd.BLACK_CARDS.items()).symmetric_difference(set(jd.BLACK_CODERS.items())))
+        if not raw:
+            if length < len(jd.WHITE_CARDS):
+                return self.add_return([], "Added CODERS expansion.")
+            else:
+                return self.add_return([], "Removed CODERS expansion.")
         else:
-            return self.add_return([], "Removed CODERS expansion.")
+            if length < len(jd.WHITE_CARDS):
+                return "Added CODERS expansion."
+            else:
+                return "Removed CODERS expansion."
         
     #Toggles CAH expansion
-    async def cah(self, _player):
-        length = len(jd.WHITE_CAH)
-        jd.WHITE_CARDS ^= jd.WHITE_CAH
-        jd.BLACK_CARDS ^= jd.BLACK_CAH
-        if length < len(jd.WHITE_CAH):
-            return self.add_return([], "Added CAH expansion.")
+    async def cah(self, _player, raw=False):
+        length = len(jd.WHITE_CARDS)
+        jd.WHITE_CARDS = dict(set(jd.WHITE_CARDS.items()).symmetric_difference(set(jd.WHITE_CAH.items())))
+        jd.BLACK_CARDS = dict(set(jd.BLACK_CARDS.items()).symmetric_difference(set(jd.BLACK_CAH.items())))
+        if not raw:
+            if length < len(jd.WHITE_CARDS):
+                return self.add_return([], "Added CAH expansion.")
+            else:
+                return self.add_return([], "Removed CAH expansion.")
         else:
-            return self.add_return([], "Removed CAH expansion.")
+            if length < len(jd.WHITE_CARDS):
+                return "Added CAH expansion."
+            else:
+                return "Removed CAH expansion."
         
     #Toggles APPLES expansion
-    async def apples(self, _player):
-        length = len(jd.WHITE_APPLES)
-        jd.WHITE_CARDS ^= jd.WHITE_APPLES
-        jd.BLACK_CARDS ^= jd.BLACK_APPLES
-        if length < len(jd.WHITE_APPLES):
-            return self.add_return([], "Added APPLES expansion.")
+    async def apples(self, _player, raw=False):
+        length = len(jd.WHITE_CARDS)
+        jd.WHITE_CARDS = dict(set(jd.WHITE_CARDS.items()).symmetric_difference(set(jd.WHITE_APPLES.items())))
+        jd.BLACK_CARDS = dict(set(jd.BLACK_CARDS.items()).symmetric_difference(set(jd.BLACK_APPLES.items())))
+        if not raw:
+            if length < len(jd.WHITE_CARDS):
+                return self.add_return([], "Added APPLES expansion.")
+            else:
+                return self.add_return([], "Removed APPLES expansion.")
         else:
-            return self.add_return([], "Removed APPLES expansion.")
+            if length < len(jd.WHITE_CARDS):
+                return "Added APPLES expansion."
+            else:
+                return "Removed APPLES expansion."
     
     #Procures an insult from a hand-crafted list of premium rudeness
     async def insult(self, _player):
