@@ -100,9 +100,9 @@ class Cribbage_Print(Game_Print):
     #Output: add_return print for message handler
     async def get_calcs(self, player):
         if self.calc_string == "":
-            return self.add_return(f"You need to finish a round before you can see the hand values, {player}.")
+            return self.add_return([], f"You need to finish a round before you can see the hand values, {player}.")
         else:
-            return self.add_return(self.calc_string)
+            return self.add_return([], self.calc_string)
         
     #Input: parse string of form "^!teams [0-9]+$"
     #Output: integer team count parsed from the string
@@ -346,7 +346,7 @@ class Cribbage_Print(Game_Print):
             #Change flipped joker to specified card
             elif self.game.change_flipped_joker(card, player) == True:
                 if(card.value == dk.JACK):
-                    self.add_return(return_list, f"Flipped joker has been made into {card.display()}.\n{self.game.get_players()[self.game.pegging_index]} gets nibs for 2.\nPegging will now begin with **{self.game.get_players()[self.game.pegging_index]}**", self.deck_look.get_hand_pic([[card]], show_index=False))
+                    self.add_return(return_list, f"Flipped joker has been made into {card.display()}.\n{self.game.get_players()[self.game.crib_index]} gets nibs for 2.\nPegging will now begin with **{self.game.get_players()[self.game.pegging_index]}**", self.deck_look.get_hand_pic([[card]], show_index=False))
                     
                     #Check for winner
                     if(self.game.get_winner() != None):
@@ -479,7 +479,7 @@ class Cribbage_Print(Game_Print):
             return self.add_return(return_list, player_scores + f"{winner_string} has won the game! Everything will now be reset.")
         else:
             self.game.end_game()
-            return player_hands + player_scores + f"{winner_string} has won the game! Everything will now be reset."
+            return self.add_return(return_list, player_hands + player_scores + f"{winner_string} has won the game! Everything will now be reset.")
 
     #Returns a string with each team and the number of points they have
     def get_point_string(self, always_solo=False):
