@@ -3,6 +3,7 @@ import io
 import os
 from PIL import Image, ImageDraw, ImageFont
 import pygame as pg
+from random import randrange
 
 import Games.deck as deck
 
@@ -78,8 +79,21 @@ class Pics():
     #Returns an Image of the selected card
     def get_card(self, card:deck.Card, index:int, showIndex:bool=False) -> Image.Image:
         #Define path to assets
+        deckName = self.custom_deck
         try:
-            asset_file_path = self.get_path(f'src\\card_art\\{self.custom_deck}_Deck.png')
+            if self.custom_deck == "Pokemon":
+                rng = randrange(0, 100)
+                if rng <= 39:
+                    deckName = "Pokemon1"
+                elif rng <= 79:
+                    deckName = "Pokemon2"
+                else:
+                    deckName = "PokemonQ"
+                rng = randrange(0, 100)
+                if rng <= 9:
+                    deckName += "_Shiny"
+
+            asset_file_path = self.get_path(f'src\\card_art\\{deckName}_Deck.png')
             sprite_sheet = Image.open(asset_file_path)
         except:
             return None
