@@ -5,7 +5,7 @@ from PIL import Image, ImageDraw, ImageFont
 import pygame as pg
 from random import randrange
 
-import Games.deck as deck
+import deck
 
 
 class Pics():
@@ -19,8 +19,20 @@ class Pics():
         self.card_width = 315 #Width of each card
         self.card_height = 438 #Height of each card
         self.bar_height = 75 #Height of the bar that holds the index
-        self.custom_deck = custom_deck
+        if custom_deck == "Pokemon":
+            rng = randrange(0, 100)
+            if rng <= 39:
+                self.custom_deck = "Pokemon1"
+            elif rng <= 79:
+                self.custom_deck = "Pokemon2"
+            else:
+                self.custom_deck = "PokemonQ"
 
+            rng = randrange(0, 100)
+            if rng <= 9:
+                self.custom_deck += "_Shiny"
+        else:
+            self.custom_deck = custom_deck
         #This one can change as needed
         self.sprite_scalar = .3 #Multiplier to zoom by to make hand a good size
 
@@ -71,6 +83,7 @@ class Pics():
         hands_img = hands_img.resize(new_size, Image.Resampling.LANCZOS)
         byte_image = io.BytesIO()
         hands_img.save(byte_image, format='PNG')
+        hands_img.show()
         byte_image.seek(0)
 
         #return image as byte array
@@ -79,21 +92,8 @@ class Pics():
     #Returns an Image of the selected card
     def get_card(self, card:deck.Card, index:int, showIndex:bool=False) -> Image.Image:
         #Define path to assets
-        deckName = self.custom_deck
         try:
-            if self.custom_deck == "Pokemon":
-                rng = randrange(0, 100)
-                if rng <= 39:
-                    deckName = "Pokemon1"
-                elif rng <= 79:
-                    deckName = "Pokemon2"
-                else:
-                    deckName = "PokemonQ"
-                rng = randrange(0, 100)
-                if rng <= 9:
-                    deckName += "_Shiny"
-
-            asset_file_path = self.get_path(f'src\\card_art\\{deckName}_Deck.png')
+            asset_file_path = self.get_path(f'src\\card_art\\{self.custom_deck}_Deck.png')
             sprite_sheet = Image.open(asset_file_path)
         except:
             return None
@@ -139,7 +139,10 @@ class Pics():
 
             draw = ImageDraw.Draw(index_card)
             try:
-                font = ImageFont.truetype(f"src\\Font\\{self.custom_deck}_Font.ttf", 55)
+                if "Pokemon" in self.custom_deck:
+                    font = ImageFont.truetype(f"src\\Font\\Pokemon_Font.ttf", 55)
+                else:
+                    font = ImageFont.truetype(f"src\\Font\\{self.custom_deck}_Font.ttf", 55)
             except:
                 return None
 
