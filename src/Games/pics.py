@@ -5,7 +5,7 @@ from PIL import Image, ImageDraw, ImageFont
 import pygame as pg
 from random import randrange
 
-import deck
+import Games.deck as deck
 
 
 class Pics():
