@@ -15,6 +15,7 @@ class Pics():
     STARWARS = "Starwars"
     POKEMON = "Pokemon"
     HALLOWEEN = "Halloween"
+    POP = "Pop"
     
     def __init__(self, custom_deck):
         #The size of the sprites
