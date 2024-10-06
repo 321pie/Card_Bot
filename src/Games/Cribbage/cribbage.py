@@ -1,4 +1,5 @@
 import copy
+from math import factorial, floor
 
 from Games.deck import Card
 import Games.deck as deck
@@ -402,7 +403,7 @@ class Cribbage(game.Game):
                 for card_index in range(1, total_card_index+1):
                     cards.append(old_cards[-card_index].to_int_runs())
 
-                #sort cards to determine run and increment total_caard_index for next iteration
+                #sort cards to determine run and increment total_card_index for next iteration
                 cards = sorted(cards, reverse=True)
                 total_card_index += 1
 
@@ -417,15 +418,18 @@ class Cribbage(game.Game):
                     points = len(cards)
                 complete_run = True
 
-        if(len(old_cards) >= 1):
-            if(cur_card.value == old_cards[-1].value): #Check for pair
-                points += 2
-                if(len(old_cards) >= 2):
-                    if(cur_card.value == old_cards[-2].value): #Check for double pair (3 of a kind)
-                        points += 4 #2 + 4 = 6
-                        if(len(old_cards) >= 3):
-                            if(cur_card.value == old_cards[-3].value): #Check for double pair (3 of a kind)
-                                points += 6 #6 + 6 = 12
+        #Check for pairs
+        num_cards_checked = 1
+        is_done = False
+        while (len(old_cards) >= num_cards_checked) and not is_done:
+            if cur_card.value == old_cards[num_cards_checked*-1].value:
+                num_cards_checked += 1
+            else:
+                is_done = True
+        
+        #If any points, use combination formula (num_cards_checked choose 2) to get point values of pair
+        if num_cards_checked >= 2:
+            points += floor(factorial(num_cards_checked) / (2 * factorial(num_cards_checked-2))) * 2
 
         if(sum == 15 or sum == 31): #Check for 15 and 31
             points += 2
