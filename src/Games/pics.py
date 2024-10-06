@@ -3,6 +3,7 @@ import io
 import os
 from PIL import Image, ImageDraw, ImageFont
 import pygame as pg
+from random import randrange
 
 import Games.deck as deck
 
@@ -12,14 +13,28 @@ class Pics():
     GENSHIN = "Genshin"
     CATS = "Cats"
     STARWARS = "Starwars"
+    POKEMON = "Pokemon"
+    HALLOWEEN = "Halloween"
     
     def __init__(self, custom_deck):
         #The size of the sprites
         self.card_width = 315 #Width of each card
         self.card_height = 438 #Height of each card
         self.bar_height = 75 #Height of the bar that holds the index
-        self.custom_deck = custom_deck
+        if custom_deck == "Pokemon":
+            rng = randrange(0, 100)
+            if rng <= 39:
+                self.custom_deck = "Pokemon1"
+            elif rng <= 79:
+                self.custom_deck = "Pokemon2"
+            else:
+                self.custom_deck = "PokemonQ"
 
+            rng = randrange(0, 100)
+            if rng <= 9:
+                self.custom_deck += "_Shiny"
+        else:
+            self.custom_deck = custom_deck
         #This one can change as needed
         self.sprite_scalar = .3 #Multiplier to zoom by to make hand a good size
 
@@ -125,7 +140,10 @@ class Pics():
 
             draw = ImageDraw.Draw(index_card)
             try:
-                font = ImageFont.truetype(f"src\\Font\\{self.custom_deck}_Font.ttf", 55)
+                if "Pokemon" in self.custom_deck:
+                    font = ImageFont.truetype(f"src\\Font\\Pokemon_Font.ttf", 55)
+                else:
+                    font = ImageFont.truetype(f"src\\Font\\{self.custom_deck}_Font.ttf", 55)
             except:
                 return None
 

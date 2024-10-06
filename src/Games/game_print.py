@@ -23,7 +23,9 @@ class Game_Print():
             "^!cats$": [self.change_look, self.change_look_parse],
             "^!classic$": [self.change_look, self.change_look_parse],
             "^!genshin$": [self.change_look, self.change_look_parse],
-            "^!starwars$": [self.change_look, self.change_look_parse]
+            "^!starwars$": [self.change_look, self.change_look_parse],
+            "^!pokemon$": [self.change_look, self.change_look_parse],
+            "^!halloween$": [self.change_look, self.change_look_parse]
         }
 
     def add_return(self, return_list, return_string, file=None, index=None):
@@ -112,6 +114,10 @@ class Game_Print():
             return [Pics.GENSHIN]
         elif parse_str == "!starwars":
             return [Pics.STARWARS]
+        elif parse_str == "!pokemon":
+            return [Pics.POKEMON]
+        elif parse_str == "!halloween":
+            return [Pics.HALLOWEEN]
         else:
             return [Pics.CLASSIC]
     
