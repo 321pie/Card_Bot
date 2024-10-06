@@ -83,7 +83,6 @@ class Pics():
         hands_img = hands_img.resize(new_size, Image.Resampling.LANCZOS)
         byte_image = io.BytesIO()
         hands_img.save(byte_image, format='PNG')
-        hands_img.show()
         byte_image.seek(0)
 
         #return image as byte array
