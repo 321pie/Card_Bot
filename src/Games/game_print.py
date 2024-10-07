@@ -26,6 +26,7 @@ class Game_Print():
             "^!starwars$": [self.change_look, self.change_look_parse],
             "^!pokemon$": [self.change_look, self.change_look_parse],
             "^!halloween$": [self.change_look, self.change_look_parse],
+            "^!zelda$": [self.change_look, self.change_look_parse],
             "^!french$": [self.change_look, self.change_look_parse],
             "^!pop$": [self.change_look, self.change_look_parse]
         }
@@ -120,6 +121,8 @@ class Game_Print():
             return [Pics.POKEMON]
         elif parse_str == "!halloween":
             return [Pics.HALLOWEEN]
+        elif parse_str == "!zelda":
+            return [Pics.ZELDA]
         elif parse_str == "!pop":
             return [Pics.POP]
         elif parse_str == "!french":

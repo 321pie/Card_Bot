@@ -14,6 +14,7 @@ class Pics():
     CATS = "Cats"
     STARWARS = "Starwars"
     POKEMON = "Pokemon"
+    ZELDA = "Zelda"
     HALLOWEEN = "Halloween"
     POP = "Pop"
     FRENCH = "French"
