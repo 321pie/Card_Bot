@@ -391,7 +391,7 @@ class Cribbage(game.Game):
 
         return points
 
-    #Check points for counting, with cur_card NOT in old_cards, but cur_card IS included in sum
+    #Check points for pegging, with cur_card NOT in old_cards, but cur_card IS included in sum
     def check_points(self, cur_card, old_cards, sum):
         points = 0
         if(len(old_cards) >= 2): #Find longest run if enough cards

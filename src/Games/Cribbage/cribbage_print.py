@@ -233,7 +233,7 @@ class Cribbage_Print(Game_Print):
             #Prepare for next round
             my_sum = self.game.pegging_done()
 
-            #Add last card data to 
+            #Add last card data to output string
             if(my_sum != 31):
                 self.add_return(return_list, f'''{player} played {card.display()}, got {points} point(s) including last card. Total is reset to 0.\n''', self.deck_look.get_hand_pic([[card]], show_index=False))
             else:
@@ -244,8 +244,8 @@ class Cribbage_Print(Game_Print):
             if(self.game.check_crib_joker() == False):
                 await self.finished_pegging(return_list)
             else:
-                self.add_return(return_list, f"***{self.game.get_players()[self.game.pegging_index]} must choose which card to turn the joker in their crib into before game can proceed.***")
-                hand_pic = await self.game.get_hand_pic(-1)
+                self.add_return(return_list, f"***{self.game.get_players()[self.game.pegging_index%len(self.game.get_players())]} must choose which card to turn the joker in their crib into before game can proceed.***")
+                hand_pic = self.deck_look.get_hand_pic([self.game.get_crib()], show_index=False)
                 self.add_return(return_list, hand_pic, isFile=True)
 
         #If pegged out, end game
