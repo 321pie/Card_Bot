@@ -346,7 +346,7 @@ class Cribbage_Print(Game_Print):
             #Change flipped joker to specified card
             elif self.game.change_flipped_joker(card, player) == True:
                 if(card.value == dk.JACK):
-                    self.add_return(return_list, f"Flipped joker has been made into {card.display()}.\n{self.game.get_players()[self.game.crib_index % len(self.game.get_players)]} gets nibs for 2.\nPegging will now begin with **{self.game.get_players()[self.game.pegging_index]}**", self.deck_look.get_hand_pic([[card]], show_index=False))
+                    self.add_return(return_list, f"Flipped joker has been made into {card.display()}.\n{self.game.get_players()[self.game.crib_index % len(self.game.get_players)]} gets nibs for 2.\nPegging will now begin with **{self.game.get_players()[self.game.pegging_index % len(self.game.get_players)]}**", self.deck_look.get_hand_pic([[card]], show_index=False))
                     
                     #Check for winner
                     if(self.game.get_winner() != None):
