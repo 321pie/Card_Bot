@@ -447,3 +447,14 @@ class Cribbage(game.Game):
     #Returns crib
     def get_crib(self) -> list[deck.Card]:
         return copy.copy(self.crib)
+    
+    #Returns number of jokers in hands
+    def get_num_jokers(self) -> int:
+        num_jokers = 0
+
+        for hand in self.hands:
+            for card in hand:
+                if card.value == deck.JOKER:
+                    num_jokers += 1
+
+        return num_jokers

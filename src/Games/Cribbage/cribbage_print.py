@@ -346,7 +346,7 @@ class Cribbage_Print(Game_Print):
             #Change flipped joker to specified card
             elif self.game.change_flipped_joker(card, player) == True:
                 if(card.value == dk.JACK):
-                    self.add_return(return_list, f"Flipped joker has been made into {card.display()}.\n{self.game.get_players()[self.game.crib_index]} gets nibs for 2.\nPegging will now begin with **{self.game.get_players()[self.game.pegging_index]}**", self.deck_look.get_hand_pic([[card]], show_index=False))
+                    self.add_return(return_list, f"Flipped joker has been made into {card.display()}.\n{self.game.get_players()[self.game.crib_index % len(self.game.get_players)]} gets nibs for 2.\nPegging will now begin with **{self.game.get_players()[self.game.pegging_index]}**", self.deck_look.get_hand_pic([[card]], show_index=False))
                     
                     #Check for winner
                     if(self.game.get_winner() != None):
@@ -671,7 +671,10 @@ class Cribbage_Print(Game_Print):
     #Returns the string to be displayed when the game is started
     #NOTE: This function overrides the one defined in Game_Print
     def get_start_string(self, _player) -> str:
-        return f'''\nThrow {self.game.throw_count} cards into **{self.game.get_crib_player()}**'s crib.\n*Use "/h" or "/hand" to see your hand.*'''
+        output_str = f'''\nThrow {self.game.throw_count} cards into **{self.game.get_crib_player()}**'s crib.\n*Use "/h" or "/hand" to see your hand.*'''
+        if self.game.get_num_jokers() != 0:
+            output_str += f'''\n***There are {self.game.get_num_jokers()} joker(s) that must be transformed before players can throw cards into the crib.***'''
+        return output_str
     
     #Returns the string to be displayed when the game is ended
     #NOTE: This function overrides the one defined in Game_Print
