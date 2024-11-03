@@ -244,7 +244,7 @@ class Cribbage_Print(Game_Print):
             if(self.game.check_crib_joker() == False):
                 await self.finished_pegging(return_list)
             else:
-                self.add_return(return_list, f"***{self.game.get_players()[self.game.pegging_index%len(self.game.get_players())]} must choose which card to turn the joker in their crib into before game can proceed.***", self.deck_look.get_hand_pic([self.game.get_crib()], show_index=False))
+                self.add_return(return_list, f"***{self.game.get_players()[self.game.crib_index%len(self.game.get_players())]} must choose which card to turn the joker in their crib into before game can proceed.***", self.deck_look.get_hand_pic([self.game.get_crib()], show_index=False))
 
         #If pegged out, end game
         if(self.game.get_winner() != None):
