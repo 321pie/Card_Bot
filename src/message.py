@@ -88,7 +88,7 @@ async def handle_user_messages(msg):
     return_list = []
 
     #Weed out excess messages
-    if(message[0] != '!'):
+    if len(message) == 0 or message[0] != '!':
         return return_list
     
     player_in_game:bool = False
