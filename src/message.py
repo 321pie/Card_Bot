@@ -171,7 +171,7 @@ def make_test(player):
 
 #Give role to user
 async def give_role(member, role):
-    await member.edit(roles=[discord.utils.get(member.guild.roles, name=role)])
+    await member.edit(roles=[discord.utils.get(member.guild.roles, name=role), discord.utils.get(member.guild.roles, name="Ping if Playing")])
     return gp().add_return([], member.name + ' is now a ' + role + '!')
 
 #Runs the command if needed or returns None

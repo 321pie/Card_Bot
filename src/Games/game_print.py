@@ -161,7 +161,10 @@ class Game_Print():
     async def delete_last_hand(self, player, replacement=None):
         if player in self.game.get_players():
             if self.hand_messages[self.game.get_player_index(player)] != None:
-                await self.hand_messages[self.game.get_player_index(player)].delete_original_response()
+                try:
+                    await self.hand_messages[self.game.get_player_index(player)].delete_original_response()
+                except:
+                    pass
             self.hand_messages[self.game.get_player_index(player)] = replacement
     
     #Returns the hand image if applicable, or None
