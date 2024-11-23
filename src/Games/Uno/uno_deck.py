@@ -4,12 +4,35 @@ from random import randint
 COLORS = ['red', 'yellow', 'green', 'blue']
 NUMBER_CARDS = ['0', '1', '2', '3', '4','5', '6', '7', '8', '9']
 ACTION_CARDS = ['skip', 'reverse', 'draw2']
-WILD_CARDS = ['wild', 'draw4']
+WILD_CARDS = ['wild', 'wild4']
 
 class Card:
     def __init__(self, value, color):
         self.value = value
         self.color = color
+    
+    def to_int_runs(self):
+        if (self.value == "skip"):
+            return 9
+        elif(self.value == "reverse"):
+            return 10
+        elif(self.value == "draw2"):
+            return 11
+        elif(self.value == "wild"):
+            return 4
+        elif(self.value == "wild4"):
+            return 8
+        elif (self.value == '0'):
+            if self.color == "red":
+                return 1
+            elif self.color == "blue":
+                return 0
+            elif self.color == "yellow":
+                return 2
+            elif self.color == "green":
+                return 3
+        else:
+            return int(self.value)
         
     def display(self):
         return f'{self.value} {self.color}'
