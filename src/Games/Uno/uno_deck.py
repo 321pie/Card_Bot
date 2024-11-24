@@ -45,7 +45,7 @@ class Deck:
         hands = []
         for i in range(num_hands):
             hand = []
-            for j in range(2):
+            for j in range(7):
                 hand.append(self.deck[randint(0, len(self.deck)-1)])
             hands.append(hand)
         return hands

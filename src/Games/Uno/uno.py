@@ -59,7 +59,6 @@ class Uno(game.Game):
         output = ""
         #Check if player played their last card
         if len(self.hands[player_index]) == 0:
-            print("Made it to the end")
             self.end_game()
             return f"{self.players[player_index]} has played their last card and won the game!"
 
@@ -122,7 +121,7 @@ class Uno(game.Game):
         card = self.deck.draw_card()
         self.hands[self.current_player_index].append(card)
         count = 1
-        while(card.color != self.top_card.color and card.value != self.top_card.value and card.value.find("wild") != -1):
+        while(card.color != self.top_card.color and card.value != self.top_card.value and card.value.find("wild") == -1):
             card = self.deck.draw_card()
             self.hands[self.current_player_index].append(card)
             count += 1
@@ -149,11 +148,12 @@ class Uno(game.Game):
         self.current_player_index = 0
         self.wild_in_play = False 
         self.draw_card_in_play= False
-        self.uno_tracker = [] 
+        self.uno_tracker = []
+        self.game_started = False 
 
     def get_end_turn_string(self, input):
         turn_string = self.add_return([], input)
-        if (self.game_started):
+        if self.game_started == True:
             if (not self.wild_in_play and not self.draw_card_in_play):
                 self.add_return(turn_string, f"Current top card is: ", UnoPics().get_hand_pic([[self.top_card]], show_index=False))
 

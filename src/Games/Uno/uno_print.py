@@ -92,7 +92,7 @@ class Uno_Print(Game_Print):
                 self.game.top_card = self.game.hands[self.game.get_player_index(player)].pop(-1)
 
             self.game.current_player_index = self.game.get_next_player_index()
-
+            self.game.draw_card_in_play = False
             return self.game.get_end_turn_string(f'''{player} has chosen to {choice} their card.''')
 
     async def uno_handler(self, player):
