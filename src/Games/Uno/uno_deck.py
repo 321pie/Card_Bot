@@ -1,5 +1,6 @@
 #Foreign imports
 from random import randint
+import random
 
 COLORS = ['red', 'yellow', 'green', 'blue']
 NUMBER_CARDS = ['0', '1', '2', '3', '4','5', '6', '7', '8', '9']
@@ -44,14 +45,13 @@ class Deck:
         hands = []
         for i in range(num_hands):
             hand = []
-            for j in range(7):
+            for j in range(2):
                 hand.append(self.deck[randint(0, len(self.deck)-1)])
             hands.append(hand)
         return hands
     
     def get_start(self):
-        # Minus 21 to avoid starting with wild/action cards
-        return self.deck[randint(0, len(self.deck)-21)]
+        return Card(random.choice(NUMBER_CARDS), random.choice(COLORS))
     
     def draw_card(self) -> Card:
-        return self.deck(randint(0, len(self.deck)-1))
+        return self.deck[randint(0, len(self.deck)-1)]
