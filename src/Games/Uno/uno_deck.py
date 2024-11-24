@@ -30,6 +30,7 @@ class Card:
 
 class Deck:
     def __init__(self):
+        self.deck = []
         for color in COLORS:
             for number in NUMBER_CARDS:
                 self.deck.append(Card(number, color))
@@ -46,7 +47,6 @@ class Deck:
             for j in range(7):
                 hand.append(self.deck[randint(0, len(self.deck)-1)])
             hands.append(hand)
-
         return hands
     
     def get_start(self):

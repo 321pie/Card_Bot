@@ -4,6 +4,12 @@ from Games.Uno.uno_deck import Card
 from Games.pics import Pics
 
 class UnoPics(Pics):
+    def __init__(self):
+        #The size of the sprites
+        self.card_width = 315 #Width of each card
+        self.card_height = 438 #Height of each card
+        self.bar_height = 75 #Height of the bar that holds the index
+        self.sprite_scalar = .3 #Multiplier to zoom by to make hand a good size
 
     #Override
     #Returns an Image of the selected card

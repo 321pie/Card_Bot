@@ -1,12 +1,14 @@
 from Games.Uno.uno import Uno
 from Games.game_print import Game_Print
-import Games.Uno.uno_pics as pics
+from Games.Uno.uno_pics import UnoPics
 from Games.Uno.uno_deck import Deck
 
 class Uno_Print(Game_Print):
+    HAND_PIC = True
+    
     def __init__(self):
         super().__init__()
-        self.deck_look = pics()
+        self.deck_look = UnoPics()
         self.game = Uno()
 
         self.commands["^!(red|yellow|green|blue)$"] = [self.wild_color, self.input_parse]
@@ -18,29 +20,26 @@ class Uno_Print(Game_Print):
      # OVERRIDE #
     async def change_look(self, player, _look):
         if player in self.game.get_players():
-            return self.add_return([], f"Feature not available for this game. Sorry! <3")
+            return self.add_return([], f'''Feature not available for this game. Sorry! <3''')
         else:
-            return self.add_return([], f"You can't edit a game you aren't a part of, {player}. Use **!join** to join an unstarted game.")
+            return self.add_return([], f'''You can't edit a game you aren't a part of, {player}. Use **!join** to join an unstarted game.''')
     
     # OVERRIDE #
-    #Returns the string to be displayed when the game is started
-    def get_start_string(self) -> str:
-        start_string = self.add_return([], f"Current top card is: ", self.deck_look.get_hand_pic([[self.game.top_card]], show_index=False))
+    async def start(self, player):
+        if player in self.game.get_players():
+            if self.game.start_game():
+                #Initialize local vars
+                for _ in self.game.get_players():
+                    self.end.append(False)
+                    self.hand_messages.append(None)
 
-        if "wild" in self.game.top_card:
-            self.add_return(start_string, f"\nThe wild card's color is: **{self.game.top_card.color}**")
-
-        self.add_return(start_string,f"\nCurrent Player order is {self.get_order_string()}")
-
-        return self.add_return(f"\nIt is **{self.game.get_current_player()}**'s turn.\nUse **/h** or **/hand** to see your hand.")
-
-    def get_order_string(self) -> str:
-        order_string = []
-        for i in len(self.game.get_players()) - 1:
-            order_string.append(f"{self.game.get_players()[self.game.player_order[i]]}")
-            if (i != len(self.game.get_players()) -1):
-                order_string.append(" -> ")
-        return order_string
+                output = self.add_return([], f"Game started by {str(player)}.\n Current top card is:", self.deck_look.get_hand_pic([[self.game.top_card]], show_index=False))
+                self.add_return(output, f'''Current Player order is {self.game.get_order_string()}''')
+                return self.add_return(output, f'''It is **{self.game.get_current_player()}**'s turn.Use **/h** or **/hand** to see your hand.''')
+            else:
+                return self.add_return([], "Something went wrong when starting the game.")
+        else:
+            return self.add_return([], f"You can't start a game you aren't queued for, **{player}**. Use **!join** to join the game.")
 
     # OVERRIDE #
     #Returns the string to be displayed when the game is ended
@@ -80,7 +79,7 @@ class Uno_Print(Game_Print):
 
             self.game.wild_in_play = False
 
-            return f"Wild card had been changed to **{color}**!\n {self.get_start_string()}"
+            return f'''Wild card had been changed to **{color}**!\n {self.game.get_end_turn_string()}'''
 
         return []
 
@@ -91,17 +90,17 @@ class Uno_Print(Game_Print):
 
             self.game.current_player_index = self.game.get_next_player_index()
 
-            return f"{player} has chosen to {choice} their card.\n{self.get_start_string()}"
+            return f'''{player} has chosen to {choice} their card.\n{self.game.get_end_turn_string()}'''
 
     def uno_handler(self, player):
         player_index = self.game.get_player_index(player)
         if self.game.game_started == True:
             #If you have only 1 card left or you have two and it's your turn to play a card you can declare uno
-            if len(self.hands[player_index]) == 1 or (len(self.hands[player_index]) == 2 and player_index == self.game.current_player_index):
+            if len(self.game.hands[player_index]) == 1 or (len(self.game.hands[player_index]) == 2 and player_index == self.game.current_player_index):
                 self.game.uno_tracker[player_index] = True
-                return f"{player} has declared Uno!"
+                return f'''{player} has declared Uno!'''
             else:
-                return f"{player} you cannot declare Uno you have to many cards!"
+                return f'''{player} you cannot declare Uno you have to many cards!'''
 
     def call_handler(self, player):
         output = []
@@ -111,10 +110,10 @@ class Uno_Print(Game_Print):
                 if len(self.game.hands[i]) == 1 and self.game.uno_tracker[i] == False and i != self.game.get_player_index(player):
                     for j in range(4):
                         self.game.hands[i].append(Deck.draw_card())
-                    output = f"{output}\n {player} has called {self.game.players[i]} for not declaring Uno! {self.game.players[i]} draws 4 cards."
+                    output = f'''{output}\n {player} has called out {self.game.players[i]} for not declaring Uno! {self.game.players[i]} draws 4 cards.'''
             
             if output == []:
-                output = f"Good try {player}. There's nobody to call out this time."
+                output = f'''Good try {player}. There's nobody to call out this time.'''
 
             return output
     
@@ -122,5 +121,17 @@ class Uno_Print(Game_Print):
         if self.game.game_started == True and self.game.current_player_index == self.game.get_player_index(player) and not self.game.draw_card_in_play and not self.game.wild_in_play:
             self.game.draw_cards_til_matching()
             
+    #Get string of hand to print for player at given index
+    def get_hand_string(self, player):
+        output_string = f'''Hand:\n'''
+        player_index = self.game.get_player_index(player)
+        for card in [card.display() for card in sorted(self.game.hands[player_index], key=lambda x: x.to_int_runs())]:
+            output_string += f"{card}, "
+        output_string = output_string[:-2] + "\n"
+        for card in [card for card in sorted(self.game.hands[player_index], key=lambda x: x.to_int_runs())]:
+            output_string += f"!{self.game.hands[player_index].index(card)},\t\t"
+        output_string = output_string[:-3] + "\n"
+
+        return output_string
                     
     
