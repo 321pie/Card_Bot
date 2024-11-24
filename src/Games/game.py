@@ -36,7 +36,6 @@ class Game():
             player_index = self.players.index(player)
             if (card_index < len(self.hands[player_index])) and (card_index >= 0):
                 if self.process_card_select(player_index, card_index) != False:
-                    print("Out of Proccess")
                     return self.hands[player_index].pop(card_index)
             
         return False
