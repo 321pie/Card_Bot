@@ -1,6 +1,5 @@
 from math import factorial, floor
 import random
-from typing import List
 
 from Games.Uno.uno_deck import Card
 from Games.Uno.uno_deck import Deck
@@ -13,11 +12,11 @@ class Uno(game.Game):
         self.deck = Deck()
         self.hands:list[list[Card]] = [] #The hands of each player, indexed the same as the players
         self.top_card: Card #Card to start with and what everyone will play off of
-        self.player_order: List[int] = [] # Player order list with player indexes as values
+        self.player_order: list[int] = [] # Player order list with player indexes as values
         self.current_player_index: int = 0 # Index of player whose turn it is to play
         self.wild_in_play: bool = False #Blocks players from playing until wild color is chosen
         self.draw_card_in_play: bool = False # Blocks players from playing until player has chosen to keep/play drawn card
-        self.uno_tracker: List[bool] = [] # List to keep track of who has called uno or not. Indexed the same as players
+        self.uno_tracker: list[bool] = [] # list to keep track of who has called uno or not. Indexed the same as players
 
     #Initializes the game on start
     #Returns 0 on success, -1 on failure
