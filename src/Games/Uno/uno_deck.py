@@ -62,5 +62,5 @@ class Deck:
         # Minus 21 to avoid starting with wild/action cards
         return self.deck[randint(0, len(self.deck)-21)]
     
-    def draw_card(self, hand, target):
+    def draw_card(self) -> Card:
         return self.deck(randint(0, len(self.deck)-1))

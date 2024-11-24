@@ -6,6 +6,7 @@ import discord
 from Games.game_print import Game_Print as gp
 from Games.Cribbage.cribbage_print import Cribbage_Print
 from Games.Juiced.juiced_print import Juiced_Print
+from Games.Uno.uno_print import Uno_Print
 from Games.Test.test_print import Test_Print
 
 active_games:list[gp] = []
@@ -123,6 +124,8 @@ async def handle_user_messages(msg):
         return make_cribbage(player)
     elif message == "!juiced" or message == "!jc":
         return make_juiced(player)
+    elif message == "uno":
+        return make_uno(player)
     elif message == "!test" or message == "!jc":
         return make_test(player)
     
@@ -158,6 +161,17 @@ def make_juiced(player):
         return gp().add_return([], f"{player} has created a Juiced game. Use **!join** to join it!")
     else:
         return gp().add_return([], f"Sorry, {player}. You need to wait until the current game is started to create another one.")
+    
+#Makes a game of Juiced to be joined
+def make_uno(player):
+    global cur_game
+    
+    if cur_game == None:
+        cur_game = Uno_Print()
+        return gp().add_return([], f"{player} has created an Uno game. Use **!join** to join it!")
+    else:
+        return gp().add_return([], f"Sorry, {player}. You need to wait until the current game is started to create another one.")
+    
     
 #Makes a game of Test to be joined
 def make_test(player):
