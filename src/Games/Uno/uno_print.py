@@ -87,13 +87,51 @@ class Uno_Print(Game_Print):
         return []
 
     async def drawn_card_handler(self, player, choice):
+        player_index = self.game.get_player_index(player)
+        card = self.game.hands[player_index][-1]
         if player == self.game.get_current_player():
+            output = f'''{player} has chosen to {choice} their card.'''
             if choice == "play":
                 self.game.top_card = self.game.hands[self.game.get_player_index(player)].pop(-1)
+                if self.game.top_card.value.find("wild") == -1:
+                    if self.game.top_card.value == "skip":
+                        skipped_player = 0
+                        if player_index == self.game.player_order[-1]:
+                            if len(self.game.players) > 2:
+                                self.game.current_player_index = self.game.player_order[1]
+                                skipped_player = self.game.player_order[0]
+                            else:
+                                skipped_player = self.game.player_order[0]
+                        elif player_index == self.game.player_order[-2]:
+                            self.game.current_player_index = self.game.player_order[0]
+                            skipped_player = self.game.player_order[-1]
+                        else:
+                            self.game.current_player_index = self.game.player_order[self.game.player_order.index(player_index) + 2]
+                            skipped_player = self.game.player_order[self.game.player_order.index(player_index) + 1]
+                        output += f"\n{self.game.players[skipped_player]} has been skipped!"
+                    elif self.game.top_card.value == "reverse":
+                        self.game.player_order.reverse()
+                        self.game.current_player_index = self.game.get_next_player_index()
+                        output += f"\nOrder has been reversed!"
+                    elif self.game.top_card.value == "draw2":
+                        # Calling next twice here as draw two skips your turn
+                        self.game.current_player_index = self.game.get_next_player_index()
+                        skipped_player = self.game.current_player_index
+                        self.game.current_player_index = self.game.get_next_player_index()     
+                        for _ in range(2):
+                            self.game.hands[skipped_player].append(self.game.deck.draw_card())
+                        output+=f"\n{self.game.players[skipped_player]} drew 2 cards and lost their turn!"
+                    else:
+                        self.game.current_player_index = self.game.get_next_player_index()
+                else:
+                    self.wild_in_play = True
+                    output += f"\nWild card has been played! {self.game.get_current_player()} gets to choose what color it becomes."
+                    return output
+            else:
+                self.game.current_player_index = self.game.get_next_player_index()
 
-            self.game.current_player_index = self.game.get_next_player_index()
             self.game.draw_card_in_play = False
-            return self.game.get_end_turn_string(f'''{player} has chosen to {choice} their card.''')
+            return self.game.get_end_turn_string(output)
 
     async def uno_handler(self, player):
         player_index = self.game.get_player_index(player)
@@ -111,8 +149,9 @@ class Uno_Print(Game_Print):
             #Call out everyone who hasn't declared uno who has 1 card
             for i in range(len(self.game.hands)):
                 if len(self.game.hands[i]) == 1 and self.game.uno_tracker[i] == False and i != self.game.get_player_index(player):
+                    print(f"Called out {self.game.players[i]}")
                     for j in range(4):
-                        self.game.hands[i].append(Deck.draw_card())
+                        self.game.hands[i].append(Deck().draw_card())
                     output = f'''{output}\n {player} has called out {self.game.players[i]} for not declaring Uno! {self.game.players[i]} draws 4 cards.'''
             
             if output == []:
