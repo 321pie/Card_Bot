@@ -89,7 +89,7 @@ class Uno(game.Game):
                 self.current_player_index = self.get_next_player_index()     
                 for _ in range(2):
                     self.hands[skipped_player].append(self.deck.draw_card())
-                output=f"{self.players[skipped_player]} drew 2 cards and lost their turn!"
+                output=f"**{self.players[skipped_player]}** drew 2 cards and lost their turn!"
             else:
                 output = f"{self.get_current_player()} has played!"
                 self.current_player_index = self.get_next_player_index()
@@ -97,6 +97,7 @@ class Uno(game.Game):
             return output
         else:
             self.wild_in_play = True
+            self.draw_card_in_play = False
             return f"Wild card has been played! {self.get_current_player()} gets to choose what color it becomes."
 
     def get_current_player(self):
@@ -120,7 +121,7 @@ class Uno(game.Game):
             count += 1
         
         self.draw_card_in_play = True
-        return f"{self.players[self.current_player_index]} had no cards they could play or they choose to draw cards for some reason! They drew {count} cards.\n {self.players[self.current_player_index]} can now choose whether to !play or !keep the usable card."
+        return f"**{self.players[self.current_player_index]} drew {count} cards.**\n {self.players[self.current_player_index]} can now choose whether to !play or !keep the usable card."
     
     def check_player_has_usable_card(self) -> bool:
         hand = self.hands[self.current_player_index]
@@ -146,34 +147,36 @@ class Uno(game.Game):
 
     def get_end_turn_string(self, input):
         turn_string = self.add_return([], input)
-        if self.game_started == True:
-            if (not self.wild_in_play and not self.draw_card_in_play):
-                self.add_return(turn_string, f"Current top card is: ", UnoPics().get_hand_pic([[self.top_card]], show_index=False))
+        if self.game_started == True and self.wild_in_play == False and self.draw_card_in_play == False:
+            self.add_return(turn_string, f"Current top card is: ", UnoPics().get_hand_pic([[self.top_card]], show_index=False))
 
-                if self.top_card.value.find("wild") != -1:
-                    self.add_return(turn_string, f"\nThe wild card's color is: **{self.top_card.color}**")
+            if self.top_card.value.find("wild") != -1:
+                self.add_return(turn_string, f"\nThe wild card's color is: **{self.top_card.color}**")
 
-                self.add_return(turn_string, f"\nCurrent Player order is {self.get_order_string()}")
+            self.add_return(turn_string, f"Current Player order is {self.get_order_string()}")
 
-                numCards = ""
-                for i in range(len(self.players)):
-                    numCards += f"\n{self.players[i]}: {len(self.hands[self.get_player_index(self.players[i])])} Cards"
-                self.add_return(turn_string, f"{numCards}")
-                
-                if self.check_player_has_usable_card() == False:
-                    #If someone has declared uno draws cards, their uno declaration gets reset
-                    if len(self.hands[self.current_player_index]) == 1:
-                        self.uno_tracker[self.current_player_index] = False
-                    return self.add_return(turn_string, f"{self.draw_cards_til_matching()}")
-                else:
-                    return self.add_return(turn_string, f"\nIt is **{self.get_current_player()}**'s turn.\nUse **/h** or **/hand** to see your hand.")
+            numCards = ""
+            for i in range(len(self.players)):
+                numCards += f"\n{self.players[i]}: {len(self.hands[self.get_player_index(self.players[i])])} Cards"
+            self.add_return(turn_string, f"{numCards}")
+            
+            if self.check_player_has_usable_card() == False:
+                #If someone has declared uno draws cards, their uno declaration gets reset
+                if len(self.hands[self.current_player_index]) == 1:
+                    self.uno_tracker[self.current_player_index] = False
+                return self.add_return(turn_string, f"{self.draw_cards_til_matching()}")
+            else:
+                return self.add_return(turn_string, f"It is **{self.get_current_player()}**'s turn.")
 
         return turn_string
     
     def get_order_string(self) -> str:
         output =""
         for i in range(len(self.get_players())):
-            output += f"{self.get_players()[self.player_order[i]]}"
+            if self.player_order[i] == self.current_player_index:
+                output += f"**{self.get_players()[self.player_order[i]]}**"
+            else:
+                output += f"{self.get_players()[self.player_order[i]]}"
             if i != (len(self.get_players()) - 1):
                 output +=" -> "
         return output

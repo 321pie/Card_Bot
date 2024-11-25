@@ -63,7 +63,9 @@ class Uno_Print(Game_Print):
                 card = self.game.hands[self.game.get_player_index(player)][card_index]
                 if card.color == self.game.top_card.color or card.value == self.game.top_card.value or card.value.find("wild") != -1:
                     self.game.top_card = card
-                    return self.game.card_select(player, card_index)
+                    output = self.game.card_select(player, card_index)
+                    await self.update_hand(player)
+                    return output
                     
     def input_parse(self, parse_str) -> list[str]:
         return [parse_str[1:]]
@@ -80,7 +82,8 @@ class Uno_Print(Game_Print):
                 self.game.current_player_index = self.game.get_next_player_index()
                 for _ in range(4):
                     self.game.hands[skipped_player_index].append(self.game.deck.draw_card())
-                output += f"\n{self.game.players[skipped_player_index]} drew 4 cards and lost their turn."
+                output += f"\n**{self.game.players[skipped_player_index]} drew 4 cards and lost their turn.**"
+            
             self.game.wild_in_play = False
             return self.game.get_end_turn_string(output)
 
@@ -88,7 +91,6 @@ class Uno_Print(Game_Print):
 
     async def drawn_card_handler(self, player, choice):
         player_index = self.game.get_player_index(player)
-        card = self.game.hands[player_index][-1]
         if player == self.game.get_current_player():
             output = f'''{player} has chosen to {choice} their card.'''
             if choice == "play":
@@ -120,13 +122,14 @@ class Uno_Print(Game_Print):
                         self.game.current_player_index = self.game.get_next_player_index()     
                         for _ in range(2):
                             self.game.hands[skipped_player].append(self.game.deck.draw_card())
-                        output+=f"\n{self.game.players[skipped_player]} drew 2 cards and lost their turn!"
+                        output+=f"\n**{self.game.players[skipped_player]} drew 2 cards and lost their turn!**"
                     else:
                         self.game.current_player_index = self.game.get_next_player_index()
                 else:
                     self.wild_in_play = True
+                    self.game.draw_card_in_play = False
                     output += f"\nWild card has been played! {self.game.get_current_player()} gets to choose what color it becomes."
-                    return output
+                    return self.add_return([], output)
             else:
                 self.game.current_player_index = self.game.get_next_player_index()
 
