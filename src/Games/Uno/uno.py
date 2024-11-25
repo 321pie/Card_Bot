@@ -62,43 +62,7 @@ class Uno(game.Game):
             self.end_game()
             return output
 
-        if self.top_card.value.find("wild") == -1:
-            if self.top_card.value == "skip":
-                skipped_player = 0
-                if player_index == self.player_order[-1]:
-                    if len(self.players) > 2:
-                        self.current_player_index = self.player_order[1]
-                        skipped_player = self.player_order[0]
-                    else:
-                        skipped_player = self.player_order[0]
-                elif player_index == self.player_order[-2]:
-                    self.current_player_index = self.player_order[0]
-                    skipped_player = self.player_order[-1]
-                else:
-                    self.current_player_index = self.player_order[self.player_order.index(player_index) + 2]
-                    skipped_player = self.player_order[self.player_order.index(player_index) + 1]
-                output = f"{self.players[skipped_player]} has been skipped!"
-            elif self.top_card.value == "reverse":
-                self.player_order.reverse()
-                self.current_player_index = self.get_next_player_index()
-                output = f"Order has been reversed!"
-            elif self.top_card.value == "draw2":
-                # Calling next twice here as draw two skips your turn
-                self.current_player_index = self.get_next_player_index()
-                skipped_player = self.current_player_index
-                self.current_player_index = self.get_next_player_index()     
-                for _ in range(2):
-                    self.hands[skipped_player].append(self.deck.draw_card())
-                output=f"**{self.players[skipped_player]}** drew 2 cards and lost their turn!"
-            else:
-                output = f"{self.get_current_player()} has played!"
-                self.current_player_index = self.get_next_player_index()
-                
-            return output
-        else:
-            self.wild_in_play = True
-            self.draw_card_in_play = False
-            return f"Wild card has been played! {self.get_current_player()} gets to choose what color it becomes."
+        return self.action_card_handler(player_index)
 
     def get_current_player(self):
         return self.players[self.current_player_index]
@@ -180,3 +144,42 @@ class Uno(game.Game):
             if i != (len(self.get_players()) - 1):
                 output +=" -> "
         return output
+    
+    def action_card_handler(self, player_index: int):
+        if self.top_card.value.find("wild") == -1:
+            if self.top_card.value == "skip":
+                skipped_player = 0
+                if player_index == self.player_order[-1]:
+                    if len(self.players) > 2:
+                        self.current_player_index = self.player_order[1]
+                        skipped_player = self.player_order[0]
+                    else:
+                        skipped_player = self.player_order[0]
+                elif player_index == self.player_order[-2]:
+                    self.current_player_index = self.player_order[0]
+                    skipped_player = self.player_order[-1]
+                else:
+                    self.current_player_index = self.player_order[self.player_order.index(player_index) + 2]
+                    skipped_player = self.player_order[self.player_order.index(player_index) + 1]
+                output = f"{self.players[skipped_player]} has been skipped!"
+            elif self.top_card.value == "reverse":
+                self.player_order.reverse()
+                self.current_player_index = self.get_next_player_index()
+                output = f"Order has been reversed!"
+            elif self.top_card.value == "draw2":
+                # Calling next twice here as draw two skips your turn
+                self.current_player_index = self.get_next_player_index()
+                skipped_player = self.current_player_index
+                self.current_player_index = self.get_next_player_index()     
+                for _ in range(2):
+                    self.hands[skipped_player].append(self.deck.draw_card())
+                output=f"**{self.players[skipped_player]}** drew 2 cards and lost their turn!"
+            else:
+                output = f"{self.get_current_player()} has played!"
+                self.current_player_index = self.get_next_player_index()
+                
+            return output
+        else:
+            self.wild_in_play = True
+            self.draw_card_in_play = False
+            return f"Wild card has been played! {self.get_current_player()} gets to choose what color it becomes."
