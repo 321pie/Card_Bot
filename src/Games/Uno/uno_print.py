@@ -13,7 +13,7 @@ class Uno_Print(Game_Print):
 
         self.commands["^!(red|yellow|green|blue)$"] = [self.wild_color, self.input_parse]
         self.commands["^!(play|keep)"] = [self.drawn_card_handler, self.input_parse]
-        self.commands["^!declare"] = [self.uno_handler]
+        self.commands["^!(declare|d)"] = [self.uno_handler]
         self.commands["^!call"] = [self.call_handler]
         self.commands["^!draw"] = [self.draw_handler]
 
@@ -90,7 +90,7 @@ class Uno_Print(Game_Print):
         return []
 
     async def drawn_card_handler(self, player, choice):
-        if player == self.game.get_current_player():
+        if self.game.get_player_index(player) == self.game.current_player_index and self.game.draw_card_in_play == True:
             output = f'''{player} has chosen to {choice} their card.\n'''
             if choice == "play":
                 self.game.top_card = self.game.hands[self.game.get_player_index(player)].pop(-1)
