@@ -32,14 +32,8 @@ class Uno_Print(Game_Print):
                 for _ in self.game.get_players():
                     self.end.append(False)
                     self.hand_messages.append(None)
-
-                output = self.add_return([], f"Game started by {str(player)}.\n Current top card is:", self.deck_look.get_hand_pic([[self.game.top_card]], show_index=False))
-                self.add_return(output, f'''Current Player order is {self.game.get_order_string()}''')
-
-                if self.game.check_player_has_usable_card() == False:
-                    return self.add_return(output, f"{self.game.draw_cards_til_matching()}")
-                else:
-                    return self.add_return(output, f'''It is **{self.game.get_current_player()}**'s turn.Use **/h** or **/hand** to see your hand.''')
+                    
+                return self.game.get_round_string(f"Game started by {player}.")
             else:
                 return self.add_return([], "Something went wrong when starting the game.")
         else:
@@ -85,7 +79,7 @@ class Uno_Print(Game_Print):
                 output += f"\n**{self.game.players[skipped_player_index]} drew 4 cards and lost their turn.**"
             
             self.game.wild_in_play = False
-            return self.game.get_end_turn_string(output)
+            return self.game.get_round_string(output)
 
         return []
 
@@ -96,7 +90,7 @@ class Uno_Print(Game_Print):
                 self.game.top_card = self.game.hands[self.game.get_player_index(player)].pop(-1)
                 output += self.game.action_card_handler(self.game.get_player_index(player))
             self.game.draw_card_in_play = False
-            return self.game.get_end_turn_string(output)
+            return self.game.get_round_string(output)
 
     async def uno_handler(self, player):
         player_index = self.game.get_player_index(player)

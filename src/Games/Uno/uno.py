@@ -51,7 +51,7 @@ class Uno(game.Game):
             player_index = self.players.index(player)
             if (card_index < len(self.hands[player_index])) and (card_index >= 0):
                 self.hands[player_index].pop(card_index)
-                return self.get_end_turn_string(self.process_card_select(player_index))
+                return self.get_round_string(self.process_card_select(player_index))
         return False
     
     def process_card_select(self, player_index:int) -> str:
@@ -68,7 +68,6 @@ class Uno(game.Game):
         return self.players[self.current_player_index]
     
     def get_next_player_index(self):
-
         if self.current_player_index == self.player_order[-1]:
             return self.player_order[0]
         else:
@@ -109,7 +108,7 @@ class Uno(game.Game):
         self.uno_tracker = []
         self.game_started = False 
 
-    def get_end_turn_string(self, input):
+    def get_round_string(self, input):
         turn_string = self.add_return([], input)
         if self.game_started == True and self.wild_in_play == False and self.draw_card_in_play == False:
             self.add_return(turn_string, f"Current top card is: ", UnoPics().get_hand_pic([[self.top_card]], show_index=False))

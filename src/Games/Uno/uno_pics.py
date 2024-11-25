@@ -1,3 +1,4 @@
+import copy
 from PIL import Image, ImageDraw, ImageFont
 
 from Games.Uno.uno_deck import Card
@@ -68,3 +69,5 @@ class UnoPics(Pics):
         #Return image path
         return card_img
 
+    def get_sorted_hand(hand):
+        return sorted(copy.copy(hand), key=lambda c: (c.color, c.to_int_runs()))
