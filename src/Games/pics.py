@@ -79,7 +79,7 @@ class Pics():
         #For each card in the hand, retrieve it from the sprite sheet and add it to hand image
         for hand_index in range(len(hands)):
                 hand = hands[hand_index]
-                handCopy = sorted(copy.copy(hand), key=lambda c: c.to_int_runs())
+                handCopy = self.get_sorted_hand(hand)
                 #For each card in hand
                 for card_index in range(len(hand)):
                     hands_img.paste(self.get_card(handCopy[card_index], hand.index(handCopy[card_index]), show_index), (card_index * self.card_width, hand_index * card_height))
@@ -157,3 +157,6 @@ class Pics():
 
         #Return image path
         return card_img
+
+    def get_sorted_hand(hand):
+        return sorted(copy.copy(hand), key=lambda c: c.to_int_runs())
