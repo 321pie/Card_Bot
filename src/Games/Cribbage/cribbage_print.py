@@ -112,6 +112,10 @@ class Cribbage_Print(Game_Print):
     #Input: player and team_count as defined in default_print
     #Output: add_return print for message handler
     async def create_teams(self, _player, team_count:int):
+        #Check if game has started yet
+        if (self.game.game_started):
+            return self.add_return([], "")
+
         #If teams are even, start game
         if (self.game.create_teams(team_count) == True):
             #Add the teams to be printed before the start returns (index=0)
@@ -129,7 +133,7 @@ class Cribbage_Print(Game_Print):
     #Input: integer index parsed from string
     #Output: list of return statements using add_return
     async def select_card(self, player, card_index):
-        if(player in self.game.get_players()):
+        if (player in self.game.get_players()):
             #Check for valid index or return
             if(card_index >= len(self.game.hands[self.game.get_player_index(player)]) or card_index < 0):
                 return []
