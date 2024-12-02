@@ -114,7 +114,7 @@ class Cribbage_Print(Game_Print):
     async def create_teams(self, _player, team_count:int):
         #Check if game has started yet
         if (self.game.game_started):
-            return self.add_return([], "")
+            return []
 
         #If teams are even, start game
         if (self.game.create_teams(team_count) == True):
