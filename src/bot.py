@@ -108,7 +108,7 @@ def run_bot():
     #Sends each available command
     @tree.command(name="help", description='''See all available commands.''')
     async def help_command(interaction:discord.Interaction):
-        await interaction.response.send_message(message.HELP_MESSAGE, ephemeral=True)
+        await interaction.response.send_message("View attached file for list of available commands", file=discord.File("help.txt"), ephemeral=True)
 
     @client.event
     async def on_message(msg):
