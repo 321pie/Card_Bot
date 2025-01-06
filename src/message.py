@@ -67,7 +67,7 @@ async def handle_user_messages(msg):
         return make_cribbage(player)
     elif message == "!juiced" or message == "!jc":
         return make_juiced(player)
-    elif message == "!test" or message == "!jc":
+    elif message == "!test":
         return make_test(player)
     
     #Roles
