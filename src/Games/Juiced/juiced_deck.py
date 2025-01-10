@@ -4813,7 +4813,8 @@ WHITE_CODERS:dict = {
     'Janice': 1,
     "Janice from accounting at the club": 1,
     "Making life worse for everyone at the club": 1,
-    "EPIC: The Musical": 1
+    "EPIC: The Musical": 1,
+    "Cecily's grading system": 1
 }
 
 BLACK_CODERS:dict = {

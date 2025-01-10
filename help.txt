@@ -1,0 +1,55 @@
+The bot knows the following commands:
+    ***General***:
+      Game:
+        '**!join**': Let the bot know that you'd like to play cribbage.
+        '**!unjoin**': Let the bot know that you changed your mind and don't want to play.
+        '**!start**': Starts a game with all players who have done !join.
+        '**!end**': Ends a game once all players have entered the command.
+        '**![0-9]+**': Plays the card with the given index.
+
+      Private Commands:
+        '**/hand**': View your hand.
+
+      Public Commands:
+        #'**/spectate**': View hands of all players (only works if not participating in the game). TODO: NOT IMPLEMENTED
+        '**/calcs**': View how points were obtained in the previous round (hands and crib).
+        '**/help**': Display orders that the bot can execute.
+        '**/rules**': Show the rules of cribbage.
+
+      Other:
+        '**!treasurelady**', '**!tl**': Change role to Treasure Lady.
+        '**!garbageman**', '**!gm**': Change role to Garbage Man.
+
+    ***Cribbage***:
+      Game:
+        '**!cribbage**', '**!cr**': Create a game of Cribbage.
+        '**!standard**': Play a regular game of cribbage (default).
+        '**!mega**': Play a game of mega hand (8 cards, twice as many points to win).
+        '**!joker**': Play a game of joker mode (2 wild cards).
+        '**![A2-9JQK]|10 [HDCS]**': Used to transform the joker into the desired card.
+        '**!teams [0-9]+**': Splits players into teams with the specified number of players on each team. Will automatically start the game.
+        '**!goal [0-9]+**': Set the amount of points needed to reach the goal to the provided number.
+        '**!skunk [0-9]+**': Set the skunk interval (default=30) to the provided number.
+        '**!points**': View current number of points each PLAYER has at current point in time.
+        '**!team_points**': View current number of points each team has at current point in time.
+
+    ***Juiced (Cards Against Humanity/Apples to Apples)***:
+      Game:
+        '**!juiced**', '**jc**':: Create a game of Juiced.
+        '**!goal [0-9]+**': Set the amount of points needed to win to the provided number.
+        '**!hand [0-9]+**': Changes the number of cards in hand to the specified number.
+        '**!insult**': Hurl a random insult into the chat.
+        '**!shuffle**': Reset all players' hands after each round.
+        '**!all**': Toggles ALL expansions!
+        '**!apples**': Toggles the APPLES expansion (Apples to Apples)!
+        '**!cah**': Toggles the CAH expansion (Cards Against Humanity)!
+        '**!coders**': Toggles the CODERS expansion!
+
+    ***Test (Used for development, no safeguards to prevent cheating)***:
+      Game:
+        '**!cribbage**', '**!cr**': Create a game of Cribbage.
+        '**!juiced**', '**jc**':: Create a game of Juiced.
+        '**!add .***': Adds the provided string as a player to the game.
+        '**!player command**': For any player in the game and any command in the game.
+        '**!player hand**': For any player in the game to print their hand.
+    
