@@ -17,6 +17,12 @@ class Uno(game.Game):
         self.wild_in_play: bool = False #Blocks players from playing until wild color is chosen
         self.draw_card_in_play: bool = False # Blocks players from playing until player has chosen to keep/play drawn card
         self.uno_tracker: list[bool] = [] # list to keep track of who has called uno or not. Indexed the same as players
+        self.house_rules: bool = False # Flag that indicates if playing with all house rules available
+        self.stack: bool = False #Flag that indicates if playing with stacking
+        self.challenge:bool = False #Flag that indicates if playing with challenges
+        self.rotate:bool = False #Flag that indicates if playing with rotations when a 0 is played
+        self.swap: bool = False #Flag that indicates if playing with swaps when a 7 is played 
+        self.jump: bool = False #Flag that indicates that jumping is is allowed if player has same card
 
     #Initializes the game on start
     #Returns 0 on success, -1 on failure
