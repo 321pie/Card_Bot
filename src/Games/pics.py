@@ -158,5 +158,5 @@ class Pics():
         #Return image path
         return card_img
 
-    def get_sorted_hand(hand):
+    def get_sorted_hand(self, hand):
         return sorted(copy.copy(hand), key=lambda c: c.to_int_runs())

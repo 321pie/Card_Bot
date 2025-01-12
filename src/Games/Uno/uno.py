@@ -46,13 +46,13 @@ class Uno(game.Game):
     # OVERRIDE #
     #Returns and removes card at given index
     #Returns card on success, False on failure
-    def card_select(self, player, card_index:int):
+    def card_select(self, player, card_index:int) -> list:
         if player in self.players:
             player_index = self.players.index(player)
             if (card_index < len(self.hands[player_index])) and (card_index >= 0):
                 self.hands[player_index].pop(card_index)
                 return self.get_round_string(self.process_card_select(player_index))
-        return False
+        return []
     
     def process_card_select(self, player_index:int) -> str:
         output = ""
@@ -74,7 +74,7 @@ class Uno(game.Game):
             return self.player_order[self.player_order.index(self.current_player_index) + 1]
         
     #This function will draw cards from the deck until you pull a wild or a card that matches color/value
-    def draw_cards_til_matching(self):
+    def draw_cards_til_matching(self) -> str:
         card = self.deck.draw_card()
         self.hands[self.current_player_index].append(card)
         count = 1
@@ -82,7 +82,6 @@ class Uno(game.Game):
             card = self.deck.draw_card()
             self.hands[self.current_player_index].append(card)
             count += 1
-        
         self.draw_card_in_play = True
         return f"**{self.players[self.current_player_index]} drew {count} cards.**\n {self.players[self.current_player_index]} can now choose whether to !play or !keep the usable card."
     
@@ -108,29 +107,26 @@ class Uno(game.Game):
         self.uno_tracker = []
         self.game_started = False 
 
-    def get_round_string(self, input):
+    def get_round_string(self, input) -> list:
         turn_string = self.add_return([], input)
-        if self.game_started == True and self.wild_in_play == False and self.draw_card_in_play == False:
+        if self.game_started == True and self.wild_in_play == False:
             self.add_return(turn_string, f"Current top card is: ", UnoPics().get_hand_pic([[self.top_card]], show_index=False))
-
             if self.top_card.value.find("wild") != -1:
                 self.add_return(turn_string, f"\nThe wild card's color is: **{self.top_card.color}**")
+
+            #Check initially if someone had to draw cards and now waiting for decision
+            if self.check_player_has_usable_card() == False:
+                #If someone has declared uno draws cards, their uno declaration gets reset
+                if len(self.hands[self.current_player_index]) == 1:
+                    self.uno_tracker[self.current_player_index] = False
+                return self.add_return(turn_string, self.draw_cards_til_matching())
 
             self.add_return(turn_string, f"Current Player order is {self.get_order_string()}")
 
             numCards = ""
             for i in range(len(self.players)):
                 numCards += f"\n{self.players[i]}: {len(self.hands[self.get_player_index(self.players[i])])} Cards"
-            self.add_return(turn_string, f"{numCards}")
-            
-            if self.check_player_has_usable_card() == False:
-                #If someone has declared uno draws cards, their uno declaration gets reset
-                if len(self.hands[self.current_player_index]) == 1:
-                    self.uno_tracker[self.current_player_index] = False
-                return self.add_return(turn_string, f"{self.draw_cards_til_matching()}")
-            else:
-                return self.add_return(turn_string, f"It is **{self.get_current_player()}**'s turn.")
-
+            return self.add_return(turn_string, f"{numCards} \n It is **{self.get_current_player()}**'s turn.")
         return turn_string
     
     def get_order_string(self) -> str:

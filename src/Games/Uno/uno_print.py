@@ -47,7 +47,7 @@ class Uno_Print(Game_Print):
 
         #Input: integer index parsed from string
     #Output: list of return statements using add_return
-    async def select_card(self, player, card_index):
+    async def select_card(self, player, card_index) -> list:
         if player in self.game.get_players() and self.game.game_started == True and not self.game.wild_in_play and not self.game.draw_card_in_play:
             #Check for valid index or return
             if(card_index >= len(self.game.hands[self.game.get_player_index(player)]) or card_index < 0):
@@ -89,6 +89,7 @@ class Uno_Print(Game_Print):
             if choice == "play":
                 self.game.top_card = self.game.hands[self.game.get_player_index(player)].pop(-1)
                 output += self.game.action_card_handler(self.game.get_player_index(player))
+                await self.update_hand(player)
             self.game.draw_card_in_play = False
             return self.game.get_round_string(output)
 

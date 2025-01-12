@@ -37,8 +37,9 @@ class Deck:
                 self.deck.append(Card(number, color))
             for action in ACTION_CARDS:
                 self.deck.append(Card(action, color))
-            for wild in WILD_CARDS:
-                self.deck.append(Card(wild, color))
+        for wild in WILD_CARDS:
+            #starts with a z so it's sorted to the end of the hand
+            self.deck.append(Card(wild, "zwild"))
 
     def get_hands(self, num_hands):
         # Infinite number of cards in uno deck
