@@ -1,4 +1,6 @@
 import copy
+import io
+import math
 from PIL import Image, ImageDraw, ImageFont
 
 from Games.Uno.uno_deck import Card
@@ -11,6 +13,7 @@ class UnoPics(Pics):
         self.card_height = 438 #Height of each card
         self.bar_height = 75 #Height of the bar that holds the index
         self.sprite_scalar = .3 #Multiplier to zoom by to make hand a good size
+        self.hand_length = 8 #Length of the hand in the picture before it wraps
 
     #Override
     #Returns an Image of the selected card
@@ -47,7 +50,7 @@ class UnoPics(Pics):
         #Grab card from sprite sheet and save it
         card_img = sprite_sheet.crop((left, top, right, bottom))
 
-        #Add index (![0-9]) to card
+        #Add index (![0-9]*) to card
         if showIndex:
             #Create black rectangle that is slightly taller than card height
             index_card = Image.new('RGB', (self.card_width, self.card_height + self.bar_height), color=(0,0,0))
@@ -68,6 +71,37 @@ class UnoPics(Pics):
 
         #Return image path
         return card_img
+    
+    #Override
+    #Get single picture with all your cards that are wrapped
+    def get_hand_pic(self, hands:list[list[Card]], show_index=True) -> io.BytesIO:
+        #Stores index number
+        hand_length = self.hand_length
+        card_height = self.card_height
+        rows = math.ceil(len(hands[0]) / self.hand_length)
+
+        if len(hands[0]) < hand_length:
+            hand_length = len(hands[0])
+
+        if show_index:
+            card_height += self.bar_height
+
+        hands_img = Image.new('RGB', (self.card_width* self.hand_length, card_height* rows), color=(0, 0, 0))
+
+        handCopy = self.get_sorted_hand(hands[0])
+
+        #For each card in hand
+        for card_index in range(len(hands[0])):
+            hands_img.paste(self.get_card(handCopy[card_index], hands[0].index(handCopy[card_index]), show_index), ((card_index % self.hand_length) * self.card_width, math.floor(card_index / self.hand_length) * card_height))
+
+        new_size = (int(self.card_width * self.hand_length * self.sprite_scalar), int(card_height*rows * self.sprite_scalar))
+        hands_img = hands_img.resize(new_size, Image.Resampling.LANCZOS)
+        byte_image = io.BytesIO()
+        hands_img.save(byte_image, format='PNG')
+        byte_image.seek(0)
+
+        #return image as byte array
+        return byte_image
 
     def get_sorted_hand(self, hand):
         return sorted(copy.copy(hand), key=lambda c: (c.color, c.value))
