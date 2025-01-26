@@ -24,6 +24,7 @@ class Uno(game.Game):
         self.swap: bool = False #Flag that indicates if playing with swaps when a 7 is played 
         self.jump: bool = False #Flag that indicates that jumping is is allowed if player has same card
         self.stackAmount: int = 0 #Amount the stack has that the next player will need to draw
+        self.stack_in_play: bool = False #Flag that says that a stack is going and players can only play a +2 or +4
 
     #Initializes the game on start
     #Returns 0 on success, -1 on failure
@@ -102,8 +103,8 @@ class Uno(game.Game):
                 break
         return found
     
-    def check_player_has_plus_two(self, player_index) -> bool:
-        hand = self.hands[player_index]
+    def check_player_has_plus_two(self) -> bool:
+        hand = self.hands[self.current_player_index]
         found = False
 
         for i in range(len(hand)):
@@ -112,8 +113,8 @@ class Uno(game.Game):
                 break
         return found
     
-    def check_player_has_plus_four(self, player_index) -> bool:
-        hand = self.hands[player_index]
+    def check_player_has_plus_four(self) -> bool:
+        hand = self.hands[self.current_player_index]
         found = False
 
         for i in range(len(hand)):
@@ -187,9 +188,30 @@ class Uno(game.Game):
         past_player = self.get_current_player()
         self.current_player_index = self.get_next_player_index()
         self.stackAmount += 2
-        if self.stack and self.check_player_has_plus_two(self.current_player_index):
-            return f"**{past_player}** has played a +2! \n **{self.get_current_player()}** can now choose to continue the stack or take the cards with **!draw**"
+        if self.stack and self.check_player_has_plus_two():
+            self.stack_in_play = True
+            return f"**{past_player}** has played a +2! \n Current Stack is now **+{self.stackAmount}**!\n**{self.get_current_player()}** can now choose to continue the stack or take the cards with **!draw**"
         else:
+            self.stack_in_play = False
+            skipped_player = self.current_player_index
+            self.current_player_index = self.get_next_player_index()     
+            for _ in range(self.stackAmount):
+                self.hands[skipped_player].append(self.deck.draw_card())
+            output = f"**{self.players[skipped_player]}** drew **{self.stackAmount}** cards and lost their turn!"
+            self.stackAmount = 0
+            return output
+    
+    def wild_four_played(self) -> str:
+        past_player = self.get_current_player()
+        self.current_player_index = self.get_next_player_index()
+        self.stackAmount += 4
+        if self.stack and self.check_player_has_plus_four():
+            self.stack_in_play = True
+            self.wild_in_play = True
+            self.draw_card_in_play = False 
+            output = f"**{past_player}** has played a +4! \n Current Stack is now **+{self.stackAmount}**!\n**{self.get_current_player()}** can now choose to continue the stack or take the cards with **!draw**"
+        else:
+            self.stack_in_play = False
             skipped_player = self.current_player_index
             self.current_player_index = self.get_next_player_index()     
             for _ in range(self.stackAmount):

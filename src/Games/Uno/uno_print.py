@@ -64,6 +64,14 @@ class Uno_Print(Game_Print):
               
             if player == self.game.get_current_player():
                 card = self.game.hands[self.game.get_player_index(player)][card_index]
+                if self.game.stack_in_play:
+                    if card.value == self.game.top_card.value and (card.value.find("draw2") != -1 or card.value.find("wild4") != -1):
+                        self.game.top_card = card
+                        output = self.game.card_select(player, card_index)
+                        await self.update_hand(player)
+                        return output
+                    else:
+                        return self.add_return([], f'''Sorry **{player}**! Stacking is currently in play, you'll need to continue the stack or **!draw** to take the cards.''')
                 if card.color == self.game.top_card.color or card.value == self.game.top_card.value or card.value.find("wild") != -1:
                     self.game.top_card = card
                     output = self.game.card_select(player, card_index)
@@ -79,18 +87,15 @@ class Uno_Print(Game_Print):
             self.game.top_card.color = color
             output += f"Wild card has been made into {color}."
             self.game.current_player_index = self.game.get_next_player_index()
-            
-            if self.game.top_card.value == "wild4":
-                skipped_player_index = self.game.current_player_index
-                self.game.current_player_index = self.game.get_next_player_index()
-                for _ in range(4):
-                    self.game.hands[skipped_player_index].append(self.game.deck.draw_card())
-                output += f"\n**{self.game.players[skipped_player_index]} drew 4 cards and lost their turn.**"
-            
-            self.game.wild_in_play = False
-            return self.game.get_round_string(output)
 
-        return []
+            if self.game.top_card.value == "wild4":
+                output += self.game.wild_four_played()
+            else:
+                self.game.current_player_index = self.game.get_next_player_index()
+                self.game.wild_in_play = False
+                output += self.game.get_round_string(output)
+
+        return output
 
     async def drawn_card_handler(self, player, choice):
         if self.game.get_player_index(player) == self.game.current_player_index and self.game.draw_card_in_play == True:
