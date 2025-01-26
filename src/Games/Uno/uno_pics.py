@@ -79,6 +79,7 @@ class UnoPics(Pics):
         hand_length = self.hand_length
         card_height = self.card_height
         rows = math.ceil(len(hands[0]) / self.hand_length)
+        columns = min(len(hands[0]), self.hand_length)
 
         if len(hands[0]) < hand_length:
             hand_length = len(hands[0])
@@ -86,7 +87,7 @@ class UnoPics(Pics):
         if show_index:
             card_height += self.bar_height
 
-        hands_img = Image.new('RGB', (self.card_width* self.hand_length, card_height* rows), color=(0, 0, 0))
+        hands_img = Image.new('RGB', (self.card_width* columns, card_height* rows), color=(0, 0, 0))
 
         handCopy = self.get_sorted_hand(hands[0])
 
@@ -94,7 +95,7 @@ class UnoPics(Pics):
         for card_index in range(len(hands[0])):
             hands_img.paste(self.get_card(handCopy[card_index], hands[0].index(handCopy[card_index]), show_index), ((card_index % self.hand_length) * self.card_width, math.floor(card_index / self.hand_length) * card_height))
 
-        new_size = (int(self.card_width * self.hand_length * self.sprite_scalar), int(card_height*rows * self.sprite_scalar))
+        new_size = (int(self.card_width * columns * self.sprite_scalar), int(card_height*rows * self.sprite_scalar))
         hands_img = hands_img.resize(new_size, Image.Resampling.LANCZOS)
         byte_image = io.BytesIO()
         hands_img.save(byte_image, format='PNG')

@@ -137,7 +137,7 @@ class Uno(game.Game):
 
     def get_round_string(self, input) -> list:
         turn_string = self.add_return([], input)
-        if self.game_started == True and self.wild_in_play == False:
+        if self.game_started == True and self.wild_in_play == False and self.stack_in_play == False:
             self.add_return(turn_string, f"Current top card is: ", UnoPics().get_hand_pic([[self.top_card]], show_index=False))
             if self.top_card.value.find("wild") != -1:
                 self.add_return(turn_string, f"\nThe wild card's color is: **{self.top_card.color}**")
@@ -207,9 +207,8 @@ class Uno(game.Game):
         self.stackAmount += 4
         if self.stack and self.check_player_has_plus_four():
             self.stack_in_play = True
-            self.wild_in_play = True
             self.draw_card_in_play = False 
-            output = f"**{past_player}** has played a +4! \n Current Stack is now **+{self.stackAmount}**!\n**{self.get_current_player()}** can now choose to continue the stack or take the cards with **!draw**"
+            return f"**{past_player}** has played a +4! \n Current Stack is now **+{self.stackAmount}**!\n**{self.get_current_player()}** can now choose to continue the stack or take the cards with **!draw**"
         else:
             self.stack_in_play = False
             skipped_player = self.current_player_index

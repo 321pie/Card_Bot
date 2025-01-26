@@ -82,18 +82,19 @@ class Uno_Print(Game_Print):
         return [parse_str[1:]]
     
     async def wild_color(self, player, color):
-        output = ""
+        output = []
         if player == self.game.get_current_player():
             self.game.top_card.color = color
-            output += f"Wild card has been made into {color}."
+            self.add_return(output, f"Wild card has been made into {color}.")
             self.game.current_player_index = self.game.get_next_player_index()
 
             if self.game.top_card.value == "wild4":
-                output += self.game.wild_four_played()
+                self.game.wild_in_play = False
+                self.add_return(output, self.game.wild_four_played())
             else:
                 self.game.current_player_index = self.game.get_next_player_index()
                 self.game.wild_in_play = False
-                output += self.game.get_round_string(output)
+                self.add_return(output, self.game.get_round_string(output))
 
         return output
 
@@ -123,7 +124,6 @@ class Uno_Print(Game_Print):
             #Call out everyone who hasn't declared uno who has 1 card
             for i in range(len(self.game.hands)):
                 if len(self.game.hands[i]) == 1 and self.game.uno_tracker[i] == False and i != self.game.get_player_index(player):
-                    print(f"Called out {self.game.players[i]}")
                     for j in range(4):
                         self.game.hands[i].append(Deck().draw_card())
                     output = f'''{output}\n {player} has called out {self.game.players[i]} for not declaring Uno! {self.game.players[i]} draws 4 cards.'''
@@ -149,7 +149,7 @@ class Uno_Print(Game_Print):
     async def house_handler(self, player):
         if player in self.game.get_players():
             self.game.house_rules = not self.game.house_rules
-            return self.add_return([], f"{player} has changed the game to{'' if self.game.house_rules else 'not'} have all the house rules! Use !house to swap back or **!start** to begin.")
+            return self.add_return([], f"{player} has changed the game to{'' if self.game.house_rules else ' not'} have all the house rules! Use !house to swap back or **!start** to begin.")
         else:
             return self.add_return([], f"You can't change a game mode you aren't queued for, {player}. Use **!join** to join the game.")
         
@@ -157,7 +157,7 @@ class Uno_Print(Game_Print):
     async def stack_handler(self, player):
         if player in self.game.get_players():
             self.game.stack = not self.game.stack
-            return self.add_return([], f"{player} has changed the game to{'' if self.game.stack else 'not'} have stacking allowed for any + card! Use !stack to swap back or **!start** to begin.")
+            return self.add_return([], f"{player} has changed the game to{'' if self.game.stack else ' not'} have stacking allowed for any + card! Use !stack to swap back or **!start** to begin.")
         else:
             return self.add_return([], f"You can't change a game mode you aren't queued for, {player}. Use **!join** to join the game.")
         
@@ -165,7 +165,7 @@ class Uno_Print(Game_Print):
     async def four_challenge_handler(self, player):
         if player in self.game.get_players():
             self.game.challenge = not self.game.challenge
-            return self.add_return([], f"{player} has changed the game to{'' if self.game.challenge else 'not'} have challenging allowed when a +4 is played! Use !fourchal to swap back or **!start** to begin.")
+            return self.add_return([], f"{player} has changed the game to{'' if self.game.challenge else ' not'} have challenging allowed when a +4 is played! Use !fourchal to swap back or **!start** to begin.")
         else:
             return self.add_return([], f"You can't change a game mode you aren't queued for, {player}. Use **!join** to join the game.")
         
@@ -173,7 +173,7 @@ class Uno_Print(Game_Print):
     async def rotate_handler(self, player):
         if player in self.game.get_players():
             self.game.rotate = not self.game.rotate
-            return self.add_return([], f"{player} has changed the game to{'' if self.game.rotate else 'not'} have rotation of hands when a 0 is played! Use !rotate to swap back or **!start** to begin.")
+            return self.add_return([], f"{player} has changed the game to{'' if self.game.rotate else ' not'} have rotation of hands when a 0 is played! Use !rotate to swap back or **!start** to begin.")
         else:
             return self.add_return([], f"You can't change a game mode you aren't queued for, {player}. Use **!join** to join the game.")
         
@@ -181,7 +181,7 @@ class Uno_Print(Game_Print):
     async def swap_handler(self, player):
         if player in self.game.get_players():
             self.game.swap = not self.game.swap
-            return self.add_return([], f"{player} has changed the game to{'' if self.game.swap else 'not'} have swapping of hands when a 7 is played! Use !swap to swap back or **!start** to begin.")
+            return self.add_return([], f"{player} has changed the game to{'' if self.game.swap else ' not'} have swapping of hands when a 7 is played! Use !swap to swap back or **!start** to begin.")
         else:
             return self.add_return([], f"You can't change a game mode you aren't queued for, {player}. Use **!join** to join the game.")
         
@@ -190,7 +190,7 @@ class Uno_Print(Game_Print):
     async def jump_handler(self, player):
         if player in self.game.get_players():
             self.game.jump = not self.game.jump
-            return self.add_return([], f"{player} has changed the game to{'' if self.game.jump else 'not'} have jumping in allowed! Use !jump to swap back or **!start** to begin.")
+            return self.add_return([], f"{player} has changed the game to{'' if self.game.jump else ' not'} have jumping in allowed! Use !jump to swap back or **!start** to begin.")
         else:
             return self.add_return([], f"You can't change a game mode you aren't queued for, {player}. Use **!join** to join the game.")
         
