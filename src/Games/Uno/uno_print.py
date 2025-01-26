@@ -130,7 +130,15 @@ class Uno_Print(Game_Print):
     
     async def draw_handler(self, player):
         if self.game.game_started == True and self.game.current_player_index == self.game.get_player_index(player) and not self.game.draw_card_in_play and not self.game.wild_in_play:
-            return self.add_return([], self.game.draw_cards_til_matching())
+            if self.game.stackAmount > 0:
+                for _ in range(self.game.stackAmount):
+                    self.game.hands[self.game.current_player_index].append(Deck().draw_card())
+                output = f"{self.game.get_current_player()} drew {self.game.stackAmount}!"
+                self.game.stackAmount = 0
+                self.game.current_player_index = self.game.get_next_player_index()
+                return self.game.get_round_string(output)
+            else:
+                return self.add_return([], self.game.draw_cards_til_matching())
     
     #Toggle on and off all house rules
     async def house_handler(self, player):
