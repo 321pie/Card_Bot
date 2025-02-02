@@ -91,7 +91,7 @@ class Uno(game.Game):
             self.hands[self.current_player_index].append(card)
             count += 1
         self.draw_card_in_play = True
-        return f"**{self.players[self.current_player_index]} drew {count} cards.**\n {self.players[self.current_player_index]} can now choose whether to !play or !keep the usable card."
+        return f"**{self.players[self.current_player_index]}** did not have any playable cards and drew **{count}** cards.\n {self.players[self.current_player_index]} can now choose whether to **!play** or **!keep** the usable card."
     
     def check_player_has_usable_card(self) -> bool:
         hand = self.hands[self.current_player_index]
@@ -142,19 +142,21 @@ class Uno(game.Game):
             if self.top_card.value.find("wild") != -1:
                 self.add_return(turn_string, f"\nThe wild card's color is: **{self.top_card.color}**")
 
+            self.add_return(turn_string, f"Current Player order is {self.get_order_string()}")
+
+            numCards = ""
+            for i in range(len(self.players)):
+                numCards += f"\n{self.players[i]}: {len(self.hands[self.get_player_index(self.players[i])])} Cards"
+
+            self.add_return(turn_string, numCards)
             #Check initially if someone had to draw cards and now waiting for decision
             if self.check_player_has_usable_card() == False:
                 #If someone has declared uno draws cards, their uno declaration gets reset
                 if len(self.hands[self.current_player_index]) == 1:
                     self.uno_tracker[self.current_player_index] = False
                 return self.add_return(turn_string, self.draw_cards_til_matching())
-
-            self.add_return(turn_string, f"Current Player order is {self.get_order_string()}")
-
-            numCards = ""
-            for i in range(len(self.players)):
-                numCards += f"\n{self.players[i]}: {len(self.hands[self.get_player_index(self.players[i])])} Cards"
-            return self.add_return(turn_string, f"{numCards} \n It is **{self.get_current_player()}**'s turn.")
+            
+            return self.add_return(turn_string, f"It is **{self.get_current_player()}**'s turn.")
         return turn_string
     
     def get_order_string(self) -> str:

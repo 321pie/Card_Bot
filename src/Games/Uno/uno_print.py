@@ -82,19 +82,19 @@ class Uno_Print(Game_Print):
         return [parse_str[1:]]
     
     async def wild_color(self, player, color):
-        output = []
+        output = ""
         if player == self.game.get_current_player():
             self.game.top_card.color = color
-            self.add_return(output, f"Wild card has been made into {color}.")
-            self.game.current_player_index = self.game.get_next_player_index()
+            output = f"Wild card has been made into {color}.\n"
 
             if self.game.top_card.value == "wild4":
                 self.game.wild_in_play = False
-                self.add_return(output, self.game.wild_four_played())
+                output += self.game.wild_four_played()
+                return self.game.get_round_string(output)
             else:
                 self.game.current_player_index = self.game.get_next_player_index()
                 self.game.wild_in_play = False
-                self.add_return(output, self.game.get_round_string(output))
+                return self.game.get_round_string(output)
 
         return output
 
@@ -105,6 +105,8 @@ class Uno_Print(Game_Print):
                 self.game.top_card = self.game.hands[self.game.get_player_index(player)].pop(-1)
                 output += self.game.action_card_handler(self.game.get_player_index(player))
                 await self.update_hand(player)
+            else:
+                self.game.current_player_index = self.game.get_next_player_index()    
             self.game.draw_card_in_play = False
             return self.game.get_round_string(output)
 
@@ -140,6 +142,7 @@ class Uno_Print(Game_Print):
                     self.game.hands[self.game.current_player_index].append(Deck().draw_card())
                 output = f"{self.game.get_current_player()} drew {self.game.stackAmount}!"
                 self.game.stackAmount = 0
+                self.game.stack_in_play = False
                 self.game.current_player_index = self.game.get_next_player_index()
                 return self.game.get_round_string(output)
             else:
