@@ -26,10 +26,12 @@ class Pics():
         self.bar_height = 75 #Height of the bar that holds the index
         if custom_deck == "Pokemon":
             rng = randrange(0, 100)
-            if rng <= 39:
+            if rng <= 29:
                 self.custom_deck = "Pokemon1"
-            elif rng <= 79:
+            elif rng <= 59:
                 self.custom_deck = "Pokemon2"
+            elif rng <= 79:
+                self.custom_deck = "PokemonS"
             else:
                 self.custom_deck = "PokemonQ"
 
