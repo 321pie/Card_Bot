@@ -1,0 +1,2 @@
+Index	Username	Last Updated	Total Cribbage Wins	Total Cribbage Losses	Total Skunks	Standard Wins	Mega Wins	Joker Wins	Times Getting Joker	Times as GM	Times as DB	Times as GG	Times as TL	Highest Standard Hand	Highest Joker Hand	Highest Mega Hand	Lowest Mega Hand	Total Points Scored	Worst Skunking												
+0	InfinityF1re	16/2/25	5	3	3	4	1	5	4	10	2	1	4	4	3	2	2	4	12												

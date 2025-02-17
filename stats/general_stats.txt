@@ -1,0 +1,2 @@
+Index	Username	Last Updated	Total Wins	Total Losses	Unique Days Played	Last Date Played	Current Play Streak																			
+0	InfinityF1re	16/2/25	5	60	2	31/8/2024	2																			

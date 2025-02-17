@@ -129,4 +129,3 @@ async def run_commands(player, message, game):
                 return await func_list[0](player)
                 
     return None
-    
