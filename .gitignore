@@ -164,5 +164,5 @@ credentials.json
 test-credentials.json
 
 # Local database changes
-/stats/*.txt
-!/stats/dontreadme.md
+stats/*.txt
+!stats/dontreadme.md
