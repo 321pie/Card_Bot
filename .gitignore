@@ -165,4 +165,3 @@ test-credentials.json
 
 # Local database changes
 stats/*.txt
-!stats/dontreadme.md
