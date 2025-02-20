@@ -6,6 +6,7 @@ import discord
 from Games.game_print import Game_Print as gp
 from Games.Cribbage.cribbage_print import Cribbage_Print
 from Games.Juiced.juiced_print import Juiced_Print
+from Games.Chess.chess_print import Chess_Print
 from Games.Test.test_print import Test_Print
 
 active_games:list[gp] = []
