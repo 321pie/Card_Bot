@@ -1,0 +1,2 @@
+Username	Total Wins	Total Losses	Unique Days Played	Last Date Played	Times Becoming GM	Times Becoming DB	Times Becoming GG	Times Becoming TL	2025-02-21 14:28:35																			
+Default	0	0	0	2025-02-17	0	0	0	0																				
