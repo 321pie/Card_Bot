@@ -5,11 +5,26 @@ Card Bot allows for multiple games to be added, and will likely grow with time.
 
 [Non-Programmer Friendly Instructions](https://docs.google.com/document/d/1ZA37ccEDgdsJG2t4bXch4cNlkp_BOfKMuwSogXjJ1p8/edit?usp=sharing)
 
-### Requirements:
+<details>
+<summary>Table of Contents (Click Here)</summary>
+
+[Requirements](#requirements)
+
+[Setup](#setup) <br/>
+&nbsp;&nbsp; [Running the Program](#running) <br/>
+&nbsp;&nbsp; [Alternate Setup](#asetup)
+
+[Creating Bot, Getting Token, and Inviting to Server](#botsetup)
+
+[Code Introduction](#orientation)
+
+</details>
+
+## <a id="requirements"/> Requirements:
 * python 3
 * pip 3
 
-### Setup:
+## <a id="setup"/> Setup:
 
 Start by installing the dependencies using the setup script:
 
@@ -23,7 +38,7 @@ windows:
 ./setup.bat
 ```
 
-### Starting:
+### <a id="running"/> Running the Program:
 Launch the bot using the start script:
 
 linux:
@@ -48,7 +63,7 @@ If you want to stop the bot, hit Ctrl+C in the terminal and you will be prompted
 
 Note: Bots must be invited to a Discord server in order to be used. More on how to create a bot, get the token, and invite the bot to a server below.
 
-### Alternate Setup:
+### <a id="asetup"/> Alternate Setup:
 If you would like to enter the token manually, create a file called credentials.json in the root folder of the project and enter the following:
 
 ```json
@@ -57,7 +72,7 @@ If you would like to enter the token manually, create a file called credentials.
 
 Replace YOUR_API_TOKEN_HERE with your discord bot's token.
 
-### Creating Bot, Getting Token, and Inviting to Server:
+## <a id="botsetup"/> Creating Bot, Getting Token, and Inviting to Server:
 [Link to create a bot](https://discord.com/developers/applications)
 
 1) Select the "Applications" tab on the left and click the "New Application" button in the top right.
@@ -89,3 +104,18 @@ Replace YOUR_API_TOKEN_HERE with your discord bot's token.
 
 7) You can get your token/client secret from the same tab (the "OAuth2" tab), which is needed to run the bot and can be used as outlined above.
 If you don't have it or accidentally share it, click "Reset Secret" to get another (old tokens won't work, so be sure to update credentials.json accordingly).
+
+## <a id="orientation"> Code Introduction:
+
+This codebase uses a Model View Controller (<a href="https://www.geeksforgeeks.org/mvc-framework-introduction/">MVC</a>) architecture.
+
+The model (business logic) is kept in a class that inherits from game.py (see juiced.py for an example).
+
+The controller (UI logic) is kept in a class that inherits from game_print.py (see juiced_print.py for an example).
+
+The view (input logic) is primarily kept in message.py (! commands), though some is also located in bot.py (/ commands).
+
+Check out game.py, game_print.py, and message.py before trying to add to the codebase. These files hold the basic building blocks for any game.<br/>
+If you want to add a game, then create a new branch for the game and submit a pull request when the game is completed.<br/>
+Testing can be done using the testing feature (more information on the test feature can be found by using /help or reading help.txt).<br/>
+If you want to add stats/achievements, ask for permissions to edit the <a href="https://docs.google.com/spreadsheets/d/1zUblRLIugMxcqi-2R0AiEAx7gt9FnujT5ik7JB0viaw/edit?usp=sharing">Google Sheets document</a> and then add your achievements to the controller.
