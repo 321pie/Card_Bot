@@ -5,6 +5,7 @@ import re
 from Games.game_print import Game_Print
 from Games.Juiced.juiced_print import Juiced_Print
 from Games.Cribbage.cribbage_print import Cribbage_Print
+from Games.Chess.chess_print import Chess_Print
 
 class Test_Print(Game_Print):
     HAND_PIC = False
@@ -25,6 +26,8 @@ class Test_Print(Game_Print):
         self.commands["^!cr$"] = [self.make_cribbage]
         self.commands["^!juiced$"] = [self.make_juiced]
         self.commands["^!jc$"] = [self.make_juiced]
+        self.commands["^!chess"] = [self.make_chess]
+        self.commands["^!ch"] = [self.make_chess]
         self.commands["^!add .*$"] = [self.add_player, self.add_player_parse]
 
     async def explain_rules(self, _player):
@@ -65,6 +68,16 @@ class Test_Print(Game_Print):
             self.game_name = "Juiced"
             self.HAND_PIC = self.game_print.HAND_PIC
             return self.add_return([], "Game has been changed to Juiced. Use **!start** to begin.")
+        
+        return self.add_return([], "Failed to change game since game has been started. Use **!end** to end.")
+    
+    #Adds Chess game
+    async def make_chess(self, _player):
+        if not self.game_print.is_started():
+            self.game_print = Chess_Print()
+            self.game_name = "Chess"
+            self.HAND_PIC = self.game_print.HAND_PIC
+            return self.add_return([], "Game has been changed to Chess. Use **!start** to begin.")
         
         return self.add_return([], "Failed to change game since game has been started. Use **!end** to end.")
     

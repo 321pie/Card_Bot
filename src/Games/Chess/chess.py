@@ -9,6 +9,7 @@ class Chess(game.Game):
         self.req_players:int = 2
         self.current_turn:int = 0
         self.board:list = []
+        self.winner:str = "Nobody"
 
     def initialize_game(self) -> bool:
         match len(self.players):
@@ -35,12 +36,12 @@ class Chess(game.Game):
         #TODO
 
     def move(self, pos) -> str:
-        parts = re.split(r'(\d+)', pos)
-        start_x = ord(parts[0]) - 96
-        start_y = parts[1]
-        end_x = ord(parts[2]) - 96
-        end_y = parts[3]
-        piece = self.board[start_x][start_y]
+        parts = re.split(r'(\d+)', pos[1:])
+        start_x = ord(parts[0][0]) - 96
+        start_y = int(parts[1])
+        end_x = ord(parts[2][0]) - 96
+        end_y = int(parts[3])
+        piece = self.board[start_y][start_x]
 
         if start_x < 0 or start_x > len(self.board) or start_y < 0 or start_y > len(self.board):
             return "Selected space not on the board"
