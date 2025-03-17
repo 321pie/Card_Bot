@@ -12,8 +12,9 @@ import discord
 import os
 
 #Local imports
-import message
 import credentials
+import message
+import Games.stats as stats
 
 # spectators = []
 # spectator_messages = []
@@ -137,6 +138,7 @@ def run_bot():
     @client.event
     async def on_ready():
         await tree.sync()
+        stats.load_pages()
         print("Card Bot is ready!")
 
     # Try to run the bot

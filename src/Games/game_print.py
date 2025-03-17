@@ -1,7 +1,10 @@
+from datetime import datetime
 import discord
+import re
 
 import Games.game as game
-from Games.pics import Pics
+from Games.pics import pics
+import Games.stats as stats
 
 class Game_Print():
     #If your game doesn't have a hand pic, then set to False and optionally implement get_hand_string (found at bottom of file)
@@ -9,7 +12,7 @@ class Game_Print():
 
     def __init__(self):
         self.game = game.Game()
-        self.deck_look = Pics(Pics.CLASSIC)
+        self.deck_look = pics(pics.CLASSIC)
         self.hand_messages:list[discord.Interaction] = [] #Variable to hold most recent hand message for each player. leave blank 
         self.end = []
         self.commands = {
@@ -48,6 +51,9 @@ class Game_Print():
             if(player not in self.game.get_players()):
                 if(len(self.game.get_players()) < self.game.max_player_count):
                     self.game.add_player(player)
+                    if datetime(*[int(value) for value in re.split("[- :]", stats.access_field(stats.General, player, stats.General.last_date_played))]).date() != datetime.today().date():
+                        stats.access_field(stats.General, player, stats.General.last_date_played, data=str(datetime.today().date()))
+                        stats.access_field(stats.General, player, stats.General.unique_days_played, func=stats.increment)
                     more_players = self.game.min_player_count - len(self.game.get_players())
                     if more_players <= 0:
                         return self.add_return([], f"Welcome to the game, **{player}**! Type **!start** to begin game with {len(self.game.get_players())} players.")
@@ -95,7 +101,10 @@ class Game_Print():
                 
                 #If everyone has voted, end game
                 if self.end.count(True) == len(self.end):
-                    end_string = self.get_end_string(player)
+                    try:
+                        end_string = self.get_end_string(player)
+                    except:
+                        end_string = ""
                     self.game.end_game()
                     self.add_return(return_list, f"Game has been ended early.\n{end_string}")
             else:
@@ -112,27 +121,27 @@ class Game_Print():
     
     def change_look_parse(self, parse_str):
         if parse_str == "!cats":
-            return [Pics.CATS]
+            return [pics.CATS]
         elif parse_str == "!genshin":
-            return [Pics.GENSHIN]
+            return [pics.GENSHIN]
         elif parse_str == "!starwars":
-            return [Pics.STARWARS]
+            return [pics.STARWARS]
         elif parse_str == "!pokemon":
-            return [Pics.POKEMON]
+            return [pics.POKEMON]
         elif parse_str == "!halloween":
-            return [Pics.HALLOWEEN]
+            return [pics.HALLOWEEN]
         elif parse_str == "!zelda":
-            return [Pics.ZELDA]
+            return [pics.ZELDA]
         elif parse_str == "!pop":
-            return [Pics.POP]
+            return [pics.POP]
         elif parse_str == "!french":
-            return [Pics.FRENCH]
+            return [pics.FRENCH]
         else:
-            return [Pics.CLASSIC]
+            return [pics.CLASSIC]
     
     async def change_look(self, player, look):
         if player in self.game.get_players():
-            self.deck_look = Pics(look)
+            self.deck_look = pics(look)
             return self.add_return([], f"Appearance of deck has been changed to **{look}**!")
         else:
             return self.add_return([], f"You can't edit a game you aren't a part of, **{player}**. Use **!join** to join an unstarted game.")

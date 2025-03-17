@@ -3,9 +3,10 @@ import re
 import discord
 
 #Local imports
-from Games.game_print import Game_Print as gp
 from Games.Cribbage.cribbage_print import Cribbage_Print
+from Games.game_print import Game_Print as gp
 from Games.Juiced.juiced_print import Juiced_Print
+import Games.stats as stats
 from Games.Test.test_print import Test_Print
 
 active_games:list[gp] = []
@@ -37,6 +38,7 @@ async def handle_user_messages(msg):
     
     player_in_game:bool = False
     player = msg.author.name
+    stats.add_player(player)
     
     #Commands from an active game
     for active_game in active_games:
@@ -72,12 +74,16 @@ async def handle_user_messages(msg):
     
     #Roles
     elif message == '!db' or message == '!dumpsterboy':
+        stats.access_field(stats.General, player, stats.General.times_becoming_db, func=stats.increment)
         return await give_role(msg.author, "Dumpster Boy")
     elif message == '!gg' or message == '!glamourgirl':
+        stats.access_field(stats.General, player, stats.General.times_becoming_gg, func=stats.increment)
         return await give_role(msg.author, "Glamour Girl")
     elif message == '!gm' or message == '!garbageman':
+        stats.access_field(stats.General, player, stats.General.times_becoming_gm, func=stats.increment)
         return await give_role(msg.author, "Garbage Man")
     elif message == '!tl' or message == '!treasurelady':
+        stats.access_field(stats.General, player, stats.General.times_becoming_tl, func=stats.increment)
         return await give_role(msg.author, "Treasure Lady")
     
     #Default case (orders bot doesn't understand)

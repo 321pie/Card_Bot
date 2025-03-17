@@ -1,11 +1,11 @@
 import copy
-import io
 import itertools
 from collections import OrderedDict
 
 from Games.Cribbage.cribbage import Cribbage
-from Games.game_print import Game_Print
 import Games.deck as dk
+from Games.game_print import Game_Print
+import Games.stats as stats
 
 class Cribbage_Print(Game_Print):
     HAND_PIC = True
@@ -17,6 +17,7 @@ class Cribbage_Print(Game_Print):
         self.commands["^!standard$"] = [self.play_standard]
         self.commands["^!mega$"] = [self.play_mega]
         self.commands["^!joker$"] = [self.play_joker]
+        self.commands["^!reverse$"] = [self.play_reverse]
         self.commands["^!teams [0-9]+$"] = [self.create_teams, self.create_team_parse]
         self.commands["^!goal [0-9]+$"] = [self.change_goal, self.change_goal_parse]
         self.commands["^!skunk [0-9]+$"] = [self.change_skunk, self.change_skunk_parse]
@@ -25,6 +26,13 @@ class Cribbage_Print(Game_Print):
         self.commands["^!calcs$"] = [self.get_calcs]
 
         self.calc_string = "" #Saves most recent hand calculations
+
+        #Stats/Achievements variables
+        self.standard:bool = True
+        self.custom:bool = False
+        self.joker:bool = False
+        self.mega:bool = False
+        self.reverse:bool = False
 
     #Input: player as defined in message.py for commands
     #Output: add_return print for message handler
@@ -47,6 +55,8 @@ class Cribbage_Print(Game_Print):
         if player in self.game.get_players():
             if goal_num != 0:
                 self.game.point_goal = goal_num
+                self.standard = False
+                self.custom = True
 
                 return self.add_return([] if goal_num<1000 else self.add_return([], f"You've messed up, hun. Use **!end** to surrender if you even dare to **!start** in the first place."), f"{player} has changed the goal to {goal_num} points. Use **!start** to begin.")
             else:
@@ -64,6 +74,9 @@ class Cribbage_Print(Game_Print):
         if player in self.game.get_players():
             if skunk_num != 0:
                 self.game.skunk_length = skunk_num
+                self.standard = False
+                self.custom = True
+
                 return self.add_return([], f"{player} has changed the skunk interval to {skunk_num} points. Use **!start** to begin.")
             else:
                 return self.add_return([], f"Don't input 0. I better not catch you doing it again. :eyes:")
@@ -74,6 +87,12 @@ class Cribbage_Print(Game_Print):
     async def play_standard(self, player):
         if player in self.game.get_players():
             self.game.standard_mode()
+            self.standard = True
+            self.custom = False
+            self.joker = False
+            self.mega = False
+            self.reverse = False
+
             return self.add_return([], f"{player} has changed the game to standard mode. Use **!start** to begin.")
         else:
             return self.add_return([], f"You can't change a game mode you aren't queued for, {player}. Use **!join** to join the game.")
@@ -83,6 +102,9 @@ class Cribbage_Print(Game_Print):
     async def play_mega(self, player):
         if player in self.game.get_players():
             self.game.mega_hand()
+            self.standard = False
+            self.mega = True
+
             return self.add_return([], f"{player} has changed the game to mega hand mode. Use !standard to swap back or **!start** to begin.")
         else:
             return self.add_return([], f"You can't change a game mode you aren't queued for, {player}. Use **!join** to join the game.")
@@ -92,7 +114,20 @@ class Cribbage_Print(Game_Print):
     async def play_joker(self, player):
         if player in self.game.get_players():
             self.game.joker_mode()
+            self.joker = True
+            
             return self.add_return([], f"{player} has changed the game to joker mode. Use !standard to swap back or **!start** to begin.")
+        else:
+            return self.add_return([], f"You can't change a game mode you aren't queued for, {player}. Use **!join** to join the game.")
+        
+    #Input: player as defined in message.py for commands
+    #Output: add_return print for message handler
+    async def play_reverse(self, player):
+        if player in self.game.get_players():
+            self.game.reverse_mode()
+            self.reverse = True
+            
+            return self.add_return([], f"{player} has changed the game to reverse mode. Use !standard to swap back or **!start** to begin.")
         else:
             return self.add_return([], f"You can't change a game mode you aren't queued for, {player}. Use **!join** to join the game.")
         
@@ -151,7 +186,7 @@ class Cribbage_Print(Game_Print):
         
         #If player has joker card (joker mode), force them to make joker something before anybody throws.
         if self.game.check_hand_joker() != None:
-            return self.add_return(return_list, f"You can't throw away cards until {self.game.check_hand_joker()} has chosen which card to turn their joker into.")
+            return self.add_return(return_list, f"You can't throw away cards until ***{self.game.check_hand_joker()}*** has chosen which card to turn their joker into.")
 
         #If throwing away a card fails, alert player.
         if(self.game.card_select(player, card_index) == False):
@@ -340,10 +375,13 @@ class Cribbage_Print(Game_Print):
                 #Update hand if applicable
                 await self.update_hand(player)
 
+                stats.access_field(stats.Cribbage, player, stats.Cribbage.times_changing_hand_joker, func=stats.increment)
+
                 return self.add_return(return_list, f"Joker in hand has been made into {card.display()}.", self.deck_look.get_hand_pic([[card]], show_index=False))
                 
             #Change flipped joker to specified card
             elif self.game.change_flipped_joker(card, player) == True:
+                stats.access_field(stats.Cribbage, player, stats.Cribbage.times_changing_flipped_joker, func=stats.increment)
                 if(card.value == dk.JACK):
                     self.add_return(return_list, f"Flipped joker has been made into {card.display()}.\n{self.game.get_players()[self.game.crib_index % len(self.game.get_players())]} gets nibs for 2.\nPegging will now begin with **{self.game.get_players()[self.game.pegging_index % len(self.game.get_players())]}**", self.deck_look.get_hand_pic([[card]], show_index=False))
                     
@@ -357,6 +395,7 @@ class Cribbage_Print(Game_Print):
                 
             #Change joker in crib to specified card
             elif self.game.change_crib_joker(card, player) == True:
+                stats.access_field(stats.Cribbage, player, stats.Cribbage.times_changing_crib_joker, func=stats.increment)
                 self.add_return(return_list, f"Joker in crib has been made into {card.display()}.", self.deck_look.get_hand_pic([[card]], show_index=False))
                 await self.finished_pegging(return_list)
                 return return_list
@@ -376,6 +415,55 @@ class Cribbage_Print(Game_Print):
 
         #Add points from hand
         [get_points, get_output] = self.calculate_hand(self.game.get_player_hand(player=player), self.game.deck.get_flipped())
+
+        #Calculate stats/achievements
+        if self.custom != True:
+            if self.reverse == True:
+                if self.joker == True:
+                    if self.mega == True:
+                        if get_points < int(stats.access_field(stats.Cribbage, player, stats.Cribbage.lowest_reverse_joker_mega_hand)):
+                            stats.access_field(stats.Cribbage, player, stats.Cribbage.lowest_reverse_joker_mega_hand, data=str(get_points))
+                        if get_points > int(stats.access_field(stats.Cribbage, player, stats.Cribbage.highest_reverse_joker_mega_hand)):
+                            stats.access_field(stats.Cribbage, player, stats.Cribbage.highest_reverse_joker_mega_hand, data=str(get_points))
+                    elif self.standard == True:
+                        if get_points < int(stats.access_field(stats.Cribbage, player, stats.Cribbage.lowest_reverse_standard_joker_hand)):
+                            stats.access_field(stats.Cribbage, player, stats.Cribbage.lowest_reverse_standard_joker_hand, data=str(get_points))
+                        if get_points > int(stats.access_field(stats.Cribbage, player, stats.Cribbage.highest_reverse_standard_joker_hand)):
+                            stats.access_field(stats.Cribbage, player, stats.Cribbage.highest_reverse_standard_joker_hand, data=str(get_points))
+                else:
+                    if self.mega == True:
+                        if get_points < int(stats.access_field(stats.Cribbage, player, stats.Cribbage.lowest_reverse_standard_mega_hand)):
+                            stats.access_field(stats.Cribbage, player, stats.Cribbage.lowest_reverse_standard_mega_hand, data=str(get_points))
+                        if get_points > int(stats.access_field(stats.Cribbage, player, stats.Cribbage.highest_reverse_standard_mega_hand)):
+                            stats.access_field(stats.Cribbage, player, stats.Cribbage.highest_reverse_standard_mega_hand, data=str(get_points))
+                    elif self.standard == True:
+                        if get_points < int(stats.access_field(stats.Cribbage, player, stats.Cribbage.lowest_reverse_standard_hand)):
+                            stats.access_field(stats.Cribbage, player, stats.Cribbage.lowest_reverse_standard_hand, data=str(get_points))
+                        if get_points > int(stats.access_field(stats.Cribbage, player, stats.Cribbage.highest_reverse_standard_hand)):
+                            stats.access_field(stats.Cribbage, player, stats.Cribbage.highest_reverse_standard_hand, data=str(get_points))
+            else:
+                if self.joker == True:
+                    if self.mega == True:
+                        if get_points < int(stats.access_field(stats.Cribbage, player, stats.Cribbage.lowest_joker_mega_hand)):
+                            stats.access_field(stats.Cribbage, player, stats.Cribbage.lowest_joker_mega_hand, data=str(get_points))
+                        if get_points > int(stats.access_field(stats.Cribbage, player, stats.Cribbage.highest_joker_mega_hand)):
+                            stats.access_field(stats.Cribbage, player, stats.Cribbage.highest_joker_mega_hand, data=str(get_points))
+                    elif self.standard == True:
+                        if get_points < int(stats.access_field(stats.Cribbage, player, stats.Cribbage.lowest_standard_joker_hand)):
+                            stats.access_field(stats.Cribbage, player, stats.Cribbage.lowest_standard_joker_hand, data=str(get_points))
+                        if get_points > int(stats.access_field(stats.Cribbage, player, stats.Cribbage.highest_standard_joker_hand)):
+                            stats.access_field(stats.Cribbage, player, stats.Cribbage.highest_standard_joker_hand, data=str(get_points))
+                else:
+                    if self.mega == True:
+                        if get_points < int(stats.access_field(stats.Cribbage, player, stats.Cribbage.lowest_standard_mega_hand)):
+                            stats.access_field(stats.Cribbage, player, stats.Cribbage.lowest_standard_mega_hand, data=str(get_points))
+                        if get_points > int(stats.access_field(stats.Cribbage, player, stats.Cribbage.highest_standard_mega_hand)):
+                            stats.access_field(stats.Cribbage, player, stats.Cribbage.highest_standard_mega_hand, data=str(get_points))
+                    elif self.standard == True:
+                        if get_points < int(stats.access_field(stats.Cribbage, player, stats.Cribbage.lowest_standard_hand)):
+                            stats.access_field(stats.Cribbage, player, stats.Cribbage.lowest_standard_hand, data=str(get_points))
+                        if get_points > int(stats.access_field(stats.Cribbage, player, stats.Cribbage.highest_standard_hand)):
+                            stats.access_field(stats.Cribbage, player, stats.Cribbage.highest_standard_hand, data=str(get_points))
 
         self.game.points[self.game.get_player_index(player)] += get_points
 
@@ -445,16 +533,41 @@ class Cribbage_Print(Game_Print):
 
         #Shows the ending point totals
         point_array = self.game.get_point_array()
+        num_skunks = 0
+        num_double_skunks = 0
         for point_index in range(len(point_array)):
             if(point_array[point_index] < (self.game.point_goal - self.game.skunk_length)):
                 if self.game.team_count == 1: #If no teams, display based on name
-                    player_scores += f"{self.game.get_players()[point_index]} got skunked x{(self.game.point_goal - point_array[point_index]) // self.game.skunk_length} at {point_array[point_index]} points.\n"
+                    #Sort out stats
+                    if self.reverse == False:
+                        if ((self.game.point_goal - point_array[point_index]) // self.game.skunk_length) > 1:
+                            num_double_skunks += 1
+                            stats.access_field(stats.Cribbage, self.game.get_players()[point_index], stats.Cribbage.total_times_double_skunked, func=stats.increment)
+                        num_skunks += 1
+                        stats.access_field(stats.Cribbage, self.game.get_players()[point_index], stats.Cribbage.total_times_skunked, func=stats.increment)
+
+                        #Add details to string
+                        player_scores += f"{self.game.get_players()[point_index]} got skunked x{(self.game.point_goal - point_array[point_index]) // self.game.skunk_length} at {point_array[point_index]} points.\n"
                 else: #If teams, display by team
                     num_teams = len(self.game.get_players()) // self.game.team_count
                     player_scores += f"Team {point_index} ("
+                    team_players = []
                     for player in range(num_teams):
                         player_scores += f"{self.game.get_players()[player*num_teams + point_index]}, "
-                    player_scores = player_scores[:-2] + f") got skunked x{(self.game.point_goal - point_array[point_index]) // self.game.skunk_length} at {point_array[point_index]} points.\n"
+                        team_players.append(self.game.get_players()[player*num_teams + point_index])
+
+                    #Sort out stats
+                    if self.reverse == False:
+                        if ((self.game.point_goal - point_array[point_index]) // self.game.skunk_length) > 1:
+                            num_double_skunks += 1
+                            for player in team_players:
+                                stats.access_field(stats.Cribbage, player, stats.Cribbage.total_times_double_skunked, func=stats.increment)
+                        num_skunks += 1
+                        for player in team_players:
+                            stats.access_field(stats.Cribbage, player, stats.Cribbage.total_times_skunked, func=stats.increment)
+
+                        #Add details to string
+                        player_scores = player_scores[:-2] + f") got skunked x{(self.game.point_goal - point_array[point_index]) // self.game.skunk_length} at {point_array[point_index]} points.\n"
             else:
                 if self.game.team_count == 1: #If no teams, display based on name
                     player_scores += f"{self.game.get_players()[point_index]} ended with {point_array[point_index]} points.\n"
@@ -466,12 +579,84 @@ class Cribbage_Print(Game_Print):
                     team = team[:-2] + ")"
 
                     #If this team won, replace winner_string with team
-                    if(point_array[point_index] >= self.game.point_goal):
+                    if (point_array[point_index] >= self.game.point_goal) and (self.reverse == False):
+                        winner_string = team
+                    elif (point_array[point_index] < self.game.point_goal) and (self.reverse == True):
                         winner_string = team
 
                     #Add team and point data to output string player_scores
                     player_scores += team + f" ended with {point_array[point_index]} points.\n"
 
+        #Sort out stats
+        if self.game.team_count == 1:
+            winning_players = [winner_string]
+        else:
+            winning_players = winner_string[8:-1].split(", ") #Remove "Team x (" from beginning and ")" from end
+        
+        for player_index in range(len(self.game.get_players())):
+            player = self.game.get_players()[player_index]
+            stats.access_field(stats.Cribbage, player, stats.Cribbage.total_points_scored, data=f"{int(stats.access_field(stats.Cribbage, player, stats.Cribbage.total_points_scored)) + self.game.points[player_index]}")
+            if player not in winning_players:
+                stats.access_field(stats.Cribbage, player, stats.Cribbage.total_losses, func=stats.increment)
+                stats.access_field(stats.General, player, stats.General.total_losses, func=stats.increment)
+
+                if self.custom == False:
+                    if self.reverse == True:
+                        if self.joker == True:
+                            if self.mega == True:
+                                stats.access_field(stats.Cribbage, player, stats.Cribbage.reverse_joker_mega_losses, func=stats.increment)
+                            elif self.standard == True:
+                                stats.access_field(stats.Cribbage, player, stats.Cribbage.reverse_standard_joker_losses, func=stats.increment)
+                        else:
+                            if self.mega == True:
+                                stats.access_field(stats.Cribbage, player, stats.Cribbage.reverse_standard_mega_losses, func=stats.increment)
+                            elif self.standard == True:
+                                stats.access_field(stats.Cribbage, player, stats.Cribbage.reverse_standard_losses, func=stats.increment)
+                    else:
+                        if self.joker == True:
+                            if self.mega == True:
+                                stats.access_field(stats.Cribbage, player, stats.Cribbage.joker_mega_losses, func=stats.increment)
+                            elif self.standard == True:
+                                stats.access_field(stats.Cribbage, player, stats.Cribbage.standard_joker_losses, func=stats.increment)
+                        else:
+                            if self.mega == True:
+                                stats.access_field(stats.Cribbage, player, stats.Cribbage.standard_mega_losses, func=stats.increment)
+                            elif self.standard == True:
+                                stats.access_field(stats.Cribbage, player, stats.Cribbage.standard_losses, func=stats.increment)
+            else:
+                stats.access_field(stats.Cribbage, player, stats.Cribbage.total_wins, func=stats.increment)
+                stats.access_field(stats.General, player, stats.General.total_wins, func=stats.increment)
+
+                if self.custom == False:
+                    if self.reverse == True:
+                        if self.joker == True:
+                            if self.mega == True:
+                                stats.access_field(stats.Cribbage, player, stats.Cribbage.reverse_joker_mega_wins, func=stats.increment)
+                            elif self.standard == True:
+                                stats.access_field(stats.Cribbage, player, stats.Cribbage.reverse_standard_joker_wins, func=stats.increment)
+                        else:
+                            if self.mega == True:
+                                stats.access_field(stats.Cribbage, player, stats.Cribbage.reverse_standard_mega_wins, func=stats.increment)
+                            elif self.standard == True:
+                                stats.access_field(stats.Cribbage, player, stats.Cribbage.reverse_standard_wins, func=stats.increment)
+                    else:
+                        if self.joker == True:
+                            if self.mega == True:
+                                stats.access_field(stats.Cribbage, player, stats.Cribbage.joker_mega_wins, func=stats.increment)
+                            elif self.standard == True:
+                                stats.access_field(stats.Cribbage, player, stats.Cribbage.standard_joker_wins, func=stats.increment)
+                        else:
+                            if self.mega == True:
+                                stats.access_field(stats.Cribbage, player, stats.Cribbage.standard_mega_wins, func=stats.increment)
+                            elif self.standard == True:
+                                stats.access_field(stats.Cribbage, player, stats.Cribbage.standard_wins, func=stats.increment)
+
+                for _ in range(num_skunks):
+                    stats.access_field(stats.Cribbage, player, stats.Cribbage.total_skunks, func=stats.increment)
+                for _ in range(num_double_skunks):
+                    stats.access_field(stats.Cribbage, player, stats.Cribbage.total_double_skunks, func=stats.increment)
+
+        #Return sequence
         if return_list != None:
             self.add_return(return_list, player_hands, self.deck_look.get_hand_pic(self.game.backup_hands + [self.game.get_crib()], show_index=False))
             self.game.end_game()

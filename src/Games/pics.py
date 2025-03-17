@@ -8,7 +8,7 @@ from random import randrange
 import Games.deck as deck
 
 
-class Pics():
+class pics():
     CLASSIC = "Classic"
     GENSHIN = "Genshin"
     CATS = "Cats"

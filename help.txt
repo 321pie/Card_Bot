@@ -26,6 +26,7 @@ The bot knows the following commands:
         '**!standard**': Play a regular game of cribbage (default).
         '**!mega**': Play a game of mega hand (8 cards, twice as many points to win).
         '**!joker**': Play a game of joker mode (2 wild cards).
+        '**!reverse**': Play a game of reverse mode (last to get out wins).
         '**![A2-9JQK]|10 [HDCS]**': Used to transform the joker into the desired card.
         '**!teams [0-9]+**': Splits players into teams with the specified number of players on each team. Will automatically start the game.
         '**!goal [0-9]+**': Set the amount of points needed to reach the goal to the provided number.

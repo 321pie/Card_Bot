@@ -26,6 +26,7 @@ class Cribbage(game.Game):
         self.throw_away_phase:bool = False #True if players still need to throw cards away
         self.pegging_phase:bool = False #True if players are in the pegging phase
         self.team_count:int = 1 #Variable to hold number of players per team (combine points)
+        self.reverse:bool = False #If true, then last to reach point_goal wins and skunking is based on how many points over
 
     #Initializes the game on start
     #Returns 0 on success, -1 on failure
@@ -42,8 +43,8 @@ class Cribbage(game.Game):
             case _ if len(self.players) >= 5:
                 self.throw_count = 1
                 self.crib_count = 8
-                self.point_goal = 241
-                self.skunk_length = 60
+                self.point_goal += self.point_goal-1
+                self.skunk_length *= 2
             case _:
                 return False
             
@@ -80,9 +81,24 @@ class Cribbage(game.Game):
         if self.team_count != 1:
             point_array = self.get_point_array()
 
-        for player_index in range(len(point_array)):
-            if(point_array[player_index] >= self.point_goal):
-                return self.players[player_index]
+        if self.reverse == False:
+            for player_index in range(len(point_array)):
+                if point_array[player_index] >= self.point_goal:
+                    return self.players[player_index]
+        else:
+            winner_count = 0 #Number of players who haven't reached point_goal (which makes you lose)
+            winner = None
+            for player_index in range(len(point_array)):
+                if (point_array[player_index] < self.point_goal):
+                    winner_count += 1
+                    winner = self.players[player_index]
+
+            #If everyone else has reached point_goal, then return the winner
+            if winner_count == 1:
+                return winner
+            elif winner_count == 0: #Should never get in here
+                print("An error has occurred, and there is no winner.")
+                return point_array[0]
 
         return None
         
@@ -351,23 +367,7 @@ class Cribbage(game.Game):
 
     #Sets up game for standard mode
     def standard_mode(self):
-        self.deck = deck.Deck()
-        self.points = []
-        self.hands = []
-        self.backup_hands = []
-        self.crib = []
-        self.num_thrown = []
-        self.pegging_list = []
-        self.point_goal = 121
-        self.skunk_length = 30
-        self.crib_count = 4
-        self.hand_size = 4
-        self.crib_index = 0
-        self.pegging_index = 0
-        self.throw_count = 0
-        self.game_started = False
-        self.throw_away_phase = False
-        self.pegging_phase = False
+        self.__init__()
 
     #Sets up game for mega hand
     def mega_hand(self):
@@ -380,6 +380,13 @@ class Cribbage(game.Game):
     def joker_mode(self):
         if(self.game_started == False):
             self.deck = deck.JokerDeck()
+
+    #Sets up game for reverse mode
+    def reverse_mode(self):
+        if(self.game_started == False):
+            self.point_goal = 60
+            self.skunk_length = 15
+            self.reverse = True
 
     #Finding Nibs  
     def nibs(self, flipped):
