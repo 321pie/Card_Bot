@@ -165,3 +165,5 @@ test-credentials.json
 
 # Local database changes
 src/Stats/*.txt
+src/Stats/cribbage_stats.txt
+src/Stats/general_stats.txt
