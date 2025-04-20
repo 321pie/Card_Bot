@@ -376,6 +376,9 @@ class Cribbage(game.Game):
             self.skunk_length = 60
             self.hand_size = 8
 
+            if self.reverse == True:
+                self.reverse_mode()
+
     #Sets up game for joker mode
     def joker_mode(self):
         if(self.game_started == False):
@@ -384,8 +387,8 @@ class Cribbage(game.Game):
     #Sets up game for reverse mode
     def reverse_mode(self):
         if(self.game_started == False):
-            self.point_goal = 60
-            self.skunk_length = 15
+            self.point_goal = ((self.point_goal-1) / 2) + 1
+            self.skunk_length = self.skunk_length / 2
             self.reverse = True
 
     #Finding Nibs  

@@ -788,11 +788,25 @@ class Cribbage_Print(Game_Print):
         first_suit = hand[0].suit
         local_points = 0
 
-        if all(card.suit == flipped.suit for card in hand):
-            local_points += len(hand) + 1
-        elif(not isCrib):
-            if all(card.suit == first_suit for card in hand):
-                local_points += len(hand)
+        if len(hand) > 6:
+            if flipped.suit in dk.RED:
+                if all(card.suit == dk.RED for card in hand) or all(card.suit == dk.BLACK for card in hand):
+                    local_points += len(hand) + 1
+                elif(not isCrib):
+                    if all(card.suit == dk.RED for card in hand) or all(card.suit == dk.BLACK for card in hand):
+                        local_points += len(hand)
+            else:
+                if all(card.suit == dk.BLACK for card in hand):
+                    local_points += len(hand) + 1
+                elif(not isCrib):
+                    if all(card.suit == dk.RED for card in hand) or all(card.suit == dk.BLACK for card in hand):
+                        local_points += len(hand)
+        else:
+            if all(card.suit == flipped.suit for card in hand):
+                local_points += len(hand) + 1
+            elif(not isCrib):
+                if all(card.suit == first_suit for card in hand):
+                    local_points += len(hand)
 
         if(local_points != 0):
             points += local_points

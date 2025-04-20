@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup as soup
 from datetime import datetime
 import re
 import requests
+import os
 from typing import Callable
 
 class General:
@@ -173,6 +174,12 @@ def write_to_file(achievement_category, page_data:list[list[str]]) -> bool:
 
 #Returns the list from the specified file
 def read_from_file(achievement_category) -> list[list[str]]:
+    #If file doesn't exist, create it
+    if not os.path.exists(achievement_category.file):
+        with open(achievement_category.file, 'w') as file:
+            pass
+        
+    #If file exists (always does ;)), then read data from it if possible
     with open(achievement_category.file, 'r') as file:
         page_data = file.read().split('\n')
         page_data = [row.split('\t') for row in page_data[:-1]] #[:-1] to account for the extra \n at the end
