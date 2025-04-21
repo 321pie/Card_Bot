@@ -85,14 +85,15 @@ def load_pages():
                 if all(item == "" for item in row_data):
                     #Save local data to variable and get dates of both
                     local_page_data = read_from_file(achievement_category)
-                    local_date = access_last_updated_date(local_page_data)
-                    remote_date = access_last_updated_date(remote_page_data)
+                    if local_page_data != None:
+                        local_date = access_last_updated_date(local_page_data)
+                        remote_date = access_last_updated_date(remote_page_data)
 
-                    #If local is more recently updated than remote, combine with remote data in case new columns were added
-                    if remote_date < local_date:
-                        #TODO: Combine
-                        print("Combining, but not really ;p")
-                        remote_page_data = local_page_data #Wow, very elegant, AMAZING even
+                        #If local is more recently updated than remote, combine with remote data in case new columns were added
+                        if remote_date < local_date:
+                            #TODO: Combine
+                            print("Combining, but not really ;p")
+                            remote_page_data = local_page_data #Wow, very elegant, AMAZING even
                         
                     write_to_file(achievement_category, remote_page_data)
 
@@ -177,8 +178,8 @@ def read_from_file(achievement_category) -> list[list[str]]:
     #If file doesn't exist, create it
     if not os.path.exists(achievement_category.file):
         with open(achievement_category.file, 'w') as file:
-            pass
-        
+            return None
+
     #If file exists (always does ;)), then read data from it if possible
     with open(achievement_category.file, 'r') as file:
         page_data = file.read().split('\n')
