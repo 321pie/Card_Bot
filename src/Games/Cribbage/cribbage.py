@@ -1,4 +1,6 @@
+from collections import OrderedDict
 import copy
+import itertools
 from math import factorial, floor
 
 from Games.deck import Card
@@ -468,3 +470,181 @@ class Cribbage(game.Game):
                     num_jokers += 1
 
         return num_jokers
+    
+    #Finding Nobs
+    def nobs(self, hand, flipped, points=0, output_string=''):
+        #For Nobs (suit of jack in hand matches the flipped suit)
+        for card in hand:
+            if (card.suit == flipped.suit) and (card.value == deck.JACK):
+                output_string += "Nobs for 1\n"
+                points += 1
+                break
+
+        return [points, output_string]
+
+    #Finding 15s
+    def find_15s(self, hand, flipped, points=0, output_string=''):
+        hand = copy.copy(hand)
+        hand.append(flipped)
+
+        for subset_size in range(1, len(hand) + 1):
+            for subset in itertools.combinations(hand, subset_size):
+                subset_sum = sum(card.to_int_15s() for card in subset)
+
+                if subset_sum == 15:
+                    points += 2
+                    subset_expression = " + ".join(f"{card.value}" for card in subset)
+                    output_string += f"{subset_expression} = 15 ({points})\n"
+                    
+        return [points, output_string]
+
+    #Finding Pairs
+    def find_pairs(self, hand, flipped, points=0, output_string=''):
+        hand = copy.copy(hand)
+        hand.append(flipped)
+
+        for card1, card2 in itertools.combinations(hand, 2):
+            if card1.value == card2.value:
+                points += 2
+                output_string += f"Pair {card1.value} / {card2.value} ({points})\n"
+                
+        return [points, output_string]
+
+    #Finding Runs
+    def find_runs(self, hand, flipped, points=0, output_string=''):
+        #Initialize list of card values
+        hand = copy.copy(hand)
+        hand.append(flipped)
+        hand.sort(key=lambda card: card.to_int_runs(), reverse=True)
+        card_values = [card.to_int_runs() for card in hand]
+        
+        #Set up variables
+        multiplier_count = 0 #Counts duplicates in runs for displaying
+        total_multiplier = 1 #Total run multiplier (duplicates)
+        multiplier = 1 #Local multiplier (duplicates)
+        run_length = 1 #Length of the current run
+
+        #Loop through each card
+        for index in range(len(card_values)):
+            if(index+1 < len(card_values)): #Ensure that overflow doesn't occur
+                if(card_values[index] == card_values[index+1]): #If duplicate, add to multiplier
+                    multiplier += 1
+                else:
+                    if(card_values[index] != card_values[index+1] and multiplier > 1): #If duplicate needs resetting
+                        multiplier_count += multiplier-1
+                        total_multiplier *= multiplier
+                        multiplier = 1
+                    if(card_values[index]-1 == card_values[index+1]): #If next card continues run (since duplicates are taken care of)
+                        run_length += 1
+                    elif(run_length >= 3): #If valid run, add points, display, and reset variables
+                        multiplier_count += multiplier-1
+                        total_multiplier *= multiplier
+                        points += run_length * total_multiplier
+                        output_string += f"{total_multiplier} run(s) of {run_length}{list(OrderedDict.fromkeys([card.value for card in sorted([hand[i] for i in range(index+1-run_length-multiplier_count, index+1)], key=lambda card: card.to_int_runs())]))} for {run_length * total_multiplier} ({points})\n"
+
+                        multiplier_count = 0
+                        total_multiplier = 1
+                        multiplier = 1
+                        run_length = 1
+                    else: #If invalid run, reset variables
+                        multiplier_count = 0
+                        total_multiplier = 1
+                        multiplier = 1
+                        run_length = 1
+            else: #If no more cards after this one, wrap up with current variables
+                if(run_length >= 3):
+                    multiplier_count += multiplier-1
+                    total_multiplier *= multiplier
+                    points += run_length * total_multiplier
+                    output_string += f"{total_multiplier} run(s) of {run_length}{list(OrderedDict.fromkeys([card.value for card in sorted([hand[i] for i in range(index+1-run_length-multiplier_count, index+1)], key=lambda card: card.to_int_runs())]))} for {run_length * total_multiplier} ({points})\n"
+                    
+                #Reset variables just to be safe
+                multiplier_count = 0
+                total_multiplier = 1
+                multiplier = 1
+                run_length = 1
+
+        return [points, output_string]
+
+    #Finding Flush
+    def find_flush(self, hand, flipped, points=0, output_string='', isCrib = False):
+        first_suit = hand[0].suit
+        local_points = 0
+
+        if len(hand) > 6:
+            if flipped.suit in deck.RED:
+                if all(card.suit == deck.RED for card in hand) or all(card.suit == deck.BLACK for card in hand):
+                    local_points += len(hand) + 1
+                elif(not isCrib):
+                    if all(card.suit == deck.RED for card in hand) or all(card.suit == deck.BLACK for card in hand):
+                        local_points += len(hand)
+            else:
+                if all(card.suit == deck.BLACK for card in hand):
+                    local_points += len(hand) + 1
+                elif(not isCrib):
+                    if all(card.suit == deck.RED for card in hand) or all(card.suit == deck.BLACK for card in hand):
+                        local_points += len(hand)
+        else:
+            if all(card.suit == flipped.suit for card in hand):
+                local_points += len(hand) + 1
+            elif(not isCrib):
+                if all(card.suit == first_suit for card in hand):
+                    local_points += len(hand)
+
+        if(local_points != 0):
+            points += local_points
+            output_string += f"Flush of {first_suit} for {local_points}\n"
+
+        return [points, output_string]
+
+    #Calculate the score for a hand
+    def calculate_hand(self, hand, flipped):
+        points = 0
+        output_string = ""
+
+        #Organize the hand
+        hand = sorted(hand, key=lambda x: x.value)
+        
+        output_string += f"Flipped:\n{flipped.value}\n\nHand:\n"
+        for card in reversed(hand):
+            output_string += f"{card.value}\n"
+        
+        output_string += "------------------------\n"
+
+        #Calculate points
+        [points, output_string] = self.find_15s(hand, flipped, points, output_string)
+        [points, output_string] = self.find_pairs(hand, flipped, points, output_string)
+        [points, output_string] = self.find_runs(hand, flipped, points, output_string)
+        [points, output_string] = self.find_flush(hand, flipped, points, output_string)
+        [points, output_string] = self.nobs(hand, flipped, points, output_string)
+
+        output_string += "------------------------\n"
+        output_string += f"Total points: {points}"
+
+        return points, output_string
+
+    #Calculate the score for a crib
+    def calculate_crib(self, hand, flipped):
+        points = 0
+        output_string = ""
+
+        #Organize the hand
+        hand = sorted(hand, key=lambda x: x.value)
+        
+        output_string += f"Flipped:\n{flipped.value}\n\nCrib:\n"
+        for card in reversed(hand):
+            output_string += f"{card.value}\n"
+        
+        output_string += "------------------------\n"
+
+        #Calculate points
+        [points, output_string] = self.find_15s(hand, flipped, points, output_string)
+        [points, output_string] = self.find_pairs(hand, flipped, points, output_string)
+        [points, output_string] = self.find_runs(hand, flipped, points, output_string)
+        [points, output_string] = self.find_flush(hand, flipped, points, output_string, True)
+        [points, output_string] = self.nobs(hand, flipped, points, output_string)
+
+        output_string += "------------------------\n"
+        output_string += f"Total points: {points}"
+
+        return points, output_string
