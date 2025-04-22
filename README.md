@@ -118,4 +118,4 @@ The view (input logic) is primarily kept in message.py (! commands), though some
 Check out game.py, game_print.py, and message.py before trying to add to the codebase. These files hold the basic building blocks for any game.<br/>
 If you want to add a game, then create a new branch for the game and submit a pull request when the game is completed.<br/>
 Testing can be done using the testing feature (more information on the test feature can be found by using /help or reading help.txt).<br/>
-If you want to add stats/achievements, ask for permissions to edit the <a href="https://docs.google.com/spreadsheets/d/1zUblRLIugMxcqi-2R0AiEAx7gt9FnujT5ik7JB0viaw/edit?usp=sharing">Google Sheets document</a> and then add your achievements to the controller.
+If you want to add stats/achievements, ask for permissions to edit the <a href="https://docs.google.com/spreadsheets/d/1zUblRLIugMxcqi-2R0AiEAx7gt9FnujT5ik7JB0viaw/edit?usp=sharing">Google Sheets document</a> and then add your achievements to the controller as well as stats.py.
