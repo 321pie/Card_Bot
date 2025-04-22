@@ -75,16 +75,19 @@ async def handle_user_messages(msg):
     #Roles
     elif message == '!db' or message == '!dumpsterboy':
         stats.access_field(stats.General, player, stats.General.times_becoming_db, func=stats.increment)
-        return await give_role(msg.author, "Dumpster Boy")
+        return await change_gender_role(msg.author, "Dumpster Boy")
     elif message == '!gg' or message == '!glamourgirl':
         stats.access_field(stats.General, player, stats.General.times_becoming_gg, func=stats.increment)
-        return await give_role(msg.author, "Glamour Girl")
+        return await change_gender_role(msg.author, "Glamour Girl")
     elif message == '!gm' or message == '!garbageman':
         stats.access_field(stats.General, player, stats.General.times_becoming_gm, func=stats.increment)
-        return await give_role(msg.author, "Garbage Man")
+        return await change_gender_role(msg.author, "Garbage Man")
     elif message == '!tl' or message == '!treasurelady':
         stats.access_field(stats.General, player, stats.General.times_becoming_tl, func=stats.increment)
-        return await give_role(msg.author, "Treasure Lady")
+        return await change_gender_role(msg.author, "Treasure Lady")
+    
+    elif message == '!ping':
+        return await toggle_role(msg.author, "Ping if Playing")
     
     #Default case (orders bot doesn't understand)
     return return_list
@@ -119,10 +122,34 @@ def make_test(player):
     else:
         return gp().add_return([], f"Sorry, {player}. You need to wait until the current game is started to create another one.")
 
-#Give role to user
-async def give_role(member, role):
-    await member.edit(roles=[discord.utils.get(member.guild.roles, name=role), discord.utils.get(member.guild.roles, name="Ping if Playing")])
-    return gp().add_return([], member.name + ' is now a ' + role + '!')
+#Toggle role for user
+async def toggle_role(member, role_name):
+    #If user has role, delete it from user. Else, give user the role
+    role = discord.utils.get(member.guild.roles, name=role_name)
+    if role in member.roles:
+        await member.remove_roles(role)
+
+        return gp().add_return([], member.name + ' is no longer a ' + role_name + '!')
+    else:
+        await member.add_roles(role)
+
+    return gp().add_return([], member.name + ' is now a ' + role_name + '!')
+
+async def change_gender_role(member, role_name):
+    #Intialize gender roles and delete current (only one gender role at a time)
+    gender_roles = [discord.utils.get(member.guild.roles, name="Treasure Lady"), discord.utils.get(member.guild.roles, name="Glamour Girl"), discord.utils.get(member.guild.roles, name="Dumpster Boy"), discord.utils.get(member.guild.roles, name="Garbage Man")]
+    for role in gender_roles:
+        if role in member.roles:
+            await member.remove_roles(role)
+
+            #If already in requested role, then toggle off
+            if role.name == role_name:
+                return gp().add_return([], member.name + ' is no longer a ' + role_name + '!')
+
+    #Add requested gender role
+    await member.add_roles(discord.utils.get(member.guild.roles, name=role_name))
+
+    return gp().add_return([], member.name + ' is now a ' + role_name + '!')
 
 #Runs the command if needed or returns None
 async def run_commands(player, message, game):

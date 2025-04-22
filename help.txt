@@ -17,8 +17,14 @@ The bot knows the following commands:
         '**/rules**': Show the rules of cribbage.
 
       Other:
-        '**!treasurelady**', '**!tl**': Change role to Treasure Lady.
-        '**!garbageman**', '**!gm**': Change role to Garbage Man.
+        Gender Roles (only one at a time):
+          '**!treasurelady**', '**!tl**': Change role to Treasure Lady.
+          '**!glamourgirl**', '**!gg**': Change role to Glamour Girl.
+          '**!dumpsterboy**', '**!db**': Change role to Dumpster Boy.
+          '**!garbageman**', '**!gm**': Change role to Garbage Man.
+
+        Other Roles:
+          '**!ping**': Adds the Ping if Playing role to notify when games are happening.
 
     ***Cribbage***:
       Game:
