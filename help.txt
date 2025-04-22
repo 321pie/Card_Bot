@@ -52,11 +52,12 @@ The bot knows the following commands:
         '**!cah**': Toggles the CAH expansion (Cards Against Humanity)!
         '**!coders**': Toggles the CODERS expansion!
 
-    ***Test (Used for development, no safeguards to prevent cheating)***:
+    ***Test (Used for development; no safeguards to prevent cheating)***:
       Game:
-        '**!cribbage**', '**!cr**': Create a game of Cribbage.
-        '**!juiced**', '**jc**':: Create a game of Juiced.
-        '**!add .***': Adds the provided string as a player to the game.
-        '**!player command**': For any player in the game and any command in the game.
-        '**!player hand**': For any player in the game to print their hand.
+        '**!test**': Create a testing environment that mirrors juiced (game can be changed with further commands).
+        '**!cribbage**', '**!cr**': Create a game of Cribbage in the testing environment.
+        '**!juiced**', '**jc**': Create a game of Juiced in the testing environment.
+        '**!add _player_***': Adds the provided string as a player to the testing environment.
+        '**!_player_ _command_**': Causes the specified player to perform the specified command in the game that is being tested.
+        '**!_player_ hand**': Prints the hand of the specified player in the testing environment (not private).
     
