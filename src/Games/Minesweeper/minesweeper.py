@@ -1,7 +1,7 @@
 import random
 
-HIDDEN_CHARACTERS = ["||:zero:||", "||:one:||", "||:two:||", "||:three:||", "||:four:||", "||:five:||", "||:six:||", "||:seven:||", "||:eight:||", "||:nine:||", "||:ten:||", "||:bomb:||"] #Holds max_bombs number of numbers (in order) and a bomb character (in that order)
-REVEALED_CHARACTERS = [":zero:", ":one:", ":two:", ":three:", ":four:", ":five:", ":six:", ":seven:", ":eight:", ":nine:", ":ten:", ":bomb:"] #Holds max_bombs number of numbers (in order) and a bomb character (in that order)
+HIDDEN_CHARACTERS = ["||:zero:||", "||:one:||", "||:two:||", "||:three:||", "||:four:||", "||:five:||", "||:six:||", "||:seven:||", "||:eight:||", "||:bomb:||"] #Holds max_bombs number of numbers (in order 0-8) and a bomb character (in that order)
+REVEALED_CHARACTERS = [":zero:", ":one:", ":two:", ":three:", ":four:", ":five:", ":six:", ":seven:", ":eight:", ":bomb:"] #Holds max_bombs number of numbers (in order 0-8) and a bomb character (in that order)
 MAX_BOMBS = 10 #Max number of bombs (corresponding index in characters array)
 
 def init_minesweeper(grid_width=5, grid_height=5, num_bombs=3):
@@ -13,18 +13,21 @@ def init_minesweeper(grid_width=5, grid_height=5, num_bombs=3):
     except:
         return "Invalid parameters. Please enter integers or nothing at all."
 
-    #Set up bombs
-    if num_bombs < 0:
-        num_bombs = 0
-    elif num_bombs > MAX_BOMBS:
-        num_bombs = MAX_BOMBS
-
     #Set grid to valid values
     if not ((0 < grid_width < 10) and (0 < grid_height < 10)):
         grid_width, grid_height = 5
 
     grid_width = grid_width
     grid_height = grid_height
+
+    #Set up bombs
+    if num_bombs < 0:
+        num_bombs = 1
+    elif num_bombs > MAX_BOMBS:
+        num_bombs = MAX_BOMBS
+
+    if num_bombs >= grid_width*grid_height:
+        num_bombs = 1
 
     #populate empty grid with unique numbers
     grid = []
@@ -60,15 +63,21 @@ def init_minesweeper(grid_width=5, grid_height=5, num_bombs=3):
     #Returns a string containing a readable grid with a 0 revealed
     return get_grid(reveal_0(grid), grid_width, grid_height, num_bombs)
 
-#Reveals a 0 (if possible)
+#Reveals a 0 (if possible, else reveal next lowst numeber)
 def reveal_0(grid) -> list[str]:
-    start_index = random.randint(0, len(grid)-1)
+    loop_done = False
+    for index in range(len(HIDDEN_CHARACTERS) - 1): #Iterate through for all numbers (starting with 0's)
+        start_index = random.randint(0, len(grid)-1) #Random starting index
+        for _ in range(len(grid)): #Iterate through grid backwards from random start_index (since negative wraps)
+            if grid[start_index] != HIDDEN_CHARACTERS[index]: #If wrong, keep going
+                start_index -= 1
+            else: #If right, change to revealed, signal loop is done, and break
+                grid[start_index] = REVEALED_CHARACTERS[index]
+                loop_done = True
+                break
 
-    while grid[start_index] != HIDDEN_CHARACTERS[0]:
-        start_index -= 1
-
-    if grid[start_index] == HIDDEN_CHARACTERS[0]:
-        grid[start_index] = REVEALED_CHARACTERS[0]
+        if loop_done: #If loop is doen, break. Else, move on to next number
+            break
 
     return grid
 
@@ -81,4 +90,7 @@ def get_grid(grid, grid_width, grid_height, num_bombs) -> str:
         for column in range(grid_width):
             output_str += str(grid[row*grid_width + column]) + " "
 
-    return output_str + f"\nThere are {num_bombs} bombs. Have fun!"
+    if num_bombs == 1:
+        return output_str + f"\nThere is {num_bombs} bomb. Have fun!"
+    else:
+        return output_str + f"\nThere are {num_bombs} bombs. Have fun!"
