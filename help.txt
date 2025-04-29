@@ -19,7 +19,7 @@ The bot knows the following commands:
       Other:
         Minigames:
           '**!minesweeper**', '**!ms**': Initiate a game of minesweeper with a 5x5 grid and 3 bombs.
-          '**!minesweeper ([1-9]|10) ([1-9]|10) ([1-9]|10)**', '**!ms ([1-9]|10) ([1-9]|10) ([1-9]|10)**': Initiate a game of minesweeper with the first two numbers being height and width, and the last number being the number of bombs.
+          '**!minesweeper [1-9] [1-9] ([1-9]|10)**', '**!ms [1-9] [1-9] ([1-9]|10)**': Initiate a game of minesweeper with the first two numbers being height and width (max of 9), and the last number being the number of bombs (max of 10).
 
         Gender Roles (only one at a time):
           '**!treasurelady**', '**!tl**': Change role to Treasure Lady.
