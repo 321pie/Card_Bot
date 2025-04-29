@@ -1,6 +1,7 @@
 import random
 
-CHARACTERS = ["||:zero:||", "||:one:||", "||:two:||", "||:three:||", "||:four:||", "||:five:||", "||:six:||", "||:seven:||", "||:eight:||", "||:nine:||", "||:ten:||", "||:bomb:||"] #Holds max_bombs number of numbers (in order) and a bomb character (in that order)
+HIDDEN_CHARACTERS = ["||:zero:||", "||:one:||", "||:two:||", "||:three:||", "||:four:||", "||:five:||", "||:six:||", "||:seven:||", "||:eight:||", "||:nine:||", "||:ten:||", "||:bomb:||"] #Holds max_bombs number of numbers (in order) and a bomb character (in that order)
+REVEALED_CHARACTERS = [":zero:", ":one:", ":two:", ":three:", ":four:", ":five:", ":six:", ":seven:", ":eight:", ":nine:", ":ten:", ":bomb:"] #Holds max_bombs number of numbers (in order) and a bomb character (in that order)
 MAX_BOMBS = 10 #Max number of bombs (corresponding index in characters array)
 
 def init_minesweeper(grid_width=5, grid_height=5, num_bombs=3):
@@ -33,7 +34,7 @@ def init_minesweeper(grid_width=5, grid_height=5, num_bombs=3):
     #Get bomb placement and add bombs to grid
     bomb_list = random.sample(grid, num_bombs)
     for bomb in bomb_list:
-        grid[grid.index(bomb)] = CHARACTERS[-1]
+        grid[grid.index(bomb)] = HIDDEN_CHARACTERS[-1]
 
     #Populate grid with valid number of bombs from characters
     for square_index in range(len(grid)):
@@ -46,18 +47,32 @@ def init_minesweeper(grid_width=5, grid_height=5, num_bombs=3):
             check_indexes += [square_index - grid_width + 1, square_index + 1, square_index + grid_width + 1]
         
         #If bomb, move on to next. Else, increment bomb count for bombs around you then replace with correct symbol
-        if grid[square_index] == CHARACTERS[-1]:
+        if grid[square_index] == HIDDEN_CHARACTERS[-1]:
             continue
         else:
             for index in check_indexes:
                 if index>=0 and index<len(grid):
-                    if grid[index] == CHARACTERS[-1]:
+                    if grid[index] == HIDDEN_CHARACTERS[-1]:
                         close_bombs += 1
 
-        grid[square_index] = CHARACTERS[close_bombs]
+        grid[square_index] = HIDDEN_CHARACTERS[close_bombs]
 
-    return get_grid(grid, grid_width, grid_height, num_bombs)
+    #Returns a string containing a readable grid with a 0 revealed
+    return get_grid(reveal_0(grid), grid_width, grid_height, num_bombs)
 
+#Reveals a 0 (if possible)
+def reveal_0(grid) -> list[str]:
+    start_index = random.randint(0, len(grid)-1)
+
+    while grid[start_index] != HIDDEN_CHARACTERS[0]:
+        start_index -= 1
+
+    if grid[start_index] == HIDDEN_CHARACTERS[0]:
+        grid[start_index] = REVEALED_CHARACTERS[0]
+
+    return grid
+
+#Puts the grid into a readable format
 def get_grid(grid, grid_width, grid_height, num_bombs) -> str:
     output_str = ""
 
