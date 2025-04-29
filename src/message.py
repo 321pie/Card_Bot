@@ -6,6 +6,7 @@ import discord
 from Games.Cribbage.cribbage_print import Cribbage_Print
 from Games.game_print import Game_Print as gp
 from Games.Juiced.juiced_print import Juiced_Print
+import Games.Minesweeper.minesweeper as minesweeper
 import Games.stats as stats
 from Games.Test.test_print import Test_Print
 
@@ -71,6 +72,12 @@ async def handle_user_messages(msg):
         return make_juiced(player)
     elif message == "!test":
         return make_test(player)
+    
+    #Commands to output a minigame
+    elif message == "!minesweeper" or message == "!ms":
+        return gp().add_return([], minesweeper.init_minesweeper())
+    elif (re.fullmatch("^!ms ([1-9]|10) ([1-9]|10) ([1-9]|10)$", message) != None) or (re.fullmatch("^!minesweeper ([1-9]|10) ([1-9]|10) ([1-9]|10)$", message) != None):
+        return gp().add_return([], minesweeper.init_minesweeper(*message.split(" ")[1:]))
     
     #Roles
     elif message == '!db' or message == '!dumpsterboy':
