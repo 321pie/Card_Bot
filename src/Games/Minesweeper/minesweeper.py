@@ -19,7 +19,7 @@ def init_minesweeper(grid_width=5, grid_height=5, num_bombs=3):
         num_bombs = MAX_BOMBS
 
     #Set grid to valid values
-    if not ((0 < grid_width < 11) and (0 < grid_height < 11)):
+    if not ((0 < grid_width < 10) and (0 < grid_height < 10)):
         grid_width, grid_height = 5
 
     grid_width = grid_width

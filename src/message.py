@@ -76,7 +76,7 @@ async def handle_user_messages(msg):
     #Commands to output a minigame
     elif message == "!minesweeper" or message == "!ms":
         return gp().add_return([], minesweeper.init_minesweeper())
-    elif (re.fullmatch("^!ms ([1-9]|10) ([1-9]|10) ([1-9]|10)$", message) != None) or (re.fullmatch("^!minesweeper ([1-9]|10) ([1-9]|10) ([1-9]|10)$", message) != None):
+    elif (re.fullmatch("^!ms [1-9] [1-9] ([1-9]|10)$", message) != None) or (re.fullmatch("^!minesweeper [1-9] [1-9] ([1-9]|10)$", message) != None):
         return gp().add_return([], minesweeper.init_minesweeper(*message.split(" ")[1:]))
     
     #Roles
