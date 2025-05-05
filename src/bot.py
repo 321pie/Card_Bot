@@ -48,7 +48,7 @@ def run_bot():
         await interaction.response.defer(ephemeral=True)
         player = interaction.user.name
 
-        for active_game in message.active_games:            
+        for active_game in message.active_games:
             if active_game.HAND_PIC == True:
                 if player in active_game.get_players():
                     hand_pic = active_game.get_hand_pic(player) #Get hand pic to display (or None if invalid)

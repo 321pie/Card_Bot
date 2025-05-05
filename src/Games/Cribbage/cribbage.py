@@ -20,14 +20,14 @@ class Cribbage(game.Game):
         self.pegging_list:list[deck.Card] = [] #List of cards in pegging round
         self.point_goal:int = 121 #Number of points to win
         self.skunk_length:int = 30 #Number of points from skunk line to end -1
-        self.crib_count:int = 4 #Number of cards in crib
+        self.crib_size:int = 4 #Number of cards in crib
         self.hand_size:int = 4 #Number of cards in a hand after throwing to crib
         self.crib_index:int = 0 #crib_index++ each round. Crib belongs to players[crib_index%len(players)]
         self.pegging_index:int = 0 #(crib_index + 1) % len(players)
         self.throw_count:int = 0 #How many cards each player throws, initialized upon starting game
         self.throw_away_phase:bool = False #True if players still need to throw cards away
         self.pegging_phase:bool = False #True if players are in the pegging phase
-        self.team_count:int = 1 #Variable to hold number of players per team (combine points)
+        self.team_size:int = 1 #Variable to hold number of players per team (combine points)
         self.reverse:bool = False #If true, then last to reach point_goal wins and skunking is based on how many points over
 
     #Initializes the game on start
@@ -44,7 +44,7 @@ class Cribbage(game.Game):
                 self.throw_count = 1
             case _ if len(self.players) >= 5:
                 self.throw_count = 1
-                self.crib_count = 8
+                self.crib_size = 8
                 self.point_goal += self.point_goal-1
                 self.skunk_length *= 2
             case _:
@@ -80,7 +80,7 @@ class Cribbage(game.Game):
     def get_winner(self):
         point_array = self.points
 
-        if self.team_count != 1:
+        if self.team_size != 1:
             point_array = self.get_point_array()
 
         if self.reverse == False:
@@ -127,7 +127,7 @@ class Cribbage(game.Game):
     #Ends the game by resetting every variable to standard cribbage
     def end_game(self):
         self.players = []
-        self.team_count = 1
+        self.team_size = 1
         self.standard_mode()
 
     #Create teams with count number of players if able. Returns True on success and False on error.
@@ -138,7 +138,7 @@ class Cribbage(game.Game):
 
         #If teams are even, set variable and return True
         if (len(self.players) % count == 0):
-            self.team_count = count
+            self.team_size = count
             return True
         
         #If teams uneven, return False
@@ -273,7 +273,7 @@ class Cribbage(game.Game):
         self.points[self.crib_index % len(self.players)] += num_points
 
         #Make sure crib has proper number of cards
-        while(len(self.crib) < self.crib_count):
+        while(len(self.crib) < self.crib_size):
             self.crib.append(self.deck.get_card())
         
         #Make sure variables are set up for pegging round
@@ -357,10 +357,10 @@ class Cribbage(game.Game):
         point_array = []
 
         point_count = 0
-        num_teams = len(self.players) // self.team_count
+        num_teams = len(self.players) // self.team_size
 
         for team_num in range(num_teams):
-            for player in range(self.team_count):
+            for player in range(self.team_size):
                 point_count += self.points[player*num_teams + team_num]
             point_array.append(point_count)
             point_count = 0
@@ -415,7 +415,7 @@ class Cribbage(game.Game):
                 for card_index in range(1, total_card_index+1):
                     cards.append(old_cards[-card_index].to_int_runs())
 
-                #sort cards to determine run and increment total_card_index for next iteration
+                #Sort cards to determine run and increment total_card_index for next iteration
                 cards = sorted(cards, reverse=True)
                 total_card_index += 1
 
@@ -571,7 +571,7 @@ class Cribbage(game.Game):
         first_suit = hand[0].suit
         local_points = 0
 
-        if len(hand) > 6:
+        if len(hand) > 6: #Mega mode checks red/black instead of specific suit
             if flipped.suit in deck.RED:
                 if all(card.suit == deck.RED for card in hand) or all(card.suit == deck.BLACK for card in hand):
                     local_points += len(hand) + 1
@@ -591,7 +591,7 @@ class Cribbage(game.Game):
                 if all(card.suit == first_suit for card in hand):
                     local_points += len(hand)
 
-        if(local_points != 0):
+        if(local_points != 0): #Normal flush behavior
             points += local_points
             output_string += f"Flush of {first_suit} for {local_points}\n"
 

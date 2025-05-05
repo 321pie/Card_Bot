@@ -1,5 +1,6 @@
 #Foreign imports
-from random import randint
+from copy import copy
+from random import shuffle
 
 HEART = ':heart_suit:' #'♥'
 DIAMOND = ':diamond_suit:' #'♦'
@@ -24,25 +25,25 @@ class Card:
         self.suit = suit
 
     def to_int_runs(self):
-        if(self.value == ACE):
+        if self.value == ACE :
             return 1
-        elif(self.value == JACK):
+        elif self.value == JACK:
             return 11
-        elif(self.value == QUEEN):
+        elif self.value == QUEEN:
             return 12
-        elif(self.value == KING):
+        elif self.value == KING:
             return 13
-        elif(self.value == JOKER):
+        elif self.value == JOKER:
             return -1
         else:
             return int(self.value)
         
     def to_int_15s(self):
-        if(self.value == ACE):
+        if self.value == ACE:
             return 1
-        elif(self.value in [JACK, QUEEN, KING]):
+        elif self.value in [JACK, QUEEN, KING]:
             return 10
-        elif(self.value == JOKER):
+        elif self.value == JOKER:
             return -1
         else:
             return int(self.value)
@@ -55,40 +56,41 @@ class Deck:
         self.reset_deck()
         
     def reset_deck(self):
-        self.deck = []
-        self.flipped = None #Card that gets flipped after throwing cards away
+        self.deck:list[Card] = []
+        self.flipped:Card = None #Card that gets flipped after throwing cards away
 
         for suit in SUITS:
             for value in VALUES:
                 self.deck.append(Card(value, suit))
 
+        shuffle(self.deck)
+
     def get_hands(self, num_hands, num_cards):
         #Check that values are within bounds
         hands = []
-        if(num_hands * num_cards <= len(self.deck)):
+        if num_hands*num_cards <= len(self.deck):
             for h in range(num_hands):
                 hand = []
                 for c in range(num_cards):
-                    card = randint(0, len(self.deck)-1)
-                    hand.append(self.deck[card])
-                    del self.deck[card]
+                    hand.append(self.deck[0])
+                    del self.deck[0]
                 hands.append(hand)
         
         return hands
     
+    #Gets a card, deletes it from the deck, but stores it in deck.flipped
     def get_flipped(self):
-        if(self.flipped == None and len(self.deck) >= 1):
-            card = randint(0, len(self.deck)-1)
-            self.flipped = self.deck[card]
-            del self.deck[card]
+        if (self.flipped == None) and (not self.is_empty()):
+            self.flipped = self.deck[0]
+            del self.deck[0]
 
         return self.flipped
     
+    #Gets a card, deleting it froom the deck
     def get_card(self):
-        if(len(self.deck) >= 1):
-            card = randint(0, len(self.deck)-1)
-            extra = self.deck[card]
-            del self.deck[card]
+        if (not self.is_empty()):
+            extra = self.deck[0]
+            del self.deck[0]
 
             return extra
         return None
@@ -96,8 +98,30 @@ class Deck:
     def get_length(self):
         return len(self.deck)
     
+    def is_empty(self):
+        if(len(self.deck) <= 0):
+            return True
+        else:
+            return False
+        
+    def get_deck(self):
+        return copy(self.deck)
+    
+    def set_deck(self, cards:list[Card]):
+        self.deck = copy(cards)
+    
 class JokerDeck(Deck):
     def reset_deck(self):
         super().reset_deck()
         self.deck.append(Card(JOKER, RED))
         self.deck.append(Card(JOKER, BLACK))
+
+class Peasant_Deck(Deck):
+    def reset_deck(self):
+        super().reset_deck()
+        self.deck = [card for card in self.deck if card.value not in [JACK, QUEEN, KING]]
+
+class Royal_Deck(Deck):
+    def reset_deck(self):
+        super().reset_deck()
+        self.deck = [card for card in self.deck if card.value in [JACK, QUEEN, KING]]

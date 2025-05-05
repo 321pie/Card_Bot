@@ -7,6 +7,7 @@ from Games.Cribbage.cribbage_print import Cribbage_Print
 from Games.game_print import Game_Print as gp
 from Games.Juiced.juiced_print import Juiced_Print
 import Games.Minesweeper.minesweeper as minesweeper
+from Games.Regicide.regicide_print import Regicide_Print
 import Games.stats as stats
 from Games.Test.test_print import Test_Print
 
@@ -70,6 +71,8 @@ async def handle_user_messages(msg):
         return make_cribbage(player)
     elif message == "!juiced" or message == "!jc":
         return make_juiced(player)
+    elif message == "!regicide" or message == "!reg":
+        return make_regicide(player)
     elif message == "!test":
         return make_test(player)
     
@@ -116,6 +119,16 @@ def make_juiced(player):
     if cur_game == None:
         cur_game = Juiced_Print()
         return gp().add_return([], f"{player} has created a Juiced game. Use **!join** to join it!")
+    else:
+        return gp().add_return([], f"Sorry, {player}. You need to wait until the current game is started to create another one.")
+    
+#Makes a game of Regicide to be joined
+def make_regicide(player):
+    global cur_game
+    
+    if cur_game == None:
+        cur_game = Regicide_Print()
+        return gp().add_return([], f"{player} has created a Regicide game. Use **!join** to join it!")
     else:
         return gp().add_return([], f"Sorry, {player}. You need to wait until the current game is started to create another one.")
     

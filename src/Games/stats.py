@@ -145,6 +145,7 @@ def access_field(achievement_category, user:str, field_name:str, data:str=None, 
     else:
         return None
     
+#Returns the "last updated" datetime from the specified page (when passed in), and updates the date if do_date_update is true
 def access_last_updated_date(page_data:list[list[str]], do_date_update:bool=False) -> datetime:
     saved_date = datetime(*[int(value) for value in re.split('[- :]', page_data[0][page_data[0].index('')-1])])
 

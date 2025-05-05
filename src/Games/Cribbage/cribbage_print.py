@@ -502,10 +502,10 @@ class Cribbage_Print(Game_Print):
 
         #Get the list of teams
         team_list = ""
-        num_teams = num_players // self.game.team_count
+        num_teams = num_players // self.game.team_size
         for team_num in range(num_teams):
             team_list += f"**Team {team_num}**: "
-            for player in range(self.game.team_count):
+            for player in range(self.game.team_size):
                 team_list += f"*{self.game.get_players()[player*num_teams + team_num]}*, "
             team_list = team_list[:-2] + "\n"
 
@@ -526,7 +526,7 @@ class Cribbage_Print(Game_Print):
                     player_hands += f"{self.game.get_players()[hand_index]}'s hand: {[card.display() for card in sorted(self.game.backup_hands[hand_index], key=lambda card:card.to_int_15s())]}\n"
 
             #Make sure that crib has been initialized
-            if(len(self.game.crib) == self.game.crib_count):
+            if(len(self.game.crib) == self.game.crib_size):
                 player_hands += f"{self.game.get_players()[self.game.crib_index%len(self.game.get_players())]}'s crib: {[card.display() for card in sorted(self.game.crib, key=lambda card:card.to_int_15s())]}\n"
 
         #Shows the ending point totals
@@ -535,7 +535,7 @@ class Cribbage_Print(Game_Print):
         num_double_skunks = 0
         for point_index in range(len(point_array)):
             if(point_array[point_index] < (self.game.point_goal - self.game.skunk_length)):
-                if self.game.team_count == 1: #If no teams, display based on name
+                if self.game.team_size == 1: #If no teams, display based on name
                     #Sort out stats
                     if self.reverse == False:
                         if ((self.game.point_goal - point_array[point_index]) // self.game.skunk_length) > 1:
@@ -547,7 +547,7 @@ class Cribbage_Print(Game_Print):
                         #Add details to string
                         player_scores += f"{self.game.get_players()[point_index]} got skunked x{(self.game.point_goal - point_array[point_index]) // self.game.skunk_length} at {point_array[point_index]} points.\n"
                 else: #If teams, display by team
-                    num_teams = len(self.game.get_players()) // self.game.team_count
+                    num_teams = len(self.game.get_players()) // self.game.team_size
                     player_scores += f"Team {point_index} ("
                     team_players = []
                     for player in range(num_teams):
@@ -567,12 +567,12 @@ class Cribbage_Print(Game_Print):
                         #Add details to string
                         player_scores = player_scores[:-2] + f") got skunked x{(self.game.point_goal - point_array[point_index]) // self.game.skunk_length} at {point_array[point_index]} points.\n"
             else:
-                if self.game.team_count == 1: #If no teams, display based on name
+                if self.game.team_size == 1: #If no teams, display based on name
                     player_scores += f"{self.game.get_players()[point_index]} ended with {point_array[point_index]} points.\n"
                 else: #If teams, display by team
-                    num_teams = len(self.game.get_players()) // self.game.team_count
+                    num_teams = len(self.game.get_players()) // self.game.team_size
                     team = f"Team {point_index} ("
-                    for player in range(self.game.team_count):
+                    for player in range(self.game.team_size):
                         team += f"{self.game.get_players()[player*num_teams + point_index]}, "
                     team = team[:-2] + ")"
 
@@ -586,7 +586,7 @@ class Cribbage_Print(Game_Print):
                     player_scores += team + f" ended with {point_array[point_index]} points.\n"
 
         #Sort out stats
-        if self.game.team_count == 1:
+        if self.game.team_size == 1:
             winning_players = [winner_string]
         else:
             winning_players = winner_string[8:-1].split(", ") #Remove "Team x (" from beginning and ")" from end
@@ -669,16 +669,16 @@ class Cribbage_Print(Game_Print):
 
         #If playing alone, don't have team names
         #Else, print out teams and points for team
-        if self.game.team_count == 1 or always_solo == True:
+        if self.game.team_size == 1 or always_solo == True:
             for player_index in range(len(self.game.get_players())):
                 output_string += f"*{self.game.get_players()[player_index]}* has {self.game.points[player_index]} points.\n"
         else:
             point_count = 0
-            num_teams = len(self.game.get_players()) // self.game.team_count
+            num_teams = len(self.game.get_players()) // self.game.team_size
 
             for team_num in range(num_teams):
                 output_string += f"**Team {team_num}** ("
-                for player in range(self.game.team_count):
+                for player in range(self.game.team_size):
                     point_count += self.game.points[player*num_teams + team_num]
                     output_string += f"*{self.game.get_players()[player*num_teams + team_num]}*, "
                 output_string = output_string[:-2] + f") has {point_count} points.\n"
