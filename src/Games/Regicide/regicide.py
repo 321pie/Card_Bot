@@ -63,49 +63,54 @@ class Regicide(Game):
         card = self.hands[self.cur_player_index][card_index]
         if (self.defending or \
         len(self.cur_atk_def) == 0) or \
-        (len([tarjeta for tarjeta in self.cur_atk_def if tarjeta.value == card.value]) == len(self.cur_atk_def) and sum([self.get_card_power(tarjeta) for tarjeta in self.cur_atk_def if tarjeta.value == card.value]) + card.to_int_15s() <= 10) or \
+        (len([tarjeta for tarjeta in self.cur_atk_def if tarjeta.value == card.value or tarjeta.value == deck.ACE]) == len(self.cur_atk_def) and sum([self.get_card_power(tarjeta) for tarjeta in self.cur_atk_def if tarjeta.value == card.value]) + card.to_int_15s() <= 10) or \
         (card.value == deck.ACE or self.cur_atk_def[0].value == deck.ACE):
             self.cur_atk_def.append(card)
         else:
             return False
-
-        #If red, resolve power
-        if card.suit == deck.HEART and (self.cur_royal.suit != deck.HEART or self.jester_active): #Shuffle discard, select (# on card) cards and put them on bottom of deck
-            shuffle(self.discard)
-            if len(self.discard) < self.get_card_power(card):
-                self.deck.set_deck(self.deck.get_deck() + self.discard)
-            else:
-                self.deck.set_deck(self.deck.get_deck() + self.discard[:self.get_card_power(card)])
-        elif card.suit == deck.DIAMOND and (self.cur_royal.suit != deck.DIAMOND or self.jester_active): #Starting with cur_player, all players draw one until (# on card) cards have been drawn
-            self.draw_cards(self.get_card_power(card))
 
         return True
     
     #Executes attack/defense if able
     def execute(self, player):
         if player != self.get_cur_player():
-            return
+            return False
         if self.defending == True:
             if sum([self.get_card_power(card) for card in self.cur_atk_def]) < self.royal_atk:
-                self.end_game()
-            
+                if sum([self.get_card_power(card) for card in self.hands[self.players.index(player)]]) >= self.royal_atk:
+                    return False #If you can defend, you must
+                else:
+                    self.end_game()
+                
             self.cur_player_index = (self.cur_player_index+1) % len(self.players)
             self.defending = False
             self.cur_atk_def = []
         else:
+            if len(self.cur_atk_def) == 0:
+                return False #Can't attack with nothing. Must yield instead
+            
             power = self.calculate_power()
+
+            #If red, resolve power
+            if any(hasattr(card.suit, deck.HEART) for card in self.cur_atk_def) and (self.cur_royal.suit != deck.HEART or self.jester_active): #Shuffle discard, select (# on card) cards and put them on bottom of deck
+                shuffle(self.discard)
+                if len(self.discard) < power:
+                    self.deck.set_deck(self.deck.get_deck() + self.discard)
+                else:
+                    self.deck.set_deck(self.deck.get_deck() + self.discard[:power])
+            if any(hasattr(card.suit, deck.DIAMOND) for card in self.cur_atk_def) and (self.cur_royal.suit != deck.DIAMOND or self.jester_active): #Starting with cur_player, all players draw one until (# on card) cards have been drawn
+                self.draw_cards(power)
             
             #Add in black powers
-            for card in self.cur_atk_def:
-                if card.suit == deck.CLUB and (self.cur_royal.suit != deck.CLUB or self.jester_active): #Double the power
-                    power *= 2
-                elif card.suit == deck.SPADE:
-                    if self.cur_royal.suit != deck.SPADE or self.jester_active: #Permanently reduce cur_royal's attack
-                        self.royal_atk -= self.get_card_power(card)
-                        if self.royal_atk < 0:
-                            self.royal_atk = 0
-                    else:
-                        self.jester_attack_reduction += self.get_card_power(card)
+            if any(hasattr(card.suit, deck.CLUB) for card in self.cur_atk_def) and (self.cur_royal.suit != deck.CLUB or self.jester_active): #Double the power
+                power *= 2
+            if any(hasattr(card.suit, deck.CLUB) for card in self.cur_atk_def) == deck.SPADE:
+                if self.cur_royal.suit != deck.SPADE or self.jester_active: #Permanently reduce cur_royal's attack
+                    self.royal_atk -= power
+                    if self.royal_atk < 0:
+                        self.royal_atk = 0
+                else:
+                    self.jester_attack_reduction += power
 
             #Damage royal and see if it died
             self.royal_hp -= power
@@ -125,6 +130,8 @@ class Regicide(Game):
             self.cur_atk_def = []
             self.yield_count = 0
 
+        return True
+
     #Yields turn and returns True if able, else returns False
     def yield_turn(self, player):
         if (player == self.players[self.cur_player_index]) and (len(self.cur_atk_def) == 0) and (self.yield_count < len(self.players)-1):
@@ -138,7 +145,7 @@ class Regicide(Game):
     #Activates jester (joker) and returns True if able, else returns False
     def jester(self, player):
         if (player == self.players[self.cur_player_index]) and (len(self.cur_atk_def) == 0) and (self.jester_count > 0):
-            if len(self.players > 1):
+            if len(self.players) > 1:
                 self.royal_atk -= self.jester_attack_reduction
                 self.jester_attack_reduction = 0
                 self.jester_active = True
@@ -228,6 +235,18 @@ class Regicide(Game):
         #Add each card's power to the total
         for card in self.cur_atk_def:
             power += self.get_card_power(card)
+
+        return power
+    
+    #Returns the total power of cur_atk_def
+    def get_current_total(self):
+        power = self.calculate_power()
+
+        if not self.defending:
+            #Add in black powers
+            for card in self.cur_atk_def:
+                if card.suit == deck.CLUB and (self.cur_royal.suit != deck.CLUB or self.jester_active): #Double the power
+                    power *= 2
 
         return power
 

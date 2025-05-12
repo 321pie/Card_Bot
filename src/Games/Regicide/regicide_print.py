@@ -41,13 +41,20 @@ class Regicide_Print(Game_Print):
             return self.add_return([], f"It's not your turn, {player}.")
         if self.game.defending:
             if sum([self.game.get_card_power(card) for card in self.game.get_cur_atk_def()]) < self.game.royal_atk:
-                self.game.execute(player)
-                return self.add_return([], f"Uh oh! You lost! :(")
-            else:
-                self.game.execute(player)
+                if self.game.execute(player) == True:
+                    return self.add_return([], f"Uh oh! You lost! :(")
+                else:
+                    return self.add_return([], f"You need to defend yourself, {player}.")
+            elif self.game.execute(player) == True:
                 return self.add_return([], f"Enemy **{self.game.cur_royal.display()}** has **{self.game.get_royal_hp()} hp**! Kill them, **{self.game.get_cur_player()}**!\nYou have {self.game.jester_count} jesters remaining.\nUse **/h** or **/hand** to see your instruments of death.", self.deck_look.get_hand_pic([[self.game.get_cur_royal()]], show_index=False))
+            else:
+                return self.add_return([], f"You need to defend yourself, {player}.")
         else:
             cur_royal = self.game.cur_royal
+
+            if len(self.game.get_cur_atk_def()) == 0:
+                return self.add_return([], f'''You must attack or use "!yield" to pass your turn, {player}.''')
+
             self.game.execute(player)
 
             #If no regicide
@@ -72,7 +79,7 @@ class Regicide_Print(Game_Print):
                 #Update hand if applicable.
                 await self.update_hand(player)
 
-                output = self.add_return([], f"**{player}** has played {played_card.display()}", self.deck_look.get_hand_pic([[card for card in self.game.get_cur_atk_def()]], show_index=False))
+                output = self.add_return([], f"**{player}** has played {played_card.display()}, for a total of {self.game.get_current_total()}", self.deck_look.get_hand_pic([[card for card in self.game.get_cur_atk_def()]], show_index=False))
                 if self.game.defending:
                     output = self.add_return(output, f"Uh oh! Enemy **{self.game.cur_royal.display()}** is attacking for {self.game.royal_atk} damage! Defend yourself, {self.game.get_cur_player()}!", self.deck_look.get_hand_pic([[self.game.get_cur_royal()]], show_index=False))
                 else:
