@@ -4838,6 +4838,8 @@ WHITE_CODERS:dict = {
     "You know what? I talked myself into it. I'm gonna bet it all on love! I'm gonna do it. I'm gonna kill Jim.": 1,
     "Wish me luck, everyone! Happy New Years, and happy Valentine's Day when it cums!": 1,
 	"Love,\nSomething Witty": 1,
+    "Costco Onion Crank": 1,
+    "My vibe": 1,
 }
 
 BLACK_CODERS:dict = {
@@ -4865,11 +4867,13 @@ BLACK_CODERS:dict = {
 }
 
 
+
 # STR = '''
 
 # '''
 
 # #This is how I yoinked the cards :)
+# #Use Ctrl+/ to uncomment this :)
 # #STR was a string holding each card's text separated by newlines -> https://docs.google.com/spreadsheets/d/1isjPlXMykGGruSFUgMJL1V6SumL3CC3ibIuCCyLA9us/edit?gid=2143092349#gid=2143092349
 # with open("cards.txt", 'w') as file:
 # 	for card in STR.split("\n"):
