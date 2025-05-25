@@ -1,6 +1,6 @@
 #Foreign imports
 from copy import copy
-from random import shuffle, choice
+from random import shuffle
 
 HEART = ':heart_suit:' #'♥'
 DIAMOND = ':diamond_suit:' #'♦'
@@ -72,9 +72,8 @@ class Deck:
             for h in range(num_hands):
                 hand = []
                 for c in range(num_cards):
-                    card = choice(self.deck)
-                    hand.append(card)
-                    del self.deck[self.deck.index(card)]
+                    hand.append(self.deck[0])
+                    del self.deck[0]
                 hands.append(hand)
         
         return hands
@@ -82,17 +81,16 @@ class Deck:
     #Gets a card, deletes it from the deck, but stores it in deck.flipped
     def get_flipped(self):
         if (self.flipped == None) and (not self.is_empty()):
-            card = choice(self.deck)
-            self.flipped = card
-            del self.deck[self.deck.index(card)]
+            self.flipped = self.deck[0]
+            del self.deck[0]
 
         return self.flipped
     
     #Gets a card, deleting it froom the deck
     def get_card(self):
         if (not self.is_empty()):
-            extra = choice(self.deck)
-            del self.deck[self.deck.index(extra)]
+            extra = self.deck[0]
+            del self.deck[0]
 
             return extra
         return None

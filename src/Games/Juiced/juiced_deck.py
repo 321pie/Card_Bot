@@ -12,12 +12,13 @@ class White_Deck(dk.Deck):
 			self.deck.append(dk.Card(card_text, color))
 
 class Black_Deck(dk.Deck):
-    def reset_deck(self):
-        self.deck = []
-        self.flipped = None #Card that gets flipped after throwing cards away
+	def reset_deck(self):
+		self.deck = []
+		self.flipped = None #Card that gets flipped after throwing cards away
 
-        for card_text, color in BLACK_CARDS.items():
-            self.deck.append(dk.Card(card_text, color))
+		for card_text, color in BLACK_CARDS.items():
+			self.deck.append(dk.Card(card_text, color))
+		dk.shuffle(self.deck)
     
 WHITE_CARDS:dict = {
       
