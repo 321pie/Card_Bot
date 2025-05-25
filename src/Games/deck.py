@@ -115,13 +115,16 @@ class JokerDeck(Deck):
         super().reset_deck()
         self.deck.append(Card(JOKER, RED))
         self.deck.append(Card(JOKER, BLACK))
+        shuffle(self.deck)
 
 class Peasant_Deck(Deck):
     def reset_deck(self):
         super().reset_deck()
         self.deck = [card for card in self.deck if card.value not in [JACK, QUEEN, KING]]
+        shuffle(self.deck)
 
 class Royal_Deck(Deck):
     def reset_deck(self):
         super().reset_deck()
         self.deck = [card for card in self.deck if card.value in [JACK, QUEEN, KING]]
+        shuffle(self.deck)
