@@ -92,19 +92,19 @@ class Regicide(Game):
             power = self.calculate_power()
 
             #If red, resolve power
-            if any(hasattr(card.suit, deck.HEART) for card in self.cur_atk_def) and (self.cur_royal.suit != deck.HEART or self.jester_active): #Shuffle discard, select (# on card) cards and put them on bottom of deck
+            if any([(card.suit == deck.HEART) for card in self.cur_atk_def]) and (self.cur_royal.suit != deck.HEART or self.jester_active): #Shuffle discard, select (# on card) cards and put them on bottom of deck
                 shuffle(self.discard)
                 if len(self.discard) < power:
                     self.deck.set_deck(self.deck.get_deck() + self.discard)
                 else:
                     self.deck.set_deck(self.deck.get_deck() + self.discard[:power])
-            if any(hasattr(card.suit, deck.DIAMOND) for card in self.cur_atk_def) and (self.cur_royal.suit != deck.DIAMOND or self.jester_active): #Starting with cur_player, all players draw one until (# on card) cards have been drawn
+            if any([(card.suit == deck.DIAMOND) for card in self.cur_atk_def]) and (self.cur_royal.suit != deck.DIAMOND or self.jester_active): #Starting with cur_player, all players draw one until (# on card) cards have been drawn
                 self.draw_cards(power)
             
             #Add in black powers
-            if any(hasattr(card.suit, deck.CLUB) for card in self.cur_atk_def) and (self.cur_royal.suit != deck.CLUB or self.jester_active): #Double the power
+            if any([(card.suit == deck.CLUB) for card in self.cur_atk_def]) and (self.cur_royal.suit != deck.CLUB or self.jester_active): #Double the power
                 power *= 2
-            if any(hasattr(card.suit, deck.CLUB) for card in self.cur_atk_def) == deck.SPADE:
+            if any([(card.suit == deck.SPADE) for card in self.cur_atk_def]):
                 if self.cur_royal.suit != deck.SPADE or self.jester_active: #Permanently reduce cur_royal's attack
                     self.royal_atk -= power
                     if self.royal_atk < 0:
