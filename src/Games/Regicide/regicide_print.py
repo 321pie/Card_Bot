@@ -48,6 +48,7 @@ class Regicide_Print(Game_Print):
             elif self.game.execute(player) == True:
                 return self.add_return([], f"Enemy **{self.game.cur_royal.display()}** has **{self.game.get_royal_hp()} hp**! Kill them, **{self.game.get_cur_player()}**!\nYou have {self.game.jester_count} jesters remaining.\nUse **/h** or **/hand** to see your instruments of death.", self.deck_look.get_hand_pic([[self.game.get_cur_royal()]], show_index=False))
             else:
+                await self.update_hand(player) #Update hand if applicable.
                 return self.add_return([], f"You need to defend yourself, {player}.")
         else:
             cur_royal = self.game.cur_royal
