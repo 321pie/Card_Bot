@@ -19,6 +19,9 @@ BLACK = ':black_large_square:'
 VALUES = [ACE, '2', '3', '4', '5', '6', '7', '8', '9', '10', JACK, QUEEN, KING]
 SUITS = [HEART, DIAMOND, CLUB, SPADE]
 
+RED_SUITS = [HEART, DIAMOND]
+BLACK_SUITS = [CLUB, SPADE]
+
 class Card:
     def __init__(self, value, suit):
         self.value = value

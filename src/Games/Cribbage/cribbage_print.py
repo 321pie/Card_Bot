@@ -225,10 +225,12 @@ class Cribbage_Print(Game_Print):
         return_list = []
 
         peg_vars = self.game.peg(player, card_index)
+        
+        #If pegged out, end game
+        if(self.game.get_winner() != None):
+            return self.get_winner_string(self.game.get_winner(), return_list=return_list)
+        
         if(peg_vars == None):
-            #If pegged out, end game
-            if(self.game.get_winner() != None):
-                return self.get_winner_string(self.game.get_winner(), return_list=return_list)
             return return_list
 
         points = peg_vars[0]

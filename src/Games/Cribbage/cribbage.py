@@ -572,17 +572,17 @@ class Cribbage(game.Game):
         local_points = 0
 
         if len(hand) > 6: #Mega mode checks red/black instead of specific suit
-            if flipped.suit in deck.RED:
-                if all(card.suit == deck.RED for card in hand) or all(card.suit == deck.BLACK for card in hand):
+            if flipped.suit in deck.RED_SUITS:
+                if all(card.suit in deck.RED_SUITS for card in hand):
                     local_points += len(hand) + 1
                 elif(not isCrib):
-                    if all(card.suit == deck.RED for card in hand) or all(card.suit == deck.BLACK for card in hand):
+                    if all(card.suit in deck.BLACK_SUITS for card in hand):
                         local_points += len(hand)
             else:
-                if all(card.suit == deck.BLACK for card in hand):
+                if all(card.suit in deck.BLACK_SUITS for card in hand):
                     local_points += len(hand) + 1
                 elif(not isCrib):
-                    if all(card.suit == deck.RED for card in hand) or all(card.suit == deck.BLACK for card in hand):
+                    if all(card.suit in deck.RED_SUITS for card in hand):
                         local_points += len(hand)
         else:
             if all(card.suit == flipped.suit for card in hand):
