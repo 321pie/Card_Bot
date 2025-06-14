@@ -87,6 +87,9 @@ class Jeopardy_Print(Game_Print):
     #Input: player as defined in message.py for commands and str guess from guess_parse
     #Output: add_return print for message handler
     async def guess(self, player, guess):
+        #Standardize guess
+        guess = guess.lower()
+
         #Check to make sure that guessing is valid
         if self.game.get_answer == None:
             return self.add_return([], f"Question must be selected using !do command before guessing can begin.")
@@ -116,8 +119,8 @@ class Jeopardy_Print(Game_Print):
     #Output: add_return print for message handler
     async def select_question(self, player, question_index:str):
         #Turn question into row and column
-        row, column = question_index.split(" ")
-        column = column / self.game.get_increase_amount()
+        column, row = question_index.split(" ")
+        row = row / self.game.get_increase_amount()
 
         #Check for correct player
         if player != self.game.get_play_player():
@@ -144,9 +147,22 @@ class Jeopardy_Print(Game_Print):
             return self.add_return([], f"**{player}** is not in this game.")
     
     #Returns a string to output to the player that shows the board
-#TODO: do it
     def get_board(self) -> str:
-        return "Not Yet Implemented :("
+        return_str = ""
+        board = self.game.get_board()
+
+        for row_index in range(self.game.get_row_count()):
+            for col_index in range(self.game.get_column_count()):
+                #Append column title wtih index for first row, then do amount if unanswered or X if answered
+                temp_str = board[col_index][row_index] + f" ({col_index})" if row_index == 0 else (row_index * self.game.get_increase_amount() if board[col_index][row_index] != None else "X")
+
+                #Make each box take up 30 chars
+                return_str += temp_str + " " * 30 - len(temp_str)
+
+            #Next row
+            return_str += "\n"
+
+        return return_str
     
     #Adds all expansions
     async def all(self, player):

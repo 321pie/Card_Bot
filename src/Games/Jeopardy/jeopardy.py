@@ -51,7 +51,7 @@ class Jeopardy(Game):
             for quote_index in range(len(row_questions)):
                 answer = sample(rsplit("[,.;:'?!#$()@%&]", row_questions[quote_index]), 1)
                 replacement = "_" * len(answer) if self.show_word_length else "___"
-                row_questions[quote_index] = (row_questions[quote_index].replace(answer, replacement, 1), answer)
+                row_questions[quote_index] = (row_questions[quote_index].replace(answer, replacement, 1), answer.lower())
 
             #Append column to board
             self.board.append([key] + row_questions)
@@ -60,10 +60,13 @@ class Jeopardy(Game):
         self.daily_double_indexes = (randint(0, self.columns), randint(0, self.rows))
     
     #Takes in the player and their guess and returns the change in points
-    def guess(self, player, guess) -> int:
+    def guess(self, player, guess:str) -> int:
         #Check that question has been selected
         if self.question_index == None:
             return 0
+        
+        #lowercase guess
+        guess = guess.lower()
         
         #If daily double, wager amount has been set, and player is correct, check answer and reset.
         if self.is_daily_double():

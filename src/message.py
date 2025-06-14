@@ -5,6 +5,7 @@ import discord
 #Local imports
 from Games.Cribbage.cribbage_print import Cribbage_Print
 from Games.game_print import Game_Print as gp
+from Games.Jeopardy.jeopardy_print import Jeopardy_Print
 from Games.Juiced.juiced_print import Juiced_Print
 import Games.Minesweeper.minesweeper as minesweeper
 from Games.Regicide.regicide_print import Regicide_Print
@@ -71,6 +72,8 @@ async def handle_user_messages(msg):
         return make_cribbage(player)
     elif message == "!juiced" or message == "!jc":
         return make_juiced(player)
+    elif message == "!jeopardy" or message == "!jp":
+        return make_jeopardy(player)
     elif message == "!regicide" or message == "!reg":
         return make_regicide(player)
     elif message == "!test":
@@ -109,6 +112,16 @@ def make_cribbage(player):
     if cur_game == None:
         cur_game = Cribbage_Print()
         return gp().add_return([], f"{player} has created a Cribbage game. Use **!join** to join it!")
+    else:
+        return gp().add_return([], f"Sorry, {player}. You need to wait until the current game is started to create another one.")
+    
+#Makes a game of Jeopardy to be joined
+def make_jeopardy(player):
+    global cur_game
+    
+    if cur_game == None:
+        cur_game = Jeopardy_Print()
+        return gp().add_return([], f"{player} has created a Jeopardy game. Use **!join** to join it!")
     else:
         return gp().add_return([], f"Sorry, {player}. You need to wait until the current game is started to create another one.")
     

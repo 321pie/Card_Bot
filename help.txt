@@ -44,6 +44,17 @@ The bot knows the following commands:
         '**!points**': View current number of points each PLAYER has at current point in time.
         '**!team_points**': View current number of points each team has at current point in time.
 
+    ***Jeopardy (Guess the quote)***:
+      Game:
+        '**!jeopardy**', '**jp**':: Create a game of Jeopardy.
+        '**!is [a-z0-9]+**': Guess the answer.
+        '**!do [0-9] [0-9]+**': Select question using "!column_index amount".
+        '**!wager [0-9]**': Wagers the set amount.
+        '**!pass**': Vote to pass round.
+        '**!all**': Toggles ALL expansions!
+        '**!std**': Toggles the STD expansion (standard)!
+        '**!coders**': Toggles the CODERS expansion!
+
     ***Juiced (Cards Against Humanity/Apples to Apples)***:
       Game:
         '**!juiced**', '**jc**':: Create a game of Juiced.
