@@ -17,7 +17,7 @@ class Jeopardy(Game):
         self.daily_double_indexes:list[tuple] = [] #Tuple with the index of the daily double (column, row)
         self.rows = 5 #Number of rows on board
         self.columns = 6 #Number of columns on board
-        self.questions = qs.STD_QUOTES #Dictionary with category as key and list of quotes as the value
+        self.questions:dict = qs.STD_QUOTES #Dictionary with category as key and list of quotes as the value
         self.points:list[int] = [] #List to hold point totals (indexed same as players)
         self.show_word_length = False #Decides if missing word length is reflected by underscores provided.
         self.increase_amount = 200 #Amount of points that each question increases by.
@@ -34,7 +34,7 @@ class Jeopardy(Game):
             self.players_passing.append(None)
 
         #Check to make sure that there are enough items in the dict
-        #TODO: Check that there are enough items in dict that have self.rows number of items.
+#TODO: Check that there are enough items in dict that have self.rows number of items.
         if len(self.questions) < self.columns:
             self.columns = 6
             self.rows = 5
@@ -66,7 +66,7 @@ class Jeopardy(Game):
             return 0
         
         #If daily double, wager amount has been set, and player is correct, check answer and reset.
-        if self.question_index in self.daily_double_indexes:
+        if self.is_daily_double():
             if self.wager_amount != None:
                 if self.players.index(player) == self.play_index:
                     answer = self.board[self.question_index[0]][self.question_index[1]][1]
@@ -100,7 +100,7 @@ class Jeopardy(Game):
         self.players_passing[player_index] = player
 
         #Return false if any players are None (default value) unless it's daily double (only one person can answer)
-        if player_index != self.play_index or self.question_index not in self.daily_double_indexes:
+        if player_index != self.play_index or not self.is_daily_double():
             for name in self.players:
                 if name == None:
                     return False
@@ -125,10 +125,10 @@ class Jeopardy(Game):
 
     #If the wager was set, return True. Else, return False.
     def wager(self, player, amount):
-        if self.question_index in self.daily_double_indexes:
+        if self.is_daily_double():
             if self.wager_amount == None:
                 if self.players.index(player) == self.play_index:
-                    if amount >= 0:
+                    if 0 <= amount <= self.game.get_increase_amount() * self.game.get_row_count() * 2:
                         self.wager_amount = amount
 
                         return True
@@ -204,3 +204,18 @@ class Jeopardy(Game):
     #Gets number of rows in board
     def get_row_count(self):
         return self.rows
+    
+    #Gets the current wager, defaults to None
+    def get_wager(self):
+        return self.wager_amount
+    
+    #Gets the amount that the score increases by
+    def get_increase_amount(self):
+        return self.increase_amount
+    
+    #Returns True if question is in the daily double, else False
+    def is_daily_double(self):
+        if self.question_index in self.daily_double_indexes:
+            return True
+        else:
+            return False
