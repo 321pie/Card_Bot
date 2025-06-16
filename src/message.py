@@ -190,7 +190,6 @@ async def run_commands(player, message, game):
         if re.fullmatch(command, message) != None:
             func_list = game.commands[command]
             if len(func_list) > 1:
-                print(*(func_list[1](message)))
                 return await func_list[0](player, *(func_list[1](message)))
             else:
                 return await func_list[0](player)
