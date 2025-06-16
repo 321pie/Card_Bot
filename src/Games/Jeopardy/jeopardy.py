@@ -1,6 +1,6 @@
 from copy import copy
 from random import randint, sample
-from re import findall
+from re import findall, sub
 
 from Games.game import Game
 import Games.Jeopardy.questions as qs
@@ -53,7 +53,7 @@ class Jeopardy(Game):
                 answer = sample(findall('''[a-zA-Z]+''', row_questions[quote_index]), 1)[0]
                 replacement = "_" * len(answer) if self.show_word_length else "___"
                 print(answer)
-                row_questions[quote_index] = (row_questions[quote_index].replace(answer, replacement, 1), answer.lower())
+                row_questions[quote_index] = (sub(f'''\b{replacement}\b''', replacement, row_questions[quote_index]), answer.lower())
 
             #Append column to board
             self.board.append([key] + row_questions)
@@ -200,20 +200,6 @@ class Jeopardy(Game):
         
     #Returns the board as a list of lists as the player would see it (each list is a category followed by the point values or None if answered already)
     def get_board(self):
-        # board = []
-
-        # for column in self.board:
-        #     col = []
-        #     for question_index in range(len(column)):
-        #         if question_index == 0:
-        #             col.append(column[question_index])
-        #         elif column[question_index] == None:
-        #             col.append(None)
-        #         else:
-        #             col.append(question_index * self.increase_amount)
-
-        #     board.append(col)
-
         return copy(self.board)
     
     #Gets number of columns in board

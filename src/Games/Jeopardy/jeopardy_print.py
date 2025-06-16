@@ -130,9 +130,7 @@ class Jeopardy_Print(Game_Print):
             return self.add_return([], f"Only **{self.game.get_play_player()}** can select the question.")
 
         #Print out response
-        print("Send help and consent woman")
         question = self.game.select_question(player, row, column)
-        print(question)
         if question == None:
             return self.add_return([], f"That question is invalid. Please select an unanswered question.")
         elif self.game.is_daily_double():
@@ -156,54 +154,6 @@ class Jeopardy_Print(Game_Print):
             return self.add_return([], f"**{player}** is not in this game.")
     
     #Returns a string to output to the player that shows the board
-    # def get_board(self) -> str:
-    #     board = self.game.get_board()
-    #     num_rows = self.game.get_row_count()
-    #     num_cols = self.game.get_column_count()
-    #     col_width = 30  #Adjust column width
-
-    #     return_str = ""
-
-    #     for row_index in range(num_rows):
-    #         for col_index in range(num_cols):
-    #             if row_index == 0:
-    #                 #For column headers
-    #                 cell_content = f"{board[col_index][row_index]} ({col_index})"
-    #             else:
-    #                 #Show value if unanswered, X if answered
-    #                 cell = board[col_index][row_index]
-    #                 cell_content = str(row_index * self.game.get_increase_amount()) if cell[0] is not None else "X"
-
-    #             #Left-align the content and pad to fixed column width
-    #             return_str += cell_content.ljust(col_width)
-    #         return_str += "\n"
-
-    #     return return_str
-    # def get_board(self) -> str:
-    #     return_str = ""
-    #     board = self.game.get_board()
-    #     col_width = 30 #Adjust to change spacing
-
-    #     for row_index in range(self.game.get_row_count()):
-    #         for col_index in range(self.game.get_column_count()):
-    #             if row_index == 0:
-    #                 #If column headers
-    #                 temp_str = f"{board[col_index][row_index]} ({col_index})"
-    #             else:
-    #                 #Show value if unanswered, X if answered
-    #                 cell = board[col_index][row_index]
-    #                 if cell[0] is not None:
-    #                     temp_str = str(row_index * self.game.get_increase_amount())
-    #                 else:
-    #                     temp_str = "X"
-
-    #             #Pad or center the string in a column
-    #             return_str += temp_str.ljust(col_width)
-
-    #         return_str += "\n"
-
-    #     return return_str
-
     def get_board(self) -> str:
         return_str = ""
         board = self.game.get_board()
@@ -248,15 +198,15 @@ class Jeopardy_Print(Game_Print):
         length = len(self.game.questions)
         self.game.questions = qs.STD_QUOTES #dict(set(self.game.questions.items()).symmetric_difference(set(qs.STD_QUOTES.items())))
         if not raw:
-            if length < len(self.game.questions):
-                return self.add_return([], "Added STD expansion.")
-            else:
-                return self.add_return([], "Removed STD expansion.")
+            # if length < len(self.game.questions):
+            return self.add_return([], "Added STD expansion.")
+            # else:
+            #     return self.add_return([], "Removed STD expansion.")
         else:
-            if length < len(self.game.questions):
-                return "Added STD expansion."
-            else:
-                return "Removed STD expansion."
+            # if length < len(self.game.questions):
+            return "Added STD expansion."
+            # else:
+            #     return "Removed STD expansion."
     
     #Toggles CODERS expansion
     async def coders(self, _player, raw=False):
@@ -268,28 +218,12 @@ class Jeopardy_Print(Game_Print):
         # print("triger time loop pls")
         self.game.questions = qs.CODERS_QUOTES
         if not raw:
-            if length < len(self.game.questions):
-                return self.add_return([], "Added CODERS expansion.")
-            else:
-                return self.add_return([], "Removed CODERS expansion.")
+            # if length < len(self.game.questions):
+            return self.add_return([], "Added CODERS expansion.")
+            # else:
+            #     return self.add_return([], "Removed CODERS expansion.")
         else:
-            if length < len(self.game.questions):
-                return "Added CODERS expansion."
-            else:
-                return "Removed CODERS expansion."
-            
-    # #TODO: DELETE IS FRROM JUICED
-    # async def coders(self, _player, raw=False):
-    #     length = len(jd.WHITE_CARDS)
-    #     jd.WHITE_CARDS = dict(set(jd.WHITE_CARDS.items()).symmetric_difference(set(jd.WHITE_CODERS.items())))
-    #     jd.BLACK_CARDS = dict(set(jd.BLACK_CARDS.items()).symmetric_difference(set(jd.BLACK_CODERS.items())))
-    #     if not raw:
-    #         if length < len(jd.WHITE_CARDS):
-    #             return self.add_return([], "Added CODERS expansion.")
-    #         else:
-    #             return self.add_return([], "Removed CODERS expansion.")
-    #     else:
-    #         if length < len(jd.WHITE_CARDS):
-    #             return "Added CODERS expansion."
-    #         else:
-    #             return "Removed CODERS expansion."
+            # if length < len(self.game.questions):
+            return "Added CODERS expansion."
+            # else:
+            #     return "Removed CODERS expansion."
