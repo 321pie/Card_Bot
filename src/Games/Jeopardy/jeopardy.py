@@ -59,7 +59,7 @@ class Jeopardy(Game):
             self.board.append([key] + row_questions)
         
         #Create a daily double square
-        self.daily_double_indexes = (randint(1, self.columns), randint(1, self.rows))
+        self.daily_double_indexes = (randint(0, self.columns-1), randint(1, self.rows-1)) #-1 since 0 indexed and start at 1 on row due to headers
     
     #Takes in the player and their guess and returns the change in points
     def guess(self, player, guess:str) -> int:
@@ -124,6 +124,20 @@ class Jeopardy(Game):
         #Remove question by setting to None
         self.board[self.question_index[0]][self.question_index[1]] = (None, None)
 
+        #Check if game is over
+        broken = False
+        for column in self.board:
+            for row_tuple in column:
+                if row_tuple[0] != None:
+                    broken = True
+                    break
+            if broken:
+                break
+        
+        #If not broken, end game
+        if not broken:
+            self.end_game()
+
         #Reset other variables to base value (None)
         self.question_index = None
         self.wager_amount = None
@@ -144,9 +158,7 @@ class Jeopardy(Game):
     def select_question(self, player, row:int, column:int):
         if self.question_index == None:
             if player == self.get_play_player():
-                print("I AM DA CHOSEN ONE")
                 if 0 < row < self.rows and 0 <= column < self.columns:
-                    print("No nuns for me, thanks")
                     if self.board[column][row][0] != None:
                         self.question_index = (column, row)
                         return self.board[column][row][0]

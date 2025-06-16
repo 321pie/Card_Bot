@@ -100,14 +100,14 @@ class Jeopardy_Print(Game_Print):
             if player != self.game.get_play_player():
                 return self.add_return([], f"Only **{self.game.get_play_player()}** can guess.")
             elif guess == self.game.get_answer():
-                return self.add_return([], f"Congrats, **{player}**! You've gained {self.game.guess(player, guess)} points.")
+                return self.add_return([], f"Congrats, **{player}**! You've gained {self.game.guess(player, guess)} points. Please select the next question.\n\n{self.get_board()}")
             else:
                 return self.add_return([], f"Uh oh, **{player}**! You've lost {self.game.guess(player, guess) * -1} points. Please select the next question.\n\n{self.get_board()}")
             
         #If not daily double, 
         else:
             if guess == self.game.get_answer():
-                return self.add_return([], f"Congrats, **{player}**! You've gained {self.game.guess(player, guess)} points. It is now **{player}**'s turn to select a question!\n\n{self.get_board()}")
+                return self.add_return([], f"Congrats, **{player}**! You've gained {self.game.guess(player, guess)} points. It is now your turn to select a question!\n\n{self.get_board()}")
             else:
                 return self.add_return([], f"Uh oh, **{player}**! You've lost {self.game.guess(player, guess) * -1} points. You can try again or pass the round with the !pass command.")
         
@@ -146,36 +146,93 @@ class Jeopardy_Print(Game_Print):
         answer = self.game.get_answer()
         if player in self.game.get_players():
             if self.game.pass_round(player):
-                return self.add_return([], f'''All players have passed the round. The answer was: "{answer}".\n **{self.game.get_play_player()}**, please select the next question.\n\n{self.get_board()}''')
+                if self.game.game_ended():
+                    return self.add_return([], f'''All players have passed the round. The answer was: "**{answer}**".\nThe game is now over.\n{self.get_point_string()}''')
+                else:
+                    return self.add_return([], f'''All players have passed the round. The answer was: "**{answer}**".\n**{self.game.get_play_player()}**, please select the next question.\n\n{self.get_board()}''')
             else:
                 return self.add_return([], f"**{player}** has passed this round.")
         else:
             return self.add_return([], f"**{player}** is not in this game.")
     
     #Returns a string to output to the player that shows the board
+    # def get_board(self) -> str:
+    #     board = self.game.get_board()
+    #     num_rows = self.game.get_row_count()
+    #     num_cols = self.game.get_column_count()
+    #     col_width = 30  #Adjust column width
+
+    #     return_str = ""
+
+    #     for row_index in range(num_rows):
+    #         for col_index in range(num_cols):
+    #             if row_index == 0:
+    #                 #For column headers
+    #                 cell_content = f"{board[col_index][row_index]} ({col_index})"
+    #             else:
+    #                 #Show value if unanswered, X if answered
+    #                 cell = board[col_index][row_index]
+    #                 cell_content = str(row_index * self.game.get_increase_amount()) if cell[0] is not None else "X"
+
+    #             #Left-align the content and pad to fixed column width
+    #             return_str += cell_content.ljust(col_width)
+    #         return_str += "\n"
+
+    #     return return_str
+    # def get_board(self) -> str:
+    #     return_str = ""
+    #     board = self.game.get_board()
+    #     col_width = 30 #Adjust to change spacing
+
+    #     for row_index in range(self.game.get_row_count()):
+    #         for col_index in range(self.game.get_column_count()):
+    #             if row_index == 0:
+    #                 #If column headers
+    #                 temp_str = f"{board[col_index][row_index]} ({col_index})"
+    #             else:
+    #                 #Show value if unanswered, X if answered
+    #                 cell = board[col_index][row_index]
+    #                 if cell[0] is not None:
+    #                     temp_str = str(row_index * self.game.get_increase_amount())
+    #                 else:
+    #                     temp_str = "X"
+
+    #             #Pad or center the string in a column
+    #             return_str += temp_str.ljust(col_width)
+
+    #         return_str += "\n"
+
+    #     return return_str
+
     def get_board(self) -> str:
         return_str = ""
         board = self.game.get_board()
+        col_width = 15 #Adjust for spacing
 
         for row_index in range(self.game.get_row_count()):
             for col_index in range(self.game.get_column_count()):
                 #Append column title wtih index for first row, then do amount if unanswered or X if answered
-                temp_str:str = board[col_index][row_index] + f" ({col_index})" if row_index == 0 else (str(row_index * self.game.get_increase_amount()) if board[col_index][row_index][0] != None else "X")
+                temp_str:str = f"({col_index}) " + board[col_index][row_index][:(col_width-5)] + " " if row_index == 0 else (str(row_index * self.game.get_increase_amount()) if board[col_index][row_index][0] != None else "X")
 
-                #Make each box take up 30 chars
-                return_str += temp_str + " " * (40 - len(temp_str))
+                #Make each box take up col_width chars
+                return_str += temp_str + " " * (col_width - len(temp_str))
 
             #Next row
             return_str += "\n"
 
-        return return_str
+        return f"```\n{return_str}\n```"
     
     #Display the points of all players
     async def points(self, _player):
+        return self.add_return([], self.get_point_string())
+    
+    #Gets a string with the points
+    def get_point_string(self):
         output_str = ""
         for point_tuple in self.game.get_points():
             output_str += f"{point_tuple[0]}   {point_tuple[1]}\n"
-        return self.add_return([], output_str)
+
+        return output_str
     
     #Adds all expansions
     async def all(self, player):

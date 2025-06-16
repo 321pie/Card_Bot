@@ -82,6 +82,10 @@ class Game():
         self.game_started = False
 
         return True
+    
+    #Returns True if the game has been ended, else returns False
+    def game_ended(self):
+        return not self.game_started
 
     #Returns the player list
     def get_players(self):
