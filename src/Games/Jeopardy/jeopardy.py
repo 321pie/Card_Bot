@@ -1,6 +1,6 @@
-import copy
+from copy import copy
 from random import randint, sample
-from re import split as rsplit
+from re import findall
 
 from Games.game import Game
 import Games.Jeopardy.questions as qs
@@ -13,11 +13,11 @@ class Jeopardy(Game):
         self.max_player_count:int = 8 #Defines the maximum number of players
         self.play_index:int = 0 #Index of the selecting player
         self.categories:list[str] = [] #List of all of the categories on board, indexed accordingly (categories[0] -> board[0])
-        self.board:list[list[tuple]] = [[]] #Contains all of the questions and answers in tuples
+        self.board:list[list[tuple]] = [] #Contains all of the questions and answers in tuples
         self.daily_double_indexes:list[tuple] = [] #Tuple with the index of the daily double (column, row)
-        self.rows = 5 #Number of rows on board
+        self.rows = 6 #Number of rows on board
         self.columns = 6 #Number of columns on board
-        self.questions:dict = qs.STD_QUOTES #Dictionary with category as key and list of quotes as the value
+        self.questions:dict = copy(qs.STD_QUOTES) #Dictionary with category as key and list of quotes as the value
         self.points:list[int] = [] #List to hold point totals (indexed same as players)
         self.show_word_length = False #Decides if missing word length is reflected by underscores provided.
         self.increase_amount = 200 #Amount of points that each question increases by.
@@ -37,27 +37,29 @@ class Jeopardy(Game):
 #TODO: Check that there are enough items in dict that have self.rows number of items.
         if len(self.questions) < self.columns:
             self.columns = 6
-            self.rows = 5
-
-        questions = sample(self.questions.items(), self.columns)
-        print(questions, len(self.questions))
+            self.rows = 6
+        
+        questions = sample(list(self.questions.items()), self.columns)
         
         #Create board
-        for key, value in questions:
+        for my_tuple in questions:
+            key, value = my_tuple
+
             #Get the random questions from the categories
             row_questions = sample(value, self.rows)
 
             #Create (quote, answer) pairs.
             for quote_index in range(len(row_questions)):
-                answer = sample(rsplit("[,.;:'?!#$()@%&]", row_questions[quote_index]), 1)
+                answer = sample(findall('''[a-zA-Z]+''', row_questions[quote_index]), 1)[0]
                 replacement = "_" * len(answer) if self.show_word_length else "___"
+                print(answer)
                 row_questions[quote_index] = (row_questions[quote_index].replace(answer, replacement, 1), answer.lower())
 
             #Append column to board
             self.board.append([key] + row_questions)
         
         #Create a daily double square
-        self.daily_double_indexes = (randint(0, self.columns), randint(0, self.rows))
+        self.daily_double_indexes = (randint(1, self.columns), randint(1, self.rows))
     
     #Takes in the player and their guess and returns the change in points
     def guess(self, player, guess:str) -> int:
@@ -84,7 +86,7 @@ class Jeopardy(Game):
         #If not daily double, check answer. Reset round if correct.
         else: 
             player_index = self.players.index(player)
-            answer = self.board[self.question_index[0]][self.question_index[1]]
+            answer = self.board[self.question_index[0]][self.question_index[1]][1]
             points = self.question_index[1] * self.increase_amount
             if guess == answer:
                 self.points[player_index] += points
@@ -104,7 +106,7 @@ class Jeopardy(Game):
 
         #Return false if any players are None (default value) unless it's daily double (only one person can answer)
         if player_index != self.play_index or not self.is_daily_double():
-            for name in self.players:
+            for name in self.players_passing:
                 if name == None:
                     return False
             
@@ -139,10 +141,12 @@ class Jeopardy(Game):
         return False
 
     #If selected question was valid, return question. Else, return None.
-    def select_question(self, player, row, column):
+    def select_question(self, player, row:int, column:int):
         if self.question_index == None:
-            if player == self.play_index:
-                if 0 < row < self.rows and 0 < column < self.columns:
+            if player == self.get_play_player():
+                print("I AM DA CHOSEN ONE")
+                if 0 < row < self.rows and 0 <= column < self.columns:
+                    print("No nuns for me, thanks")
                     if self.board[column][row][0] != None:
                         self.question_index = (column, row)
                         return self.board[column][row][0]
@@ -171,7 +175,7 @@ class Jeopardy(Game):
     def get_points(self):
         return_list = []
         for player_index in range(len(self.players)):
-            return_list.append(self.players[player_index], self.points[player_index])
+            return_list.append((self.players[player_index], self.points[player_index]))
 
         return return_list
         
@@ -184,21 +188,21 @@ class Jeopardy(Game):
         
     #Returns the board as a list of lists as the player would see it (each list is a category followed by the point values or None if answered already)
     def get_board(self):
-        board = []
+        # board = []
 
-        for column in self.board:
-            col = []
-            for question_index in range(len(column)):
-                if question_index == 0:
-                    col.append(column[question_index])
-                elif column[question_index] == None:
-                    col.append(None)
-                else:
-                    col.append(question_index * self.increase_amount)
+        # for column in self.board:
+        #     col = []
+        #     for question_index in range(len(column)):
+        #         if question_index == 0:
+        #             col.append(column[question_index])
+        #         elif column[question_index] == None:
+        #             col.append(None)
+        #         else:
+        #             col.append(question_index * self.increase_amount)
 
-            board.append(col)
+        #     board.append(col)
 
-        return board
+        return copy(self.board)
     
     #Gets number of columns in board
     def get_column_count(self):

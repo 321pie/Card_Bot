@@ -11,7 +11,7 @@ class Jeopardy_Print(Game_Print):
         super().__init__()
 
         self.deck_look = None
-        self.game = Jeopardy
+        self.game = Jeopardy()
         
         #Add commands
         self.commands = {
@@ -26,6 +26,7 @@ class Jeopardy_Print(Game_Print):
         self.commands["^!is [a-z0-9]+$"] = [self.guess, self.guess_parse]
         self.commands["^!do [0-9] [0-9]+$"] = [self.select_question, self.select_question_parse]
         self.commands["^!pass$"] = [self.pass_turn]
+        self.commands["^!points$"] = [self.points]
         self.commands["^!all$"] = [self.all]
         self.commands["^!coders$"] = [self.coders]
         self.commands["^!std$"] = [self.standard]
@@ -82,7 +83,7 @@ class Jeopardy_Print(Game_Print):
     #Input: command string as defined in message.py for command helper functions
     #Output: the guess passed by the player
     def guess_parse(self, parse_str):
-        return parse_str[1:]
+        return [parse_str[4:]]
     
     #Input: player as defined in message.py for commands and str guess from guess_parse
     #Output: add_return print for message handler
@@ -106,28 +107,32 @@ class Jeopardy_Print(Game_Print):
         #If not daily double, 
         else:
             if guess == self.game.get_answer():
-                return self.add_return([], f"Congrats, **{player}**! You've gained {self.game.guess(player, guess)} points.")
+                return self.add_return([], f"Congrats, **{player}**! You've gained {self.game.guess(player, guess)} points. It is now **{player}**'s turn to select a question!\n\n{self.get_board()}")
             else:
                 return self.add_return([], f"Uh oh, **{player}**! You've lost {self.game.guess(player, guess) * -1} points. You can try again or pass the round with the !pass command.")
         
     #Input: command string as defined in message.py for command helper functions
     #Output: the question passed by the player
-    def select_question_parse(self, parse_str):
-        return parse_str[1:]
+    def select_question_parse(self, parse_str:str):
+        return [parse_str[4:]]
     
     #Input: player as defined in message.py for commands and str from select_question_parse in form row col
     #Output: add_return print for message handler
     async def select_question(self, player, question_index:str):
         #Turn question into row and column
         column, row = question_index.split(" ")
-        row = row / self.game.get_increase_amount()
+        column = int(column)
+        row = int(int(row) / self.game.get_increase_amount())
+        print(row, column)
 
         #Check for correct player
         if player != self.game.get_play_player():
             return self.add_return([], f"Only **{self.game.get_play_player()}** can select the question.")
 
         #Print out response
+        print("Send help and consent woman")
         question = self.game.select_question(player, row, column)
+        print(question)
         if question == None:
             return self.add_return([], f"That question is invalid. Please select an unanswered question.")
         elif self.game.is_daily_double():
@@ -138,9 +143,10 @@ class Jeopardy_Print(Game_Print):
     #Input: player as defined in message.py for commands and integer goal_num from change_goal_parse
     #Output: add_return print for message handler
     async def pass_turn(self, player):
+        answer = self.game.get_answer()
         if player in self.game.get_players():
             if self.game.pass_round(player):
-                return self.add_return([], f"All players have passed the round. **{self.game.get_play_player()}**, please select the next question.\n\n{self.get_board()}")
+                return self.add_return([], f'''All players have passed the round. The answer was: "{answer}".\n **{self.game.get_play_player()}**, please select the next question.\n\n{self.get_board()}''')
             else:
                 return self.add_return([], f"**{player}** has passed this round.")
         else:
@@ -154,28 +160,36 @@ class Jeopardy_Print(Game_Print):
         for row_index in range(self.game.get_row_count()):
             for col_index in range(self.game.get_column_count()):
                 #Append column title wtih index for first row, then do amount if unanswered or X if answered
-                temp_str = board[col_index][row_index] + f" ({col_index})" if row_index == 0 else (row_index * self.game.get_increase_amount() if board[col_index][row_index] != None else "X")
+                temp_str:str = board[col_index][row_index] + f" ({col_index})" if row_index == 0 else (str(row_index * self.game.get_increase_amount()) if board[col_index][row_index][0] != None else "X")
 
                 #Make each box take up 30 chars
-                return_str += temp_str + " " * 30 - len(temp_str)
+                return_str += temp_str + " " * (40 - len(temp_str))
 
             #Next row
             return_str += "\n"
 
         return return_str
     
+    #Display the points of all players
+    async def points(self, _player):
+        output_str = ""
+        for point_tuple in self.game.get_points():
+            output_str += f"{point_tuple[0]}   {point_tuple[1]}\n"
+        return self.add_return([], output_str)
+    
     #Adds all expansions
     async def all(self, player):
-        output_str = ""
-        output_str += await self.coders(player, raw=True) + "\n"
-        output_str += await self.default(player, raw=True) + "\n"
+        # output_str = ""
+        # output_str += await self.coders(player, raw=True) + "\n"
+        # output_str += await self.default(player, raw=True) + "\n"
+        self.game.questions = qs.STD_QUOTES + qs.CODERS_QUOTES
 
-        return self.add_return([], output_str)
+        return self.add_return([], "Added all expansions.") # output_str)
     
     #Toggles CODERS expansion
     async def standard(self, _player, raw=False):
         length = len(self.game.questions)
-        self.game.questions = dict(set(self.game.questions.items()).symmetric_difference(set(qs.STD_QUOTES.items())))
+        self.game.questions = qs.STD_QUOTES #dict(set(self.game.questions.items()).symmetric_difference(set(qs.STD_QUOTES.items())))
         if not raw:
             if length < len(self.game.questions):
                 return self.add_return([], "Added STD expansion.")
@@ -190,7 +204,12 @@ class Jeopardy_Print(Game_Print):
     #Toggles CODERS expansion
     async def coders(self, _player, raw=False):
         length = len(self.game.questions)
-        self.game.questions = dict(set(self.game.questions.items()).symmetric_difference(set(qs.CODERS_QUOTES.items())))
+        # print("Before disaster")
+        # #set(self.game.questions.items())
+        # print("Get tricked on")
+        # self.game.questions = dict(set({key : tuple(value) for key, value in self.game.questions.items()}).symmetric_difference(set({key : tuple(value) for key, value in qs.CODERS_QUOTES.items()})))
+        # print("triger time loop pls")
+        self.game.questions = qs.CODERS_QUOTES
         if not raw:
             if length < len(self.game.questions):
                 return self.add_return([], "Added CODERS expansion.")
@@ -201,3 +220,19 @@ class Jeopardy_Print(Game_Print):
                 return "Added CODERS expansion."
             else:
                 return "Removed CODERS expansion."
+            
+    # #TODO: DELETE IS FRROM JUICED
+    # async def coders(self, _player, raw=False):
+    #     length = len(jd.WHITE_CARDS)
+    #     jd.WHITE_CARDS = dict(set(jd.WHITE_CARDS.items()).symmetric_difference(set(jd.WHITE_CODERS.items())))
+    #     jd.BLACK_CARDS = dict(set(jd.BLACK_CARDS.items()).symmetric_difference(set(jd.BLACK_CODERS.items())))
+    #     if not raw:
+    #         if length < len(jd.WHITE_CARDS):
+    #             return self.add_return([], "Added CODERS expansion.")
+    #         else:
+    #             return self.add_return([], "Removed CODERS expansion.")
+    #     else:
+    #         if length < len(jd.WHITE_CARDS):
+    #             return "Added CODERS expansion."
+    #         else:
+    #             return "Removed CODERS expansion."
