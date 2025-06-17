@@ -1,6 +1,6 @@
 from copy import copy
 from random import randint, sample
-from re import findall, sub
+from re import findall, sub, escape
 
 from Games.game import Game
 import Games.Jeopardy.questions as qs
@@ -52,8 +52,7 @@ class Jeopardy(Game):
             for quote_index in range(len(row_questions)):
                 answer = sample(findall('''[a-zA-Z]+''', row_questions[quote_index]), 1)[0]
                 replacement = "_" * len(answer) if self.show_word_length else "___"
-                print(answer)
-                row_questions[quote_index] = (sub(f'''\b{replacement}\b''', replacement, row_questions[quote_index]), answer.lower())
+                row_questions[quote_index] = (sub(rf"\b{escape(answer)}\b", replacement, row_questions[quote_index], count=1), answer.lower())
 
             #Append column to board
             self.board.append([key] + row_questions)
@@ -224,3 +223,14 @@ class Jeopardy(Game):
             return True
         else:
             return False
+        
+    #Returns player that is winning
+    def get_winner(self):
+        winner_index = 0
+        points = 0
+        for player_index in range(len(self.players)):
+            if self.points[player_index] > points:
+                winner_index = player_index
+                points = self.points[player_index]
+        
+        return self.players[winner_index]

@@ -46,15 +46,15 @@ class Jeopardy_Print(Game_Print):
     # OVERRIDE #
     #Returns the string to be displayed when the game is ended
     def get_end_string(self, _player) -> str:
-        return f"The game has been ended early.\n{self.get_point_string()}\nThe winner is: **{self.game.get_winner(True)}**"
+        return f"\n{self.get_point_string()}\nThe winner is: **{self.game.get_winner()}**"
 
     #Returns a string that has a list each player and their corresponding point totals
     def get_point_string(self):
-        output_string = "**Total Points:**\n"
-        for player in self.game.get_players():
-            output_string += f"*{player}*: {self.game.get_points(player)}\n"
+        output_str = "**Total Points:**\n"
+        for point_tuple in self.game.get_points():
+            output_str += f"{point_tuple[0]}:   {point_tuple[1]}\n"
 
-        return output_string
+        return output_str
     
     #Input: command string as defined in message.py for command helper functions
     #Output: the integer wager passed by the player
@@ -123,7 +123,6 @@ class Jeopardy_Print(Game_Print):
         column, row = question_index.split(" ")
         column = int(column)
         row = int(int(row) / self.game.get_increase_amount())
-        print(row, column)
 
         #Check for correct player
         if player != self.game.get_play_player():
@@ -175,14 +174,6 @@ class Jeopardy_Print(Game_Print):
     #Display the points of all players
     async def points(self, _player):
         return self.add_return([], self.get_point_string())
-    
-    #Gets a string with the points
-    def get_point_string(self):
-        output_str = ""
-        for point_tuple in self.game.get_points():
-            output_str += f"{point_tuple[0]}   {point_tuple[1]}\n"
-
-        return output_str
     
     #Adds all expansions
     async def all(self, player):

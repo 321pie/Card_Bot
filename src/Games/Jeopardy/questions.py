@@ -44,7 +44,7 @@ WILLIAM_SHAKESPEARE:list = [
     '''Stars, hide your fires; Let not light see my black and deep desires.''',
     '''I like this place and could willingly waste my time in it.''',
     '''Lord, what fools these mortals be!''',
-    '''thus with a kiss I die''',
+    '''Thus with a kiss I die.''',
     '''There are more things in Heaven and Earth, Horatio, than are dreamt of in your philosophy.''',
     '''Good night, good night! parting is such sweet sorrow,\nThat I shall say good night till it be morrow.''',
     '''Double, double, toil and trouble;\nFire burn, and cauldron bubble!''',
@@ -232,7 +232,7 @@ EDWARD_BULYER_LYTTON:list = [
     '''Alas! there is no fool like him who wishes for knowledge! It is only through woe that we are taught to reflect, and we gather the honey of worldly wisdom, not from flowers, but thorns.''',
     '''I soon discovered that all civility is but the mask of design.''',
     '''The pen is mightier than the sword.''',
-    '''Who shall argue with the most stubborn of all bigotries, — the fanaticism of unbelief?''',
+    '''Who shall argue with the most stubborn of all bigotries, the fanaticism of unbelief?''',
     '''It is an error to suppose that courage means courage in everything. Most people are brave only in the dangers to which they accustom themselves.'''
 ]
 
