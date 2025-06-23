@@ -46,7 +46,7 @@ class Jeopardy(Game):
             key, value = my_tuple
 
             #Get the random questions from the categories
-            row_questions = sample(value, self.rows)
+            row_questions = sample(value, self.rows-1) #-1 to account for headers
 
             #Create (quote, answer) pairs.
             for quote_index in range(len(row_questions)):
@@ -58,7 +58,7 @@ class Jeopardy(Game):
             self.board.append([key] + row_questions)
         
         #Create a daily double square
-        self.daily_double_indexes = (randint(0, self.columns-1), randint(1, self.rows-1)) #-1 since 0 indexed and start at 1 on row due to headers
+        self.daily_double_indexes.append((randint(0, self.columns-1), randint(1, self.rows-1))) #-1 since 0 indexed and start at 1 on row due to headers
     
     #Takes in the player and their guess and returns the change in points
     def guess(self, player, guess:str) -> int:
@@ -96,7 +96,6 @@ class Jeopardy(Game):
                 self.points[player_index] -= points
                 return points * -1
 
-
     #Takes in the player who is passing the round. Returns True if all players have passed the round, else False
     def pass_round(self, player):
         #Add player to players_passing
@@ -126,7 +125,7 @@ class Jeopardy(Game):
         #Check if game is over
         broken = False
         for column in self.board:
-            for row_tuple in column:
+            for row_tuple in column[1:]:
                 if row_tuple[0] != None:
                     broken = True
                     break
@@ -146,7 +145,7 @@ class Jeopardy(Game):
         if self.is_daily_double():
             if self.wager_amount == None:
                 if self.players.index(player) == self.play_index:
-                    if 0 <= amount <= self.game.get_increase_amount() * self.game.get_row_count() * 2:
+                    if 0 <= amount <= self.get_increase_amount() * self.get_row_count() * 2:
                         self.wager_amount = amount
 
                         return True
@@ -219,8 +218,9 @@ class Jeopardy(Game):
     
     #Returns True if question is in the daily double, else False
     def is_daily_double(self):
-        if self.question_index in self.daily_double_indexes:
-            return True
+        for daily_double_index in self.daily_double_indexes:
+            if self.question_index[0] == daily_double_index[0] and self.question_index[1] == daily_double_index[1]:
+                return True
         else:
             return False
         

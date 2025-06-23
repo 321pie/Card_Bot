@@ -306,7 +306,7 @@ ANDREW_RICE:list = [
     '''Do they just control the bacteria in the air or....?''',
     '''She is too strong and too independent of a woman... she WILL crush me...''',
     '''I've adopted him through marriage.''',
-    '''I dont think your reflection shows your insides...''',
+    '''I don't think your reflection shows your insides...''',
     '''You are human, you're not a virus.''',
     '''Yeah, my finger cat.''',
     '''A man in a speedo...''',
@@ -635,18 +635,33 @@ ANDREW_RICE:list = [
     '''I am going to play my last card for... the program crashing.''',
     '''Garbage Man by Day, Treasure Lady by Night.''',
     '''The garbage man recycles.''',
-    '''The garbage man gives garbage hands.'''
+    '''The garbage man gives garbage hands.''',
+    '''I must find the sorted D.''',
+    '''It didn't even reach the sorted D... why didn't it reach the sorted D?''',
+    '''I need to get rid of this hot garbage... Ooe, too much hot garbage.''',
+    '''Abbey, it's time to commit the greatest sin and the program crashing.''',
+    '''We don't need our nasty little man anymore.''',
+    '''What is it printing? Woman Consent.''',
+    '''WE ONLY NEED ONE WOMAN'S CONSENT HERE!''',
+    '''I am the woman, and I speak for the consent.''',
+    '''I am prolific in my works.''',
+    '''Why is the row an integer?''',
+    '''Maybe I'm not there in the head.''',
+    '''Send help and consent woman.''',
+    '''Why are there nuns when I select my question? Where did the nuns come from?''',
+    '''I didn't fix that one thing with the other thing and what I want to know is where's the caveman?''',
+    '''Get them, waterboarded or otherwise.''',
 ]
 
 CHEYENNE_STESKAL:list = [
     '''Well I make more than you…''',
     '''I bring the party. The party is racism.''',
-    '''Alec you always look like your blinking.''',
+    '''Alec you always look like you're blinking.''',
     '''If only I were a man...''',
     '''You're trying to drag me down to your level, your more stupider level.''',
     '''You make your wife sleep in a separate bed near the door? WHAT KIND OF HOME ARE YOU LIVING IN???''',
     '''I can't flip the flamingos?''',
-    '''Can I get this kid an egg? I dont think she liked that.''',
+    '''Can I get this kid an egg? I don't think she liked that.''',
     '''I should make a new mayonaise machine. #FarmingProblem''',
     '''I just tried to milk a sheep. It told me that it can't produce milk... it told me itself in the third person.''',
     '''Life is really interesting when you have short term memory.''',
@@ -797,7 +812,8 @@ ABBEY_DUBOIS:list = [
     '''I am the perfect being!''',
     '''Virtualization: Machine go brr''',
     '''I have joined the dead baby society.''',
-    '''JORDAN! YOU'RE A SOFTWARE ENGINEER! HOW DO YOU NOT KNOW HOW TO USE THE SCROLL ON YOUR TRACKPAD?!'''
+    '''JORDAN! YOU'RE A SOFTWARE ENGINEER! HOW DO YOU NOT KNOW HOW TO USE THE SCROLL ON YOUR TRACKPAD?!''',
+    '''Because you set it to an integer?''',
 ]
 
 MICAH_GORDON:list = [
@@ -825,7 +841,7 @@ MICAH_GORDON:list = [
     '''You know what really injects my dependencies?''',
     '''Get off me Cheyenne.''',
     '''I'm just built different, just not in the right way.''',
-    '''Hey hey I wasted the Devil on that one?!''',
+    '''Hey, hey! I wasted the Devil on that one?!''',
     '''I thought that Dead Babies was going to get it.''',
     '''No, but you use them best.''',
     '''Oh... three dicks...''',
@@ -843,7 +859,9 @@ MICAH_GORDON:list = [
     '''I like my coffee how I like my IDEs: dark mode.''',
     '''I'm dumb enough to know that I am smart enough to be right.''',
     '''I like my friendship like I like my grammars: context free.''',
-    '''We don’t know for a fact. We know for an assumption.'''
+    '''We don’t know for a fact. We know for an assumption.''',
+    '''Is that a glitter cannon or are you just excited to see me?''',
+    '''I'm cultured. it's all of my gut bacteria.'''
 ]
 
 CODERS_MISC:list = [

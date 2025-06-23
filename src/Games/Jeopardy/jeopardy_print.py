@@ -65,17 +65,17 @@ class Jeopardy_Print(Game_Print):
     #Output: add_return print for message handler
     async def wager(self, player, wager):
         cur_player = self.game.get_play_player()
-        max_wager_amount = self.game.get_increase_amount() * self.game.get_row_count() * 2
+        max_wager_amount = self.game.get_increase_amount() * (self.game.get_row_count()-1) * 2
 
         #If correct player, wager not set, and valid wager value, set wager
         if player != cur_player:
             return self.add_return([], f"Only **{cur_player}** can wager and play this round.")
         if self.game.get_wager() != None:
             return self.add_return([], f"The wager has already been set. Please answer the question.")
-        if 0 < wager < max_wager_amount:
+        if wager < 0 or wager > max_wager_amount:
             return self.add_return([], f"You must wager a positive amount between 0 and {max_wager_amount}.")
         else:
-            if self.game.wager(wager) == True:
+            if self.game.wager(player, wager) == True:
                 return self.add_return([], f"The wager has been set. Please answer the following question with the !is command:\n{self.game.get_question()}")
             else:
                 return self.add_return([], "Uh, oh! Something went wrong with your wager! Blame Andrew! :skull:")
@@ -100,16 +100,32 @@ class Jeopardy_Print(Game_Print):
             if player != self.game.get_play_player():
                 return self.add_return([], f"Only **{self.game.get_play_player()}** can guess.")
             elif guess == self.game.get_answer():
-                return self.add_return([], f"Congrats, **{player}**! You've gained {self.game.guess(player, guess)} points. Please select the next question.\n\n{self.get_board()}")
+                guess_points = self.game.guess(player, guess) #Get points so that we can check for game ended or not
+                if self.game.game_ended():
+                    return self.add_return([], f'''Congrats, **{player}**! You've gained {guess_points} points.\nThe game is now over.\n{self.get_point_string()}''')
+                else:
+                    return self.add_return([], f"Congrats, **{player}**! You've gained {guess_points} points. Please select the next question.\n\n{self.get_board()}")
             else:
-                return self.add_return([], f"Uh oh, **{player}**! You've lost {self.game.guess(player, guess) * -1} points. Please select the next question.\n\n{self.get_board()}")
+                guess_points = self.game.guess(player, guess) #Get points so that we can check for game ended or not
+                if self.game.game_ended():
+                    return self.add_return([], f'''Uh oh, **{player}**! You've lost {guess_points * -1} points.\nThe game is now over.\n{self.get_point_string()}''')
+                else:
+                    return self.add_return([], f"Uh oh, **{player}**! You've lost {guess_points * -1} points. Please select the next question.\n\n{self.get_board()}")
             
         #If not daily double, 
         else:
             if guess == self.game.get_answer():
-                return self.add_return([], f"Congrats, **{player}**! You've gained {self.game.guess(player, guess)} points. It is now your turn to select a question!\n\n{self.get_board()}")
+                guess_points = self.game.guess(player, guess) #Get points so that we can check for game ended or not
+                if self.game.game_ended():
+                    return self.add_return([], f'''Congrats, **{player}**! You've gained {guess_points} points.\nThe game is now over.\n{self.get_point_string()}''')
+                else:
+                    return self.add_return([], f"Congrats, **{player}**! You've gained {guess_points} points. It is now your turn to select a question!\n\n{self.get_board()}")
             else:
-                return self.add_return([], f"Uh oh, **{player}**! You've lost {self.game.guess(player, guess) * -1} points. You can try again or pass the round with the !pass command.")
+                guess_points = self.game.guess(player, guess) #Get points so that we can check for game ended or not
+                if self.game.game_ended():
+                    return self.add_return([], f'''Uh oh, **{player}**! You've lost {guess_points * -1} points.\nThe game is now over.\n{self.get_point_string()}''')
+                else:
+                    return self.add_return([], f"Uh oh, **{player}**! You've lost {guess_points * -1} points. You can try again or pass the round with the !pass command.")
         
     #Input: command string as defined in message.py for command helper functions
     #Output: the question passed by the player
@@ -180,7 +196,7 @@ class Jeopardy_Print(Game_Print):
         # output_str = ""
         # output_str += await self.coders(player, raw=True) + "\n"
         # output_str += await self.default(player, raw=True) + "\n"
-        self.game.questions = qs.STD_QUOTES + qs.CODERS_QUOTES
+        self.game.questions = qs.STD_QUOTES | qs.CODERS_QUOTES
 
         return self.add_return([], "Added all expansions.") # output_str)
     
