@@ -92,7 +92,7 @@ class Jeopardy_Print(Game_Print):
         guess = guess.lower()
 
         #Check to make sure that guessing is valid
-        if self.game.get_answer == None:
+        if self.game.get_answer() == None:
             return self.add_return([], f"Question must be selected using !do command before guessing can begin.")
 
         #Check for daily double shenanigans

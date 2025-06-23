@@ -651,6 +651,26 @@ ANDREW_RICE:list = [
     '''Why are there nuns when I select my question? Where did the nuns come from?''',
     '''I didn't fix that one thing with the other thing and what I want to know is where's the caveman?''',
     '''Get them, waterboarded or otherwise.''',
+    '''I need this to be a fully comprehensive dict.''',
+    '''Let's do me for 600.''',
+    '''Let me fix Cheyenne real quick.''',
+    '''You'd think I'd have learned to read by now... it's all the child labor, it kept me from my studies.''',
+    '''We're not saintly, we are racially profiling dead babies.''',
+    '''Yay! I know myself!''',
+    '''I don't speak Cheyenne.''',
+    '''Cheyenne is very trans in her quotes... I don't know why... it's just the way the cookie crumbles.''',
+    '''What kind of lesbians?''',
+    '''It is either racism or sexism... it's one of the two...''',
+    '''Why am I subscribing to nuns?''',
+    '''WHY CANT I SUBSCRIBE TO THE NUNS?''',
+    '''What is wrong with the nuns?''',
+    '''Cheyenne worked, Abbey did not.''',
+    '''I man the perfect being? This isn't a Cheyenne quote.''',
+    '''It's Abbey Du-Board.''',
+    '''Why am I going into the nuns?''',
+    '''Lie in wait for the nuns to strike.''',
+    '''I guess Cheyenne isn't the only one with the trans quotes.''',
+    '''Why am I illiterate?'''
 ]
 
 CHEYENNE_STESKAL:list = [
@@ -861,7 +881,7 @@ MICAH_GORDON:list = [
     '''I like my friendship like I like my grammars: context free.''',
     '''We don’t know for a fact. We know for an assumption.''',
     '''Is that a glitter cannon or are you just excited to see me?''',
-    '''I'm cultured. it's all of my gut bacteria.'''
+    '''I'm cultured. It's all of my gut bacteria.'''
 ]
 
 CODERS_MISC:list = [
@@ -954,7 +974,10 @@ ROOT:list = [
     '''Feel free to laugh at me. I am a walking joke.''',
     '''I have a massive package.''',
     '''Why'd you have to go make things so complicated?''',
-    '''Jon killed me, and now I'm working again.'''
+    '''Jon killed me, and now I'm working again.''',
+    '''I forgot about Abbey.''',
+    '''You hated us, so I forgot about you.''',
+    '''It didn't really fly as much as I was worried about.'''
 ]
 
 STD_QUOTES:dict = {
@@ -973,9 +996,9 @@ STD_QUOTES:dict = {
 CODERS_QUOTES:dict = {
     "Andrew Rice" : ANDREW_RICE,
     "Cheyenne Steskal" : CHEYENNE_STESKAL,
-    "Abbey Dubois" : ABBEY_DUBOIS,
+    "Abbey DuBois" : ABBEY_DUBOIS,
     "Alec Wong" : ALEC_WONG,
     "Micah Gordon" : MICAH_GORDON,
     "Miscellaneous" : CODERS_MISC,
-    "Root (OfTheProblem)" : ROOT
+    "Root OfTheProblem" : ROOT
 }
