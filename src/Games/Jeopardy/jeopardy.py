@@ -73,15 +73,16 @@ class Jeopardy(Game):
         if self.is_daily_double():
             if self.wager_amount != None:
                 if self.players.index(player) == self.play_index:
+                    wager_amount = self.wager_amount
                     answer = self.board[self.question_index[0]][self.question_index[1]][1]
                     if guess == answer:
-                        self.points[self.play_index] += self.wager
+                        self.points[self.play_index] += wager_amount
                         self.reset_round()
-                        return self.wager
+                        return wager_amount
                     else:
-                        self.points[self.play_index] -= self.wager
+                        self.points[self.play_index] -= wager_amount
                         self.reset_round()
-                        return self.wager * -1
+                        return wager_amount * -1
         #If not daily double, check answer. Reset round if correct.
         else: 
             player_index = self.players.index(player)
@@ -145,12 +146,16 @@ class Jeopardy(Game):
         if self.is_daily_double():
             if self.wager_amount == None:
                 if self.players.index(player) == self.play_index:
-                    if 0 <= amount <= self.get_increase_amount() * self.get_row_count() * 2:
+                    if 0 <= amount <= self.max_wager():
                         self.wager_amount = amount
 
                         return True
                     
         return False
+    
+    #Gets the max wager amount
+    def max_wager(self):
+        return self.get_increase_amount() * (self.get_row_count()-1) * 2
 
     #If selected question was valid, return question. Else, return None.
     def select_question(self, player, row:int, column:int):

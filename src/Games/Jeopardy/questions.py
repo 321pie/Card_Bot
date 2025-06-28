@@ -814,7 +814,7 @@ ABBEY_DUBOIS:list = [
     '''You're discovering something new about your hands every day...''',
     '''She usually doesn't sit on me.''',
     '''I peg amazing.''',
-    '''Thats a man...''',
+    '''That's a man...''',
     '''I can play on myself.''',
     '''The pretzel bag is not your enemy!''',
     '''Or there’s the people who don’t care and just celebrate their mom's birthday.''',
