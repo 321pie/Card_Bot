@@ -1,4 +1,5 @@
 import Games.deck as dk
+from random import shuffle
 
 BLACK = ":flag_black:"
 WHITE = ":flag_white:"
@@ -11,6 +12,8 @@ class White_Deck(dk.Deck):
 		for card_text, count in WHITE_CARDS.items():
 			self.deck.append(dk.Card(card_text, count))
 
+		shuffle(self.deck)
+
 class Black_Deck(dk.Deck):
 	def reset_deck(self):
 		self.deck = []
@@ -18,7 +21,8 @@ class Black_Deck(dk.Deck):
 
 		for card_text, count in BLACK_CARDS.items():
 			self.deck.append(dk.Card(card_text, count))
-		dk.shuffle(self.deck)
+		
+		shuffle(self.deck)
     
 WHITE_CARDS:dict = {
       
@@ -3854,7 +3858,7 @@ WHITE_APPLES:dict = {
 	"caves" : 1,
 	"Celine Dion" : 1,
 	"cell phones" : 1,
-	"Cesar Ch�vez" : 1,
+	"Cesar Chávez" : 1,
 	"chain letters" : 1,
 	"chains" : 1,
 	"Challenger explosion" : 1,
@@ -4762,7 +4766,7 @@ WHITE_CODERS:dict = {
 	"CST 126 - C++ Programming 2": 1,
 	"CST 130 - Computer Organization": 1,
 	"CST 120 - Embedded C": 1,
-	"CST 126 - OOP with C++": 1,
+	"CST 136 - OOP with C++": 1,
 	"CST 250 - Computer Assembly Lang": 1,
 	"CST 276 - Software Design Pattern": 1,
 	"CST 211 - Data Structures (Data Structs)": 1,
