@@ -8,7 +8,7 @@ import Games.deck as deck
 import Games.game as game
 
 class Cribbage(game.Game):
-    def __init__(self):
+    def __init__(self, players=[]):
         super().__init__()
 
         self.points:list[int] = [] #Number of points, indexed same as players
@@ -29,6 +29,8 @@ class Cribbage(game.Game):
         self.pegging_phase:bool = False #True if players are in the pegging phase
         self.team_size:int = 1 #Variable to hold number of players per team (combine points)
         self.reverse:bool = False #If true, then last to reach point_goal wins and skunking is based on how many points over
+
+        self.players = players
 
     #Initializes the game on start
     #Returns 0 on success, -1 on failure
@@ -369,7 +371,7 @@ class Cribbage(game.Game):
 
     #Sets up game for standard mode
     def standard_mode(self):
-        self.__init__()
+        self.__init__(self.players)
 
     #Sets up game for mega hand
     def mega_hand(self):
