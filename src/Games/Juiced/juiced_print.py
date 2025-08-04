@@ -21,8 +21,8 @@ class Juiced_Print(Game_Print):
         self.commands["^!apples$"] = [self.apples]
         self.commands["^!cah$"] = [self.cah]
         self.commands["^!coders$"] = [self.coders]
-        self.commands["^!goal [0-9]+$"] = [self.change_goal, self.change_goal_parse]
-        self.commands["^!hand [0-9]+$"] = [self.change_hand_length, self.change_hand_length_parse]
+        self.commands["^!goal [0-9]+$"] = [self.change_goal]
+        self.commands["^!hand [0-9]+$"] = [self.change_hand_length]
     
     # OVERRIDE #
     async def change_look(self, player, _look):
@@ -129,11 +129,12 @@ class Juiced_Print(Game_Print):
     #Input: command string as defined in message.py for command helper functions
     #Output: the integer goal number passed by the player
     def change_goal_parse(self, parse_str):
-        return [int(parse_str[6:])]
+        return int(parse_str[6:])
 
     #Input: player as defined in message.py for commands and integer goal_num from change_goal_parse
     #Output: add_return print for message handler
-    async def change_goal(self, player, goal_num):
+    async def change_goal(self, player, message):
+        goal_num = self.change_goal_parse(message)
         if player in self.game.get_players():
             if goal_num != 0:
                 self.game.win_points = goal_num
@@ -146,11 +147,12 @@ class Juiced_Print(Game_Print):
     #Input: command string as defined in message.py for command helper functions
     #Output: the integer goal number passed by the player
     def change_hand_length_parse(self, parse_str):
-        return [int(parse_str[6:])]
+        return int(parse_str[6:])
 
     #Input: player as defined in message.py for commands and integer goal_num from change_goal_parse
     #Output: add_return print for message handler
-    async def change_hand_length(self, player, hand_len):
+    async def change_hand_length(self, player, message):
+        hand_len = self.change_hand_length_parse(message)
         if player in self.game.get_players():
             if (hand_len >= 5) and (hand_len <= 20):
                 self.game.hand_len = hand_len
@@ -159,21 +161,21 @@ class Juiced_Print(Game_Print):
         return self.add_return([], f"You can't edit a game you're not in, {player}. Use **!join** to join.")
 
     #Toggles the game to get new hands for every player every round
-    async def shuffle(self, _player):
+    async def shuffle(self, _player, _message):
         self.game.shuffle = not self.game.shuffle
         return self.add_return([], "Hands will be reset every round." if self.game.shuffle==True else "Hands will not be reset every round.")
     
     #Adds all expansions
-    async def all(self, player):
+    async def all(self, player, _message):
         output_str = ""
-        output_str += await self.coders(player, raw=True) + "\n"
-        output_str += await self.cah(player, raw=True) + "\n"
-        output_str += await self.apples(player, raw=True) + "\n"
+        output_str += await self.coders(player, None, raw=True) + "\n"
+        output_str += await self.cah(player, None, raw=True) + "\n"
+        output_str += await self.apples(player, None, raw=True) + "\n"
 
         return self.add_return([], output_str)
     
     #Toggles CODERS expansion
-    async def coders(self, _player, raw=False):
+    async def coders(self, _player, _message, raw=False):
         length = len(jd.WHITE_CARDS)
         jd.WHITE_CARDS = dict(set(jd.WHITE_CARDS.items()).symmetric_difference(set(jd.WHITE_CODERS.items())))
         jd.BLACK_CARDS = dict(set(jd.BLACK_CARDS.items()).symmetric_difference(set(jd.BLACK_CODERS.items())))
@@ -189,7 +191,7 @@ class Juiced_Print(Game_Print):
                 return "Removed CODERS expansion."
         
     #Toggles CAH expansion
-    async def cah(self, _player, raw=False):
+    async def cah(self, _player, _message, raw=False):
         length = len(jd.WHITE_CARDS)
         jd.WHITE_CARDS = dict(set(jd.WHITE_CARDS.items()).symmetric_difference(set(jd.WHITE_CAH.items())))
         jd.BLACK_CARDS = dict(set(jd.BLACK_CARDS.items()).symmetric_difference(set(jd.BLACK_CAH.items())))
@@ -205,7 +207,7 @@ class Juiced_Print(Game_Print):
                 return "Removed CAH expansion."
         
     #Toggles APPLES expansion
-    async def apples(self, _player, raw=False):
+    async def apples(self, _player, _message, raw=False):
         length = len(jd.WHITE_CARDS)
         jd.WHITE_CARDS = dict(set(jd.WHITE_CARDS.items()).symmetric_difference(set(jd.WHITE_APPLES.items())))
         jd.BLACK_CARDS = dict(set(jd.BLACK_CARDS.items()).symmetric_difference(set(jd.BLACK_APPLES.items())))
@@ -221,7 +223,7 @@ class Juiced_Print(Game_Print):
                 return "Removed APPLES expansion."
     
     #Procures an insult from a hand-crafted list of premium rudeness
-    async def insult(self, _player):
+    async def insult(self, _player, _message):
         return self.add_return([], self.INSULT_LIST[randint(0, len(self.INSULT_LIST)-1)])
     
     INSULT_LIST = [

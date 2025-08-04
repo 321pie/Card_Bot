@@ -25,7 +25,7 @@ class Test_Print(Game_Print):
         self.commands["^!cr$"] = [self.make_cribbage]
         self.commands["^!juiced$"] = [self.make_juiced]
         self.commands["^!jc$"] = [self.make_juiced]
-        self.commands["^!add .*$"] = [self.add_player, self.add_player_parse]
+        self.commands["^!add .*$"] = [self.add_player]
 
     async def explain_rules(self, _player):
         return self.add_return([], "Use '!add *player*' to add a player to the game.")
@@ -49,7 +49,7 @@ class Test_Print(Game_Print):
         return []
     
     #Adds Cribbage game
-    async def make_cribbage(self, _player):
+    async def make_cribbage(self, _player, _message):
         if not self.game_print.is_started():
             self.game_print = Cribbage_Print()
             self.game_name = "Cribbage"
@@ -59,7 +59,7 @@ class Test_Print(Game_Print):
         return self.add_return([], "Failed to change game since game has been started. Use **!end** to end.")
     
     #Adds Juiced game
-    async def make_juiced(self, _player):
+    async def make_juiced(self, _player, _message):
         if not self.game_print.is_started():
             self.game_print = Juiced_Print()
             self.game_name = "Juiced"
@@ -73,7 +73,8 @@ class Test_Print(Game_Print):
         return parse_str.split(sep=" ", maxsplit=1)[1]
 
     #Adds a player to the game
-    async def add_player(self, player, new_player):
+    async def add_player(self, player, message):
+        new_player = self.add_player_parse(message)
         if (not self.game_print.is_started()) and (self.game_print.game.add_player(new_player) == True):
             #Add player to players for message.py
             if player not in self.players:

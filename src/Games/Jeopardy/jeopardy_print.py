@@ -22,9 +22,9 @@ class Jeopardy_Print(Game_Print):
             "^!start$": [self.start],
             "^!end$": [self.end_game],
         }
-        self.commands["^!wager [0-9]+$"] = [self.wager, self.wager_parse]
-        self.commands["^!is [a-z0-9]+$"] = [self.guess, self.guess_parse]
-        self.commands["^!do [0-9] [0-9]+$"] = [self.select_question, self.select_question_parse]
+        self.commands["^!wager [0-9]+$"] = [self.wager]
+        self.commands["^!is [a-z0-9]+$"] = [self.guess]
+        self.commands["^!do [0-9] [0-9]+$"] = [self.select_question]
         self.commands["^!pass$"] = [self.pass_turn]
         self.commands["^!points$"] = [self.points]
         self.commands["^!all$"] = [self.all]
@@ -59,11 +59,12 @@ class Jeopardy_Print(Game_Print):
     #Input: command string as defined in message.py for command helper functions
     #Output: the integer wager passed by the player
     def wager_parse(self, parse_str):
-        return [int(parse_str[7:])]
+        return int(parse_str[7:])
 
     #Input: player as defined in message.py for commands and integer wager from wager_parse
     #Output: add_return print for message handler
-    async def wager(self, player, wager):
+    async def wager(self, player, message):
+        wager = self.wager_parse(message)
         cur_player = self.game.get_play_player()
         max_wager_amount = self.game.get_increase_amount() * (self.game.get_row_count()-1) * 2
 
@@ -83,11 +84,12 @@ class Jeopardy_Print(Game_Print):
     #Input: command string as defined in message.py for command helper functions
     #Output: the guess passed by the player
     def guess_parse(self, parse_str):
-        return [parse_str[4:]]
+        return parse_str[4:]
     
     #Input: player as defined in message.py for commands and str guess from guess_parse
     #Output: add_return print for message handler
-    async def guess(self, player, guess):
+    async def guess(self, player, message):
+        guess = self.guess_parse(message)
         #Standardize guess
         guess = guess.lower()
 
@@ -130,11 +132,12 @@ class Jeopardy_Print(Game_Print):
     #Input: command string as defined in message.py for command helper functions
     #Output: the question passed by the player
     def select_question_parse(self, parse_str:str):
-        return [parse_str[4:]]
+        return parse_str[4:]
     
     #Input: player as defined in message.py for commands and str from select_question_parse in form row col
     #Output: add_return print for message handler
-    async def select_question(self, player, question_index:str):
+    async def select_question(self, player, message):
+        question_index = self.select_question_parse(message)
         #Turn question into row and column
         column, row = question_index.split(" ")
         column = int(column)
@@ -155,7 +158,7 @@ class Jeopardy_Print(Game_Print):
         
     #Input: player as defined in message.py for commands and integer goal_num from change_goal_parse
     #Output: add_return print for message handler
-    async def pass_turn(self, player):
+    async def pass_turn(self, player, _message):
         answer = self.game.get_answer()
         if player in self.game.get_players():
             if self.game.pass_round(player):
@@ -188,11 +191,11 @@ class Jeopardy_Print(Game_Print):
         return f"```\n{return_str}\n```"
     
     #Display the points of all players
-    async def points(self, _player):
+    async def points(self, _player, _message):
         return self.add_return([], self.get_point_string())
     
     #Adds all expansions
-    async def all(self, player):
+    async def all(self, player, _message):
         # output_str = ""
         # output_str += await self.coders(player, raw=True) + "\n"
         # output_str += await self.default(player, raw=True) + "\n"
@@ -201,7 +204,7 @@ class Jeopardy_Print(Game_Print):
         return self.add_return([], "Added all expansions.") # output_str)
     
     #Toggles CODERS expansion
-    async def standard(self, _player, raw=False):
+    async def standard(self, _player, _message, raw=False):
         length = len(self.game.questions)
         self.game.questions = qs.STD_QUOTES #dict(set(self.game.questions.items()).symmetric_difference(set(qs.STD_QUOTES.items())))
         if not raw:
@@ -216,7 +219,7 @@ class Jeopardy_Print(Game_Print):
             #     return "Removed STD expansion."
     
     #Toggles CODERS expansion
-    async def coders(self, _player, raw=False):
+    async def coders(self, _player,  _message, raw=False):
         length = len(self.game.questions)
         # print("Before disaster")
         # #set(self.game.questions.items())

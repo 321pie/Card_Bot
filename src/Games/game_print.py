@@ -22,16 +22,16 @@ class Game_Print():
             "^!unjion$": [self.unjoin],
             "^!start$": [self.start],
             "^!end$": [self.end_game],
-            "^![0-9]+$": [self.select_card, self.select_card_parse],
-            "^!cats$": [self.change_look, self.change_look_parse],
-            "^!classic$": [self.change_look, self.change_look_parse],
-            "^!genshin$": [self.change_look, self.change_look_parse],
-            "^!starwars$": [self.change_look, self.change_look_parse],
-            "^!pokemon$": [self.change_look, self.change_look_parse],
-            "^!halloween$": [self.change_look, self.change_look_parse],
-            "^!zelda$": [self.change_look, self.change_look_parse],
-            "^!french$": [self.change_look, self.change_look_parse],
-            "^!pop$": [self.change_look, self.change_look_parse]
+            "^![0-9]+$": [self.select_card],
+            "^!cats$": [self.change_look],
+            "^!classic$": [self.change_look],
+            "^!genshin$": [self.change_look],
+            "^!starwars$": [self.change_look],
+            "^!pokemon$": [self.change_look],
+            "^!halloween$": [self.change_look],
+            "^!zelda$": [self.change_look],
+            "^!french$": [self.change_look],
+            "^!pop$": [self.change_look]
         }
 
     def add_return(self, return_list, return_string, file=None, index=None):
@@ -45,7 +45,7 @@ class Game_Print():
 
         return return_list
 
-    async def join(self, player):
+    async def join(self, player, _message):
         if(self.game.game_started == False):
             #Add person to player list and send confirmation message
             if(player not in self.game.get_players()):
@@ -65,7 +65,7 @@ class Game_Print():
                 return self.add_return([], f"You've already queued for this game, **{player}**. Type **!start** to begin game with {len(self.game.get_players())} players.")
         return []
 
-    async def unjoin(self, player):
+    async def unjoin(self, player, _message):
         if(self.game.game_started == False):
             #Remove person from player list and send confirmation message
             if(player in self.game.get_players()):
@@ -75,7 +75,7 @@ class Game_Print():
                 return self.add_return([], f"You can't leave a game you aren't queued for, **{player}**. Use **!join** to join the game.")
         return []
 
-    async def start(self, player):
+    async def start(self, player, _message):
         if player in self.game.get_players():
             if self.game.start_game():
                 #Initialize local vars
@@ -90,7 +90,7 @@ class Game_Print():
         
     #Input: player and str as defined in message.py for commands
     #Output: add_return print for message handler
-    async def end_game(self, player):
+    async def end_game(self, player, _message):
         return_list = []
 
         if player in self.game.get_players():
@@ -116,30 +116,31 @@ class Game_Print():
     
     #Input: parse string of form "^![0-9]+$"
     #Output: integer index parsed from string in list
-    def select_card_parse(self, parse_str) -> list[int]:
-        return [int(parse_str[1:])]
+    def select_card_parse(self, parse_str) -> int:
+        return int(parse_str[1:])
     
     def change_look_parse(self, parse_str):
         if parse_str == "!cats":
-            return [pics.CATS]
+            return pics.CATS
         elif parse_str == "!genshin":
-            return [pics.GENSHIN]
+            return pics.GENSHIN
         elif parse_str == "!starwars":
-            return [pics.STARWARS]
+            return pics.STARWARS
         elif parse_str == "!pokemon":
-            return [pics.POKEMON]
+            return pics.POKEMON
         elif parse_str == "!halloween":
-            return [pics.HALLOWEEN]
+            return pics.HALLOWEEN
         elif parse_str == "!zelda":
-            return [pics.ZELDA]
+            return pics.ZELDA
         elif parse_str == "!pop":
-            return [pics.POP]
+            return pics.POP
         elif parse_str == "!french":
-            return [pics.FRENCH]
+            return pics.FRENCH
         else:
-            return [pics.CLASSIC]
+            return pics.CLASSIC
     
-    async def change_look(self, player, look):
+    async def change_look(self, player, message):
+        look = self.change_look_parse(message)
         if player in self.game.get_players():
             self.deck_look = pics(look)
             return self.add_return([], f"Appearance of deck has been changed to **{look}**!")
@@ -190,7 +191,8 @@ class Game_Print():
 ###############################################################################
     #Input: integer index parsed from string
     #Output: list of return statements using add_return
-    async def select_card(self, player, card_index:int):
+    async def select_card(self, player, message):
+        card_index = self.select_card_parse(message)
         #If card gets played
         if self.game.card_select(player, card_index):
             return self.add_return([], f"**{player}** has played {self.game.get_hand(player)[card_index]}")
