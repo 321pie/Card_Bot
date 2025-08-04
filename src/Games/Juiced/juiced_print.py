@@ -21,8 +21,8 @@ class Juiced_Print(Game_Print):
         self.commands["^!apples$"] = [self.apples]
         self.commands["^!cah$"] = [self.cah]
         self.commands["^!coders$"] = [self.coders]
-        self.commands["^!goal [0-9]+$"] = [self.change_goal, self.change_goal_parse]
-        self.commands["^!hand [0-9]+$"] = [self.change_hand_length, self.change_hand_length_parse]
+        self.commands["^!goal [0-9]+$"] = [self.change_goal]
+        self.commands["^!hand [0-9]+$"] = [self.change_hand_length]
     
     # OVERRIDE #
     async def change_look(self, player, _look):
@@ -129,11 +129,12 @@ class Juiced_Print(Game_Print):
     #Input: command string as defined in message.py for command helper functions
     #Output: the integer goal number passed by the player
     def change_goal_parse(self, parse_str):
-        return [int(parse_str[6:])]
+        return int(parse_str[6:])
 
     #Input: player as defined in message.py for commands and integer goal_num from change_goal_parse
     #Output: add_return print for message handler
-    async def change_goal(self, player, goal_num):
+    async def change_goal(self, player, message):
+        goal_num = self.change_goal_parse(message)
         if player in self.game.get_players():
             if goal_num != 0:
                 self.game.win_points = goal_num
@@ -146,11 +147,12 @@ class Juiced_Print(Game_Print):
     #Input: command string as defined in message.py for command helper functions
     #Output: the integer goal number passed by the player
     def change_hand_length_parse(self, parse_str):
-        return [int(parse_str[6:])]
+        return int(parse_str[6:])
 
     #Input: player as defined in message.py for commands and integer goal_num from change_goal_parse
     #Output: add_return print for message handler
-    async def change_hand_length(self, player, hand_len):
+    async def change_hand_length(self, player, message):
+        hand_len = self.change_hand_length_parse(message)
         if player in self.game.get_players():
             if (hand_len >= 5) and (hand_len <= 20):
                 self.game.hand_len = hand_len

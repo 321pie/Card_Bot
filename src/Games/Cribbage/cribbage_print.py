@@ -11,14 +11,14 @@ class Cribbage_Print(Game_Print):
     def __init__(self):
         super().__init__()
         self.game = Cribbage()
-        self.commands["^!([a2-9jqk]|10) [hdcs]$"] = [self.make_joker, self.make_joker_parse]
+        self.commands["^!([a2-9jqk]|10) [hdcs]$"] = [self.make_joker]
         self.commands["^!standard$"] = [self.play_standard]
         self.commands["^!mega$"] = [self.play_mega]
         self.commands["^!joker$"] = [self.play_joker]
         self.commands["^!reverse$"] = [self.play_reverse]
-        self.commands["^!teams [0-9]+$"] = [self.create_teams, self.create_team_parse]
-        self.commands["^!goal [0-9]+$"] = [self.change_goal, self.change_goal_parse]
-        self.commands["^!skunk [0-9]+$"] = [self.change_skunk, self.change_skunk_parse]
+        self.commands["^!teams [0-9]+$"] = [self.create_teams]
+        self.commands["^!goal [0-9]+$"] = [self.change_goal]
+        self.commands["^!skunk [0-9]+$"] = [self.change_skunk]
         self.commands["^!points$"] = [self.get_points]
         self.commands["^!tpoints$"] = [self.get_team_points]
         self.commands["^!calcs$"] = [self.get_calcs]
@@ -45,11 +45,12 @@ class Cribbage_Print(Game_Print):
     #Input: command string as defined in message.py for command helper functions
     #Output: the integer goal number passed by the player
     def change_goal_parse(self, parse_str):
-        return [int(parse_str[6:])]
+        return int(parse_str[6:])
 
     #Input: player as defined in message.py for commands and integer goal_num from change_goal_parse
     #Output: add_return print for message handler
-    async def change_goal(self, player, goal_num):
+    async def change_goal(self, player, message):
+        goal_num = self.change_goal_parse(message)
         if player in self.game.get_players():
             if goal_num != 0:
                 self.game.point_goal = goal_num
@@ -64,11 +65,12 @@ class Cribbage_Print(Game_Print):
     #Input: command string as defined in message.py for command helper functions
     #Output: the integer goal number passed by the player
     def change_skunk_parse(self, parse_str):
-        return [int(parse_str[7:])]
+        return int(parse_str[7:])
 
     #Input: player as defined in message.py for commands and integer goal_num from change_skunk_parse
     #Output: add_return print for message handler
-    async def change_skunk(self, player, skunk_num):
+    async def change_skunk(self, player, message):
+        skunk_num = self.change_skunk_parse(message)
         if player in self.game.get_players():
             if skunk_num != 0:
                 self.game.skunk_length = skunk_num
@@ -140,11 +142,12 @@ class Cribbage_Print(Game_Print):
     #Input: parse string of form "^!teams [0-9]+$"
     #Output: integer team count parsed from the string
     def create_team_parse(self, parse_str):
-        return [int(parse_str[7:])]
+        return int(parse_str[7:])
     
     #Input: player and team_count as defined in default_print
     #Output: add_return print for message handler
-    async def create_teams(self, _player, team_count:int):
+    async def create_teams(self, _player, message):
+        team_count = self.create_team_parse(message)
         #If teams are even, start game
         if (self.game.create_teams(team_count) == True):
             #Add the teams to be printed before the start returns (index=0)
@@ -161,7 +164,8 @@ class Cribbage_Print(Game_Print):
 
     #Input: integer index parsed from string
     #Output: list of return statements using add_return
-    async def select_card(self, player, card_index):
+    async def select_card(self, player, message):
+        card_index = self.select_card_parse(message)
         if(player in self.game.get_players()):
             #Check for valid index or return
             if(card_index >= len(self.game.hands[self.game.get_player_index(player)]) or card_index < 0):
@@ -360,7 +364,8 @@ class Cribbage_Print(Game_Print):
             return [None, None]
 
     #Function to turn joker into another card
-    async def make_joker(self, player, value, suit):
+    async def make_joker(self, player, message):
+        value, suit = self.make_joker_parse(message)
         return_list = []
 
         if player in self.game.get_players():

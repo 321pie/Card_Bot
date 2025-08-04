@@ -22,9 +22,9 @@ class Jeopardy_Print(Game_Print):
             "^!start$": [self.start],
             "^!end$": [self.end_game],
         }
-        self.commands["^!wager [0-9]+$"] = [self.wager, self.wager_parse]
-        self.commands["^!is [a-z0-9]+$"] = [self.guess, self.guess_parse]
-        self.commands["^!do [0-9] [0-9]+$"] = [self.select_question, self.select_question_parse]
+        self.commands["^!wager [0-9]+$"] = [self.wager]
+        self.commands["^!is [a-z0-9]+$"] = [self.guess]
+        self.commands["^!do [0-9] [0-9]+$"] = [self.select_question]
         self.commands["^!pass$"] = [self.pass_turn]
         self.commands["^!points$"] = [self.points]
         self.commands["^!all$"] = [self.all]
@@ -59,11 +59,12 @@ class Jeopardy_Print(Game_Print):
     #Input: command string as defined in message.py for command helper functions
     #Output: the integer wager passed by the player
     def wager_parse(self, parse_str):
-        return [int(parse_str[7:])]
+        return int(parse_str[7:])
 
     #Input: player as defined in message.py for commands and integer wager from wager_parse
     #Output: add_return print for message handler
-    async def wager(self, player, wager):
+    async def wager(self, player, message):
+        wager = self.wager_parse(message)
         cur_player = self.game.get_play_player()
         max_wager_amount = self.game.get_increase_amount() * (self.game.get_row_count()-1) * 2
 
@@ -83,11 +84,12 @@ class Jeopardy_Print(Game_Print):
     #Input: command string as defined in message.py for command helper functions
     #Output: the guess passed by the player
     def guess_parse(self, parse_str):
-        return [parse_str[4:]]
+        return parse_str[4:]
     
     #Input: player as defined in message.py for commands and str guess from guess_parse
     #Output: add_return print for message handler
-    async def guess(self, player, guess):
+    async def guess(self, player, message):
+        guess = self.guess_parse(message)
         #Standardize guess
         guess = guess.lower()
 
@@ -130,11 +132,12 @@ class Jeopardy_Print(Game_Print):
     #Input: command string as defined in message.py for command helper functions
     #Output: the question passed by the player
     def select_question_parse(self, parse_str:str):
-        return [parse_str[4:]]
+        return parse_str[4:]
     
     #Input: player as defined in message.py for commands and str from select_question_parse in form row col
     #Output: add_return print for message handler
-    async def select_question(self, player, question_index:str):
+    async def select_question(self, player, message):
+        question_index = self.select_question_parse(message)
         #Turn question into row and column
         column, row = question_index.split(" ")
         column = int(column)
