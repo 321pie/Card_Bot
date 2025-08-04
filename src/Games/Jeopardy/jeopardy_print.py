@@ -158,7 +158,7 @@ class Jeopardy_Print(Game_Print):
         
     #Input: player as defined in message.py for commands and integer goal_num from change_goal_parse
     #Output: add_return print for message handler
-    async def pass_turn(self, player):
+    async def pass_turn(self, player, _message):
         answer = self.game.get_answer()
         if player in self.game.get_players():
             if self.game.pass_round(player):
@@ -191,11 +191,11 @@ class Jeopardy_Print(Game_Print):
         return f"```\n{return_str}\n```"
     
     #Display the points of all players
-    async def points(self, _player):
+    async def points(self, _player, _message):
         return self.add_return([], self.get_point_string())
     
     #Adds all expansions
-    async def all(self, player):
+    async def all(self, player, _message):
         # output_str = ""
         # output_str += await self.coders(player, raw=True) + "\n"
         # output_str += await self.default(player, raw=True) + "\n"
@@ -204,7 +204,7 @@ class Jeopardy_Print(Game_Print):
         return self.add_return([], "Added all expansions.") # output_str)
     
     #Toggles CODERS expansion
-    async def standard(self, _player, raw=False):
+    async def standard(self, _player, _message, raw=False):
         length = len(self.game.questions)
         self.game.questions = qs.STD_QUOTES #dict(set(self.game.questions.items()).symmetric_difference(set(qs.STD_QUOTES.items())))
         if not raw:
@@ -219,7 +219,7 @@ class Jeopardy_Print(Game_Print):
             #     return "Removed STD expansion."
     
     #Toggles CODERS expansion
-    async def coders(self, _player, raw=False):
+    async def coders(self, _player,  _message, raw=False):
         length = len(self.game.questions)
         # print("Before disaster")
         # #set(self.game.questions.items())

@@ -45,7 +45,7 @@ class Game_Print():
 
         return return_list
 
-    async def join(self, player):
+    async def join(self, player, _message):
         if(self.game.game_started == False):
             #Add person to player list and send confirmation message
             if(player not in self.game.get_players()):
@@ -65,7 +65,7 @@ class Game_Print():
                 return self.add_return([], f"You've already queued for this game, **{player}**. Type **!start** to begin game with {len(self.game.get_players())} players.")
         return []
 
-    async def unjoin(self, player):
+    async def unjoin(self, player, _message):
         if(self.game.game_started == False):
             #Remove person from player list and send confirmation message
             if(player in self.game.get_players()):
@@ -75,7 +75,7 @@ class Game_Print():
                 return self.add_return([], f"You can't leave a game you aren't queued for, **{player}**. Use **!join** to join the game.")
         return []
 
-    async def start(self, player):
+    async def start(self, player, _message):
         if player in self.game.get_players():
             if self.game.start_game():
                 #Initialize local vars
@@ -90,7 +90,7 @@ class Game_Print():
         
     #Input: player and str as defined in message.py for commands
     #Output: add_return print for message handler
-    async def end_game(self, player):
+    async def end_game(self, player, _message):
         return_list = []
 
         if player in self.game.get_players():

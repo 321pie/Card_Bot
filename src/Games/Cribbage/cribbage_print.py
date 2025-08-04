@@ -34,12 +34,12 @@ class Cribbage_Print(Game_Print):
 
     #Input: player as defined in message.py for commands
     #Output: add_return print for message handler
-    async def get_team_points(self, _player):
+    async def get_team_points(self, _player, _message):
         return self.add_return([], self.get_point_string())
     
     #Input: player as defined in message.py for commands
     #Output: add_return print for message handler
-    async def get_points(self, _player):
+    async def get_points(self, _player, _message):
         return self.add_return([], self.get_point_string(True))
 
     #Input: command string as defined in message.py for command helper functions
@@ -84,7 +84,7 @@ class Cribbage_Print(Game_Print):
 
     #Input: player as defined in message.py for commands
     #Output: add_return print for message handler
-    async def play_standard(self, player):
+    async def play_standard(self, player, _message):
         if player in self.game.get_players():
             self.game.standard_mode()
             self.standard = True
@@ -99,7 +99,7 @@ class Cribbage_Print(Game_Print):
         
     #Input: player as defined in message.py for commands
     #Output: add_return print for message handler
-    async def play_mega(self, player):
+    async def play_mega(self, player, _message):
         if player in self.game.get_players():
             self.game.mega_hand()
             self.standard = False
@@ -111,7 +111,7 @@ class Cribbage_Print(Game_Print):
         
     #Input: player as defined in message.py for commands
     #Output: add_return print for message handler
-    async def play_joker(self, player):
+    async def play_joker(self, player, _message):
         if player in self.game.get_players():
             self.game.joker_mode()
             self.joker = True
@@ -122,7 +122,7 @@ class Cribbage_Print(Game_Print):
         
     #Input: player as defined in message.py for commands
     #Output: add_return print for message handler
-    async def play_reverse(self, player):
+    async def play_reverse(self, player, _message):
         if player in self.game.get_players():
             self.game.reverse_mode()
             self.reverse = True
@@ -133,7 +133,7 @@ class Cribbage_Print(Game_Print):
         
     #Input: player as defined in message.py for commands
     #Output: add_return print for message handler
-    async def get_calcs(self, player):
+    async def get_calcs(self, player, _message):
         if self.calc_string == "":
             return self.add_return([], f"You need to finish a round before you can see the hand values, {player}.")
         else:

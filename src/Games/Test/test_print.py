@@ -49,7 +49,7 @@ class Test_Print(Game_Print):
         return []
     
     #Adds Cribbage game
-    async def make_cribbage(self, _player):
+    async def make_cribbage(self, _player, _message):
         if not self.game_print.is_started():
             self.game_print = Cribbage_Print()
             self.game_name = "Cribbage"
@@ -59,7 +59,7 @@ class Test_Print(Game_Print):
         return self.add_return([], "Failed to change game since game has been started. Use **!end** to end.")
     
     #Adds Juiced game
-    async def make_juiced(self, _player):
+    async def make_juiced(self, _player, _message):
         if not self.game_print.is_started():
             self.game_print = Juiced_Print()
             self.game_name = "Juiced"
