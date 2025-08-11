@@ -1,6 +1,8 @@
 # Card Bot
 
-This project is a rework of the [old Cribbage bot](https://github.com/AbbeyRDuBois/Cribbage_Counter).<br>
+This project is a rework of the [old cribbage bot](https://github.com/AbbeyRDuBois/Cribbage_Counter).<br>
+You can find the cribbage calculator GUI from that project as an exe file under src/Games/Cribbage.
+
 Card Bot allows for multiple games to be added, and will likely grow with time.
 
 [Non-Programmer Friendly Instructions](https://docs.google.com/document/d/1ZA37ccEDgdsJG2t4bXch4cNlkp_BOfKMuwSogXjJ1p8/edit?usp=sharing)
@@ -119,3 +121,5 @@ Check out game.py, game_print.py, and message.py before trying to add to the cod
 If you want to add a game, then create a new branch for the game and submit a pull request when the game is completed.<br/>
 Testing can be done using the testing feature (more information on the test feature can be found by using /help or reading help.txt).<br/>
 If you want to add stats/achievements, ask for permissions to edit the <a href="https://docs.google.com/spreadsheets/d/1zUblRLIugMxcqi-2R0AiEAx7gt9FnujT5ik7JB0viaw/edit?usp=sharing">Google Sheets document</a> and then add your achievements to the controller as well as stats.py.
+
+
