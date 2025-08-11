@@ -1,5 +1,3 @@
-import copy
-
 from Games.Cribbage.cribbage import Cribbage
 import Games.deck as dk
 from Games.game_print import Game_Print
@@ -396,7 +394,8 @@ class Cribbage_Print(Game_Print):
                 
                     return return_list
                 else:
-                    return self.add_return(return_list, f"Flipped joker has been made into {card.display()}.\nPegging will now begin with **{self.game.get_players()[self.game.pegging_index]}**", self.deck_look.get_hand_pic([[card]], show_index=False))
+                    self.add_return(return_list, f"Flipped joker has been made into {card.display()}.", self.deck_look.get_hand_pic([[card]], show_index=False))
+                    return self.add_return(return_list, f"Pegging will now begin with **{self.game.get_players()[self.game.pegging_index]}**")
                 
             #Change joker in crib to specified card
             elif self.game.change_crib_joker(card, player) == True:

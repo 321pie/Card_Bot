@@ -30,7 +30,7 @@ class Cribbage(game.Game):
         self.team_size:int = 1 #Variable to hold number of players per team (combine points)
         self.reverse:bool = False #If true, then last to reach point_goal wins and skunking is based on how many points over
 
-        self.players = players
+        self.players = copy.copy(players) #If not copied, then list will be shared across implementations (players=[] only evaluated once)
 
     #Initializes the game on start
     #Returns 0 on success, -1 on failure
@@ -125,12 +125,6 @@ class Cribbage(game.Game):
         #Get hands for next round
         self.hands = self.deck.get_hands(len(self.players), self.hand_size + self.throw_count)
         self.backup_hands = []
-
-    #Ends the game by resetting every variable to standard cribbage
-    def end_game(self):
-        self.players = []
-        self.team_size = 1
-        self.standard_mode()
 
     #Create teams with count number of players if able. Returns True on success and False on error.
     def create_teams(self, count):

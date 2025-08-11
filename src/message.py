@@ -41,18 +41,19 @@ async def handle_user_messages(msg):
     
     player_in_game:bool = False
     player = msg.author.name
-    stats.add_player(player)
     
     #Commands from an active game
     for active_game in active_games:
+        print("Pre print: ", active_games)
+        #Remove game from list if ended
+        if active_game.is_started() == False:
+            active_games.remove(active_game)
+            continue
+
         if player in active_game.get_players():
             player_in_game = True
             return_var = await run_commands(player, message, active_game)
             if return_var != None:
-                #Remove game from list if ended
-                if active_game.is_started() == False:
-                    active_games.remove(active_game)
-
                 return return_var
             else:
                 break #Player can only be in one game at a time
