@@ -4845,6 +4845,7 @@ WHITE_CODERS:dict = {
 	"Love,\nSomething Witty": 1,
     "Costco Onion Crank": 1,
     "My vibe": 1,
+	"Three hot Estonian men": 1,
 }
 
 BLACK_CODERS:dict = {
@@ -4868,7 +4869,8 @@ BLACK_CODERS:dict = {
     "I pushed ______ to production. What could go wrong?": 1,
     '''git commit -m "_____"''': 1,
     "Janice from accounting isn't very good at her job. She didn't even think to account for the possibility of ______.": 1,
-    "Our sprint velocity would increase if we had ______.": 1
+    "Our sprint velocity would increase if we had ______.": 1,
+	"Getting momma birded by three hot Estonian men is the ultimate dining experience, but ______ is the next best thing.": 1,
 }
 
 
