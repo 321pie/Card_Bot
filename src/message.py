@@ -44,7 +44,6 @@ async def handle_user_messages(msg):
     
     #Commands from an active game
     for active_game in active_games:
-        print("Pre print: ", active_games)
         #Remove game from list if ended
         if active_game.is_started() == False:
             active_games.remove(active_game)
