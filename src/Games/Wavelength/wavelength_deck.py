@@ -12,7 +12,7 @@ class Spectrum_Deck(dk.Deck):
 		shuffle(self.deck)
 
 #Gets filled at runtime
-spectrum_cards:dict = []
+spectrum_cards:list = []
 
 DEFAULT_CARDS:list = [
 	'''(+10) Highly addictive ↔ Mildly addictive (-10)''',

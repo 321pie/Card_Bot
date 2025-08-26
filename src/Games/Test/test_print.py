@@ -135,7 +135,7 @@ class Test_Print(Game_Print):
         return self.game_print.get_hand_string(player)
 
     #Starts the game
-    async def start(self, player):
+    async def start(self, player, _message):
         if self.game_print.game.start_game():
             #Initialize local vars
             for _ in self.game_print.game.get_players():
@@ -147,7 +147,7 @@ class Test_Print(Game_Print):
         
     #Input: player and str as defined in message.py for commands
     #Output: add_return print for message handler
-    async def end_game(self, player):
+    async def end_game(self, player, _message):
         self.game_print.game.end_game()
         return self.add_return([], f"Game has been ended early.\n{self.get_end_string(player)}")
         
