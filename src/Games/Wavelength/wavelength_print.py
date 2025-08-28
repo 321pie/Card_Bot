@@ -59,8 +59,31 @@ class Wavelength_Print(Game_Print):
             return f"You aren't in the game {player}, so you don't have a hand."
         
     def make_guess(self, player, message):
-        #TODO: Actually program this pls lol
-        pass
+        output_list = []
+        round_ended = False
+
+        #If not judge and no guess submitted, submit guess
+        if player != self.game.get_judge():
+            if not self.game.did_guess(player):
+                round_ended = self.game.process_guess(player)
+                self.add_return(output_list, f"{player} has made their guess.")
+            else:
+                self.add_return(output_list, f"{player} has already made their guess, and all guesses are final.")
+        else:
+            self.add_return(output_list, f"{self.game.get_judge()} can't guess! They know the answer!")
+
+        #If all players have submitted, output points
+        if round_ended == True:
+            self.add_return(output_list, f"\n\nPoints:")
+            for player in self.game.get_players():
+                self.add_return(output_list, f"{player}: {self.game.get_points(player)}")
+            
+            #Check for winner or next prompt/judge
+            winner = self.game.get_winner()
+            if winner != None:
+                self.add_return(output_list, f"Congrats, {player}! You've won the game!")
+            else:
+                self.add_return(output_list, f"**{self.game.get_judge()}** is the judge. The category is:\n**{self.get_card_string(self.game.get_judge_card())}**\nPlease make a guess between {self.game.lowest_guess} and {self.game.highest_guess} based on the hint by using the **!guess** command.\nJudges use **/h** or **/hand** to see the correct answer and give your hint.")
     
     #Input: command string as defined in message.py for command helper functions
     #Output: the integer goal number passed by the player

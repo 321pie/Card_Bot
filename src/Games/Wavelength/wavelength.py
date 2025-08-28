@@ -33,7 +33,9 @@ class Wavelength(Game):
         self.reset_round()
 
     #If round ended, returns True or winner's name. Else, returns False.
-    def process_guess(self, player_index:int, guess:int):
+    def process_guess(self, player:any, guess:int) -> bool:
+        player_index = self.players.index(player)
+
         #Player who knows the correct answer can't vote
         if player_index == self.judge_index:
             return False
@@ -112,8 +114,11 @@ class Wavelength(Game):
             return abs(points - 2) + 2
     
     #Get a list of cards that players have played to be judged
-    def get_unholy_actions(self) -> list:
-        return copy.copy(self.unholy_actions)
+    def did_guess(self, player) -> bool:
+        if player not in self.players:
+            return False
+        else:
+            return self.guess_list[self.players.index(player)] != None
     
     #Returns player that is winning if always_return==True, else will return None if a winner is not found
     def get_winner(self, always_return=False):
