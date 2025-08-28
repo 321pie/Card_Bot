@@ -268,7 +268,7 @@ FRANCIS_BACON:list = [
     '''There Are But Two Tragedies in Life--One is One's Inability to attain One's Heart's Desire--The Other Is To Have It!'''
 ]
 
-ANDREW_RICE:list = [
+ANDREW_R:list = [
     '''I blew kids up.''',
     '''What can I say? A little bit of Treasure on my Lady.''',
     '''I feel like I AM the danger.''',
@@ -673,7 +673,7 @@ ANDREW_RICE:list = [
     '''Why am I illiterate?'''
 ]
 
-CHEYENNE_STESKAL:list = [
+CHEYENNE_S:list = [
     '''Well I make more than you…''',
     '''I bring the party. The party is racism.''',
     '''Alec you always look like you're blinking.''',
@@ -745,7 +745,7 @@ CHEYENNE_STESKAL:list = [
     '''I can’t even hurt myself.'''
 ]
 
-ALEC_WONG:list = [
+ALEC_W:list = [
     '''Classic men: taking away women’s physical autonomy.''',
     '''I hate women... am I right gamers?''',
     '''Here's the closet book.''',
@@ -809,7 +809,7 @@ ALEC_WONG:list = [
     '''What’s the context in your pants?'''
 ]
 
-ABBEY_DUBOIS:list = [
+ABBEY_D:list = [
     '''I got a hot dog. I have finally accomplished something with my life''',
     '''You're discovering something new about your hands every day...''',
     '''She usually doesn't sit on me.''',
@@ -836,7 +836,7 @@ ABBEY_DUBOIS:list = [
     '''Because you set it to an integer?''',
 ]
 
-MICAH_GORDON:list = [
+MICAH_G:list = [
     '''Why be special when you have stonks?''',
     '''If they lose an arm, they’re using their laptop wrong.''',
     '''Gordon Ramby.''',
@@ -949,7 +949,7 @@ CODERS_MISC:list = [
     '''Don’t stretch it too far. You don’t want to over stretch it.'''
 ]
 
-ROOT:list = [
+ROOT_O:list = [
     '''Why is our friendship Ronald Mc Donald with a baseball bat?''',
     '''I have two brain cells left in my brain: Ctrl+C and Ctrl+V.''',
     '''It's just me, myself, and I.''',
@@ -994,11 +994,11 @@ STD_QUOTES:dict = {
 }
 
 CODERS_QUOTES:dict = {
-    "Andrew Rice" : ANDREW_RICE,
-    "Cheyenne Steskal" : CHEYENNE_STESKAL,
-    "Abbey DuBois" : ABBEY_DUBOIS,
-    "Alec Wong" : ALEC_WONG,
-    "Micah Gordon" : MICAH_GORDON,
+    "Andrew R" : ANDREW_R,
+    "Cheyenne S" : CHEYENNE_S,
+    "Abbey D" : ABBEY_D,
+    "Alec W" : ALEC_W,
+    "Micah G" : MICAH_G,
     "Miscellaneous" : CODERS_MISC,
-    "Root OfTheProblem" : ROOT
+    "Root O" : ROOT_O
 }
