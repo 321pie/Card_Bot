@@ -76,3 +76,11 @@ The bot knows the following commands:
         '**!_player_ _command_**': Causes the specified player to perform the specified command in the game that is being tested.
         '**!_player_ hand**': Prints the hand of the specified player in the testing environment (not private).
     
+    ***Wavelength***:
+      Game:
+        '**!wavelength**', '**!wl**': Create a game of Wavelength.
+        '**!goal [0-9]+**': Set the amount of points needed to reach the goal to the provided number.
+        '**!guess [0-9]+**': Use to guess given the hint.
+        '**!all**': Toggles ALL expansions!
+        '**!default**': Toggles the DEFAULT expansion!
+        '**!coders**': Toggles the CODERS expansion!

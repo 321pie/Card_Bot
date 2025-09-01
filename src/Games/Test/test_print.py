@@ -27,7 +27,7 @@ class Test_Print(Game_Print):
         self.commands["^!jc$"] = [self.make_juiced]
         self.commands["^!add .*$"] = [self.add_player]
 
-    async def explain_rules(self, _player):
+    async def explain_rules(self, _player, _message):
         return self.add_return([], "Use '!add *player*' to add a player to the game.")
     
     # OVERRIDE #
@@ -45,7 +45,7 @@ class Test_Print(Game_Print):
         return f"Test has been ended\n{self.game_print.get_end_string(player)}"
     
     #Used as a dummy function to "delete" a command
-    def null_command(self, player):
+    def null_command(self, _player, _message):
         return []
     
     #Adds Cribbage game
@@ -94,7 +94,8 @@ class Test_Print(Game_Print):
         return output_list
     
     #Handles commands passed in from the player to pass on to the underlying game
-    async def handle_command(self, _actual_player, player, message):
+    async def handle_command(self, _actual_player, command):
+        player, message = self.handle_command_parse(command)
         if player in self.game_print.game.get_players():
             #If they want the hand, give it to them
             if message == "hand":
@@ -114,10 +115,7 @@ class Test_Print(Game_Print):
         for command in game.commands:
             if re.fullmatch(command, message) != None:
                 func_list = game.commands[command]
-                if len(func_list) > 1:
-                    return await func_list[0](player, *(func_list[1](message)))
-                else:
-                    return await func_list[0](player)
+                return await func_list[0](player, message)
                     
         return []
     
@@ -135,7 +133,7 @@ class Test_Print(Game_Print):
         return self.game_print.get_hand_string(player)
 
     #Starts the game
-    async def start(self, player):
+    async def start(self, player, _message):
         if self.game_print.game.start_game():
             #Initialize local vars
             for _ in self.game_print.game.get_players():
@@ -147,7 +145,7 @@ class Test_Print(Game_Print):
         
     #Input: player and str as defined in message.py for commands
     #Output: add_return print for message handler
-    async def end_game(self, player):
+    async def end_game(self, player, _message):
         self.game_print.game.end_game()
         return self.add_return([], f"Game has been ended early.\n{self.get_end_string(player)}")
         

@@ -11,6 +11,7 @@ import Games.Minesweeper.minesweeper as minesweeper
 from Games.Regicide.regicide_print import Regicide_Print
 import Games.stats as stats
 from Games.Test.test_print import Test_Print
+from Games.Wavelength.wavelength_print import Wavelength_Print
 
 active_games:list[gp] = []
 
@@ -78,6 +79,8 @@ async def handle_user_messages(msg):
         return make_regicide(player)
     elif message == "!test":
         return make_test(player)
+    elif message == "!wavelength" or message == "!wl":
+        return make_wavelength(player)
     
     #Commands to output a minigame
     elif message == "!minesweeper" or message == "!ms":
@@ -154,6 +157,16 @@ def make_test(player):
         return gp().add_return([], f"{player} has created a Test game. Use **!join** to join it!")
     else:
         return gp().add_return([], f"Sorry, {player}. You need to wait until the current game is started to create another one.")
+    
+#Makes a game of Wavelength to be joined
+def make_wavelength(player):
+    global cur_game
+    
+    if cur_game == None:
+        cur_game = Wavelength_Print()
+        return gp().add_return([], f"{player} has created a Wavelength game. Use **!join** to join it!")
+    else:
+        return gp().add_return([], f"Sorry, {player}. You need to wait until the current game is started to create another one.")
 
 #Toggle role for user
 async def toggle_role(member, role_name):
@@ -190,6 +203,5 @@ async def run_commands(player, message, game):
         if re.fullmatch(command, message) != None:
             func_list = game.commands[command]
             return await func_list[0](player, message)
-                
                 
     return None
