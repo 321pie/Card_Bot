@@ -24,12 +24,10 @@ class Wavelength(Game):
     #Initializes the game on start
     #Returns True on success, False on failure
     def initialize_game(self) -> bool:
-        #Reinitialize with updated values for available cards, adding defaults if none are initialized
+        #Reinitialize with updated values for available cards, adding defaults if none are initialized (chose 10 for no particular reason)
         self.deck = deck.Spectrum_Deck()
         if len(self.deck.get_deck()) < 10:
             deck.spectrum_cards += deck.DEFAULT_CARDS
-            deck.spectrum_cards += deck.CODERS_CARDS #TODO: Delete and add proper adding lol
-            print("Adding coders card is an out. PLS FIX!")
             self.deck = deck.Spectrum_Deck()
 
         self.reset_round()

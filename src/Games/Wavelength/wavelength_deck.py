@@ -203,10 +203,10 @@ DEFAULT_CARDS:list = [
 	'''(+10) Overrated game ↔ Underrated game (-10)''',
 	'''(+10) You don't want your parents to watch you do it ↔ You want your parents to watch you do it (-10)''',
 	'''(+10) Evil people ↔ Good people (-10)''',
-	'''(+10) jock  ↔ nerd  (-10)''',
+	'''(+10) jock ↔ nerd  (-10)''',
 ]
 
-POLITICAL_CARDS:list = [
+DEFAULT_POLITICAL_CARDS:list = [
 	'''(+10) Democracy ↔ Dictatorship (-10)''',
 	'''(+10) Partisan ↔ Non-partisan (-10)''',
 	'''(+10) Capitalist ↔ Socialist (-10)''',

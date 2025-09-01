@@ -15,7 +15,9 @@ class Wavelength_Print(Game_Print):
         self.scrambled_unholy_actions:list[list] = []
         
         #Add commands
-        #self.commands["^!all$"] = [self.all]
+        self.commands["^!all$"] = [self.all]
+        self.commands["^!defualt$"] = [self.default]
+        self.commands["^!coders$"] = [self.coders]
         self.commands["^!goal [0-9]+$"] = [self.change_goal]
         self.commands["^!guess -?([0-9]|(10))$"] = [self.make_guess]
     
@@ -107,59 +109,49 @@ class Wavelength_Print(Game_Print):
                 return self.add_return([], f"Don't input 0. I better not catch you doing it again. :eyes:")
         return self.add_return([], f"You can't edit a game you're not in, {player}. Use **!join** to join.")
     
-    # #Adds all expansions
-    # async def all(self, player, _message):
-    #     output_str = ""
-    #     output_str += await self.coders(player, None, raw=True) + "\n"
-    #     output_str += await self.cah(player, None, raw=True) + "\n"
-    #     output_str += await self.apples(player, None, raw=True) + "\n"
+    #Adds all expansions
+    async def all(self, player, _message):
+        output_str = ""
+        output_str += await self.coders(player, None, raw=True) + "\n"
+        output_str += await self.default(player, None, raw=True) + "\n"
 
-    #     return self.add_return([], output_str)
+        return self.add_return([], output_str)
     
-    # #Toggles CODERS expansion
-    # async def coders(self, _player, _message, raw=False):
-    #     length = len(jd.WHITE_CARDS)
-    #     jd.WHITE_CARDS = dict(set(jd.WHITE_CARDS.items()).symmetric_difference(set(jd.WHITE_CODERS.items())))
-    #     jd.BLACK_CARDS = dict(set(jd.BLACK_CARDS.items()).symmetric_difference(set(jd.BLACK_CODERS.items())))
-    #     if not raw:
-    #         if length < len(jd.WHITE_CARDS):
-    #             return self.add_return([], "Added CODERS expansion.")
-    #         else:
-    #             return self.add_return([], "Removed CODERS expansion.")
-    #     else:
-    #         if length < len(jd.WHITE_CARDS):
-    #             return "Added CODERS expansion."
-    #         else:
-    #             return "Removed CODERS expansion."
+    #Toggles CODERS expansion
+    async def coders(self, _player, _message, raw=False):
+        #Get old length and try to remove cards
+        length = len(wd.spectrum_cards)
+        wd.spectrum_cards = [card for card in wd.spectrum_cards if card not in wd.CODERS_CARDS]
+
+        #If length changed, cards were removed. Else, add cards.
+        if len(wd.spectrum_cards) < length:
+            if not raw:
+                return self.add_return([], "Removed CODERS expansion.")
+            else:
+                return "Removed CODERS expansion."
+        else:
+            wd.spectrum_cards += wd.CODERS_CARDS
+            if not raw:
+                return self.add_return([], "Added CODERS expansion.")
+            else:
+                return "Added CODERS expansion."
         
-    # #Toggles CAH expansion
-    # async def cah(self, _player, _message, raw=False):
-    #     length = len(jd.WHITE_CARDS)
-    #     jd.WHITE_CARDS = dict(set(jd.WHITE_CARDS.items()).symmetric_difference(set(jd.WHITE_CAH.items())))
-    #     jd.BLACK_CARDS = dict(set(jd.BLACK_CARDS.items()).symmetric_difference(set(jd.BLACK_CAH.items())))
-    #     if not raw:
-    #         if length < len(jd.WHITE_CARDS):
-    #             return self.add_return([], "Added CAH expansion.")
-    #         else:
-    #             return self.add_return([], "Removed CAH expansion.")
-    #     else:
-    #         if length < len(jd.WHITE_CARDS):
-    #             return "Added CAH expansion."
-    #         else:
-    #             return "Removed CAH expansion."
-        
-    # #Toggles APPLES expansion
-    # async def apples(self, _player, _message, raw=False):
-    #     length = len(jd.WHITE_CARDS)
-    #     jd.WHITE_CARDS = dict(set(jd.WHITE_CARDS.items()).symmetric_difference(set(jd.WHITE_APPLES.items())))
-    #     jd.BLACK_CARDS = dict(set(jd.BLACK_CARDS.items()).symmetric_difference(set(jd.BLACK_APPLES.items())))
-    #     if not raw:
-    #         if length < len(jd.WHITE_CARDS):
-    #             return self.add_return([], "Added APPLES expansion.")
-    #         else:
-    #             return self.add_return([], "Removed APPLES expansion.")
-    #     else:
-    #         if length < len(jd.WHITE_CARDS):
-    #             return "Added APPLES expansion."
-    #         else:
-    #             return "Removed APPLES expansion."
+    #Toggles CAH expansion
+    async def default(self, _player, _message, raw=False):
+        #Get old length and try to remove cards
+        length = len(wd.spectrum_cards)
+        wd.spectrum_cards = [card for card in wd.spectrum_cards if card not in wd.DEFAULT_CARDS and card not in wd.DEFAULT_POLITICAL_CARDS]
+
+        #If length changed, cards were removed. Else, add cards.
+        if len(wd.spectrum_cards) < length:
+            if not raw:
+                return self.add_return([], "Removed CODERS expansion.")
+            else:
+                return "Removed CODERS expansion."
+        else:
+            wd.spectrum_cards += wd.DEFAULT_CARDS
+            wd.spectrum_cards += wd.DEFAULT_POLITICAL_CARDS
+            if not raw:
+                return self.add_return([], "Added CODERS expansion.")
+            else:
+                return "Added CODERS expansion."
