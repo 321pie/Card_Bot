@@ -129,16 +129,13 @@ DEFAULT_CARDS:list = [
 	'''(+10) Hard to do ↔ Easy to do (-10)''',
 	'''(+10) Priceless ↔ Worthless (-10)''',
 	'''(+10) Nurture ↔ Nature (-10)''',
-	'''(+10) Democracy ↔ Dictatorship (-10)''',
 	'''(+10) Weird greeting ↔ Normal greeting (-10)''',
 	'''(+10) Cat name ↔ Dog name (-10)''',
-	'''(+10) Partisan ↔ Non-partisan (-10)''',
 	'''(+10) Infinite ↔ Limited (-10)''',
 	'''(+10) Formal event ↔ Casual event (-10)''',
 	'''(+10) Good investment ↔ Bad investment (-10)''',
 	'''(+10) Heavy topic ↔ Small talk (-10)''',
 	'''(+10) Spicy ↔ Mild (-10)''',
-	'''(+10) Sacrilegious ↔ Religious (-10)''',
 	'''(+10) Art ↔ Not art (-10)''',
 	'''(+10) Prohibited ↔ Illegal (-10)''',
 	'''(+10) Elitist ↔ Popular (-10)''',
@@ -148,7 +145,6 @@ DEFAULT_CARDS:list = [
 	'''(+10) Too big ↔ Too small (-10)''',
 	'''(+10) Long ↔ Short (-10)''',
 	'''(+10) Best year in history ↔ Worst year in history (-10)''',
-	'''(+10) Capitalist ↔ Socialist (-10)''',
 	'''(+10) Well known fact ↔ Little known fact (-10)''',
 	'''(+10) Mobile ↔ Stationary (-10)''',
 	'''(+10) Global issue ↔ Local issue (-10)''',
@@ -208,4 +204,31 @@ DEFAULT_CARDS:list = [
 	'''(+10) You don't want your parents to watch you do it ↔ You want your parents to watch you do it (-10)''',
 	'''(+10) Evil people ↔ Good people (-10)''',
 	'''(+10) jock  ↔ nerd  (-10)''',
+]
+
+
+POLITICAL_CARDS:list = [
+	'''(+10) Democracy ↔ Dictatorship (-10)''',
+	'''(+10) Partisan ↔ Non-partisan (-10)''',
+	'''(+10) Capitalist ↔ Socialist (-10)''',
+	'''(+10) Sacrilegious ↔ Religious (-10)''',
+]
+
+CODERS_CARDS:list = [
+	'''(+10) Phils grading <-> Cecily's grading (-10)''',
+	'''(+10) Terri Torres <-> Ken Davis (-10)''',
+	'''(+10) Kinder's physics <-> Yang's physics (-10)''',
+	'''(+10) Software ↔ Business (-10)''',
+	'''(+10) Garbage Man ↔ Treasure Lady (-10)''',
+	'''(+10) Linux ↔ Windows (-10)''',
+	'''(+10) Perfect Hand ↔ Dead Baby (-10)''',
+	'''(+10) C ↔ C# (-10)''',
+	'''(+10) Javascript ↔ C# (-10)''',
+	'''(+10) Android ↔ IOS (-10)''',
+	'''(+10) Haunted Jaunt ↔ Fancy French Stride (-10)''',
+	'''(+10) Link ↔ Ganondorf (-10)''',
+	'''(+10) Peach ↔ Zelda (-10)''',
+	'''(+10) Polities ↔ Poseidon (-10)''',
+	'''(+10) Calypso ↔ Circe (-10)''',
+	'''(+10) Zues ↔ Hades (-10)''',
 ]
