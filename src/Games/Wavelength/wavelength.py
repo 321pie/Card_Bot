@@ -26,8 +26,8 @@ class Wavelength(Game):
     def initialize_game(self) -> bool:
         #Reinitialize with updated values for available cards, adding defaults if none are initialized
         self.deck = deck.Spectrum_Deck()
-        if len(self.deck) < 10:
-            deck.spectrum_cards += deck.spectrum_cards
+        if len(self.deck.get_deck()) < 10:
+            deck.spectrum_cards += deck.DEFAULT_CARDS
             self.deck = deck.Spectrum_Deck()
 
         self.reset_round()
@@ -60,29 +60,31 @@ class Wavelength(Game):
 
         return False
 
-    #Optionally used to modify variables on card select
-    #card_index needs to be indexed based on: (judge -> self.unholy_actions) (player -> self.hands[player_index])
-    #NOTE: Card gets deleted, so don't modify self.hands. See self.card_select() for more details.
-    def process_card_select(self, player_index:int, card_index:int) -> bool:
-        if player_index == self.judge_index:
-            return False
-        if card_index == self.judge_index:
-            return False
+    # #Optionally used to modify variables on card select
+    # #card_index needs to be indexed based on: (judge -> self.unholy_actions) (player -> self.hands[player_index])
+    # #NOTE: Card gets deleted, so don't modify self.hands. See self.card_select() for more details.
+    # def process_card_select(self, player_index:int, card_index:int) -> bool:
+    #     if player_index == self.judge_index:
+    #         return False
+    #     if card_index == self.judge_index:
+    #         return False
             
-        #Assign a new Judge Judy, give points, and reset round
-        self.judge_index = (self.judge_index + 1) % len(self.players)
+    #     #Assign a new Judge Judy, give points, and reset round
+    #     self.judge_index = (self.judge_index + 1) % len(self.players)
 
-        for player_index in range(len(self.players)):
-            self.points[player_index] += self.calc_points()
+    #     for player_index in range(len(self.players)):
+    #         add_points = self.calc_points()
+    #         self.points[player_index] += add_points
+    #         self.points[self.judge_index] += add_points
         
-        self.reset_round()
+    #     self.reset_round()
 
-        return False
+    #     return False
     
     #Prepare for new round. Returns player that won if game has ended, else None
     def reset_round(self):
         #Init variables to initialize the game
-        self.hands = self.deck.get_hands(len(self.players), self.hand_len) #Variable declared in base class
+        self.hands = [] #No hands!
         for _ in self.players:
             self.points.append(0)
             self.guess_list.append(None)
