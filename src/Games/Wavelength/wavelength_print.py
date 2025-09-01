@@ -17,7 +17,7 @@ class Wavelength_Print(Game_Print):
         #Add commands
         #self.commands["^!all$"] = [self.all]
         self.commands["^!goal [0-9]+$"] = [self.change_goal]
-        self.commands["^!guess -?[0-9]|(10)$"] = [self.make_guess]
+        self.commands["^!guess -?([0-9]|(10))$"] = [self.make_guess]
     
     # OVERRIDE #
     async def change_look(self, player, _look):

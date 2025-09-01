@@ -206,7 +206,6 @@ DEFAULT_CARDS:list = [
 	'''(+10) jock  ↔ nerd  (-10)''',
 ]
 
-
 POLITICAL_CARDS:list = [
 	'''(+10) Democracy ↔ Dictatorship (-10)''',
 	'''(+10) Partisan ↔ Non-partisan (-10)''',

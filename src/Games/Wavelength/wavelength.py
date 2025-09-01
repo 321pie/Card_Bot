@@ -19,7 +19,7 @@ class Wavelength(Game):
         self.highest_guess:int = 10 #Highest possible guess
         self.guess_list:list[list[int]] = [] #List to hold the values that payers have guessed
         self.points:list[int] = [] #List to hold point totals (indexed same as players)
-        self.win_points:int = 20 #Number of points needed to win a game
+        self.win_points:int = 30 #Number of points needed to win a game
 
     #Initializes the game on start
     #Returns True on success, False on failure
@@ -28,6 +28,8 @@ class Wavelength(Game):
         self.deck = deck.Spectrum_Deck()
         if len(self.deck.get_deck()) < 10:
             deck.spectrum_cards += deck.DEFAULT_CARDS
+            deck.spectrum_cards += deck.CODERS_CARDS #TODO: Delete and add proper adding lol
+            print("Adding coders card is an out. PLS FIX!")
             self.deck = deck.Spectrum_Deck()
 
         self.reset_round()
@@ -48,38 +50,19 @@ class Wavelength(Game):
 
         #If everyone except judge has guessed, then assign a new judge, calc points, and move on to next round.
         if len([gess for gess in self.guess_list if gess != None]) == len(self.players) - 1:
-            self.judge_index = (self.judge_index + 1) % len(self.players)
-
             for player_index in range(len(self.players)):
                 if self.guess_list[player_index] != None:
-                    self.points[player_index] += self.calc_points(self.guess_list[player_index])
+                    add_points = self.calc_points(self.guess_list[player_index])
+                    self.points[player_index] += add_points
+                    self.points[self.judge_index] += add_points
+
+            self.judge_index = (self.judge_index + 1) % len(self.players)
 
             self.reset_round()
 
             return True
 
         return False
-
-    # #Optionally used to modify variables on card select
-    # #card_index needs to be indexed based on: (judge -> self.unholy_actions) (player -> self.hands[player_index])
-    # #NOTE: Card gets deleted, so don't modify self.hands. See self.card_select() for more details.
-    # def process_card_select(self, player_index:int, card_index:int) -> bool:
-    #     if player_index == self.judge_index:
-    #         return False
-    #     if card_index == self.judge_index:
-    #         return False
-            
-    #     #Assign a new Judge Judy, give points, and reset round
-    #     self.judge_index = (self.judge_index + 1) % len(self.players)
-
-    #     for player_index in range(len(self.players)):
-    #         add_points = self.calc_points()
-    #         self.points[player_index] += add_points
-    #         self.points[self.judge_index] += add_points
-        
-    #     self.reset_round()
-
-    #     return False
     
     #Prepare for new round. Returns player that won if game has ended, else None
     def reset_round(self):
