@@ -32,7 +32,6 @@ DEFAULT_CARDS:list = [
 	'''(+10) Requires skill ↔ Requires luck (-10)''',
 	'''(+10) Flavorful ↔ Flavorless (-10)''',
 	'''(+10) Fascinating topic ↔ Boring topic (-10)''',
-	'''(+10) Good actors ↔ Bad actor (-10)''',
 	'''(+10) Hipster ↔ Basic (-10)''',
 	'''(+10) Safe job ↔ Dangerous job (-10)''',
 	'''(+10) Sci-Fi ↔ Fantasy (-10)''',

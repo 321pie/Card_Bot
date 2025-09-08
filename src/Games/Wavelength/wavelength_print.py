@@ -17,6 +17,7 @@ class Wavelength_Print(Game_Print):
         #Add commands
         self.commands["^!all$"] = [self.all]
         self.commands["^!defualt$"] = [self.default]
+        self.commands["^!base$"] = [self.base]
         self.commands["^!coders$"] = [self.coders]
         self.commands["^!goal [0-9]+$"] = [self.change_goal]
         self.commands["^!guess -?([0-9]|(10))$"] = [self.make_guess]
@@ -78,9 +79,12 @@ class Wavelength_Print(Game_Print):
 
         #If all players have submitted, output points
         if round_ended == True:
-            self.add_return(output_list, f"\n\nCorrect answer was: ***{correct_answer}***\nPoints:")
+            point_string = ""
+            point_string += f"\n\nCorrect answer was: ***{correct_answer}***\nPoints:\n"
             for player in self.game.get_players():
-                self.add_return(output_list, f"{player}: {self.game.get_points(player)}")
+                point_string += f"{player}: {self.game.get_points(player)}\n"
+
+            self.add_return(output_list, point_string)
             
             #Check for winner or next prompt/judge
             winner = self.game.get_winner()
@@ -136,7 +140,7 @@ class Wavelength_Print(Game_Print):
             else:
                 return "Added CODERS expansion."
         
-    #Toggles CAH expansion
+    #Toggles DEFAULT expansion
     async def default(self, _player, _message, raw=False):
         #Get old length and try to remove cards
         length = len(wd.spectrum_cards)
@@ -145,13 +149,32 @@ class Wavelength_Print(Game_Print):
         #If length changed, cards were removed. Else, add cards.
         if len(wd.spectrum_cards) < length:
             if not raw:
-                return self.add_return([], "Removed CODERS expansion.")
+                return self.add_return([], "Removed DEFAULT expansion.")
             else:
-                return "Removed CODERS expansion."
+                return "Removed DEFAULT expansion."
         else:
             wd.spectrum_cards += wd.DEFAULT_CARDS
             wd.spectrum_cards += wd.DEFAULT_POLITICAL_CARDS
             if not raw:
-                return self.add_return([], "Added CODERS expansion.")
+                return self.add_return([], "Added DEFAULT expansion.")
             else:
-                return "Added CODERS expansion."
+                return "Added DEFAULT expansion."
+            
+    #Toggles BASE expansion
+    async def base(self, _player, _message, raw=False):
+        #Get old length and try to remove cards
+        length = len(wd.spectrum_cards)
+        wd.spectrum_cards = [card for card in wd.spectrum_cards if card not in wd.DEFAULT_CARDS]
+
+        #If length changed, cards were removed. Else, add cards.
+        if len(wd.spectrum_cards) < length:
+            if not raw:
+                return self.add_return([], "Removed BASE expansion.")
+            else:
+                return "Removed BASE expansion."
+        else:
+            wd.spectrum_cards += wd.DEFAULT_CARDS
+            if not raw:
+                return self.add_return([], "Added BASE expansion.")
+            else:
+                return "Added BASE expansion."
