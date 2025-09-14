@@ -20,7 +20,8 @@ class Wavelength_Print(Game_Print):
         self.commands["^!base$"] = [self.base]
         self.commands["^!coders$"] = [self.coders]
         self.commands["^!goal [0-9]+$"] = [self.change_goal]
-        self.commands["^!guess -?([0-9]|(10))$"] = [self.make_guess]
+        self.commands["^!guess -?([0-9]|(10))$"] = [self.make_long_guess]
+        self.commands["^!g -?([0-9]|(10))$"] = [self.make_short_guess]
     
     # OVERRIDE #
     async def change_look(self, player, _look):
@@ -61,10 +62,20 @@ class Wavelength_Print(Game_Print):
         else:
             return f"You aren't in the game {player}, so you don't have a hand."
         
-    async def make_guess(self, player, message):
+    #Used to parse the "!guess " off the message
+    async def make_long_guess(self, player, message):
+        guess = int(message[7:])
+        return self.make_guess(player, guess)
+    
+    #Used to parse the "!g " off the message
+    async def make_short_guess(self, player, message):
+        guess = int(message[3:])
+        return self.make_guess(player, guess)
+
+    #Used to make a guess (requires parse for guess from message)
+    def make_guess(self, player, guess):
         output_list = []
         round_ended = False
-        guess = int(message[7:])
         correct_answer = self.game.correct_answer
 
         #If not judge and no guess submitted, submit guess

@@ -80,7 +80,8 @@ The bot knows the following commands:
       Game:
         '**!wavelength**', '**!wl**': Create a game of Wavelength.
         '**!goal [0-9]+**': Set the amount of points needed to reach the goal to the provided number.
-        '**!guess [0-9]+**': Use to guess given the hint.
+        '**!guess -?([0-9]|(10))**', '**!g -?([0-9]|(10))**': Use to guess given the hint.
         '**!all**': Toggles ALL expansions!
-        '**!default**': Toggles the DEFAULT expansion!
+        '**!default**': Toggles the DEFAULT expansion (default game)!
+        '**!base**': Toggles the BASE expansion (default game without political spectrums)!
         '**!coders**': Toggles the CODERS expansion!
