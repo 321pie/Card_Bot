@@ -228,5 +228,5 @@ CODERS_CARDS:list = [
 	'''(+10) Peach ↔ Zelda (-10)''',
 	'''(+10) Polities ↔ Poseidon (-10)''',
 	'''(+10) Calypso ↔ Circe (-10)''',
-	'''(+10) Zues ↔ Hades (-10)''',
+	'''(+10) Zeus ↔ Hades (-10)''',
 ]
