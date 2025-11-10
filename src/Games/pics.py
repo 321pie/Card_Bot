@@ -18,6 +18,7 @@ class pics():
     HALLOWEEN = "Halloween"
     POP = "Pop"
     FRENCH = "French"
+    HK = "Hollow_Knight"
     
     def __init__(self, custom_deck):
         #The size of the sprites

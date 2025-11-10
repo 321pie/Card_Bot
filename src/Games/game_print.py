@@ -31,7 +31,8 @@ class Game_Print():
             "^!halloween$": [self.change_look],
             "^!zelda$": [self.change_look],
             "^!french$": [self.change_look],
-            "^!pop$": [self.change_look]
+            "^!pop$": [self.change_look],
+            "^!hk$": [self.change_look]
         }
 
     def add_return(self, return_list, return_string, file=None, index=None):
@@ -136,6 +137,8 @@ class Game_Print():
             return pics.POP
         elif parse_str == "!french":
             return pics.FRENCH
+        elif parse_str == "!hk":
+            return pics.HK
         else:
             return pics.CLASSIC
     
