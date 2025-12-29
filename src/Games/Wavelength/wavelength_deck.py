@@ -178,7 +178,7 @@ DEFAULT_CARDS:list = [
 	'''(+10) Commerce ↔ Art (-10)''',
 	'''(+10) Pop icon ↔ One hit wonder (-10)''',
 	'''(+10) Good advice ↔ Bad advice (-10)''',
-	'''(+10) Good candy ↔ Bad candy↔ licorice (-10)''',
+	'''(+10) Good candy ↔ Bad candy (licorice) (-10)''',
 	'''(+10) Radical ↔ Traditional (-10)''',
 	'''(+10) Good mouthfeel ↔ Bad mouthfeel (-10)''',
 	'''(+10) Legal ↔ Illegal (-10)''',
