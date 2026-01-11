@@ -52,6 +52,7 @@ class Game_Print():
             if(player not in self.game.get_players()):
                 if(len(self.game.get_players()) < self.game.max_player_count):
                     self.game.add_player(player)
+                    stats.add_player(player)
                     if datetime(*[int(value) for value in re.split("[- :]", stats.access_field(stats.General, player, stats.General.last_date_played))]).date() != datetime.today().date():
                         stats.access_field(stats.General, player, stats.General.last_date_played, data=str(datetime.today().date()))
                         stats.access_field(stats.General, player, stats.General.unique_days_played, func=stats.increment)
