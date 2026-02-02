@@ -41,7 +41,7 @@ class Jeopardy_Print(Game_Print):
     # OVERRIDE #
     #Returns the string to be displayed when the game is started
     def get_start_string(self, _player) -> str:
-        return f"**{self.game.get_play_player()}** is selecting the first question.\n\n" + self.get_board()
+        return f"**{self.game.get_play_player()}** is selecting the first question.\nUse command: !do (index) (amount)/nOnce picked, use command: !is (answer)\n\n" + self.get_board()
     
     # OVERRIDE #
     #Returns the string to be displayed when the game is ended
