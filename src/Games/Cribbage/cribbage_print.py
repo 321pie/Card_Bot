@@ -551,7 +551,7 @@ class Cribbage_Print(Game_Print):
                         stats.access_field(stats.Cribbage, self.game.get_players()[point_index], stats.Cribbage.total_times_skunked, func=stats.increment)
 
                         #Add details to string
-                        player_scores += f"{self.game.get_players()[point_index]} got skunked x{(self.game.point_goal - point_array[point_index]) // self.game.skunk_length} at {point_array[point_index]} points.\n"
+                        player_scores += f"{self.game.get_players()[point_index]} got skunked x{((self.game.point_goal - 1) - point_array[point_index]) // self.game.skunk_length} at {point_array[point_index]} points.\n"
                 else: #If teams, display by team
                     num_teams = len(self.game.get_players()) // self.game.team_size
                     player_scores += f"Team {point_index} ("
@@ -571,7 +571,7 @@ class Cribbage_Print(Game_Print):
                             stats.access_field(stats.Cribbage, player, stats.Cribbage.total_times_skunked, func=stats.increment)
 
                         #Add details to string
-                        player_scores = player_scores[:-2] + f") got skunked x{(self.game.point_goal - point_array[point_index]) // self.game.skunk_length} at {point_array[point_index]} points.\n"
+                        player_scores = player_scores[:-2] + f") got skunked x{((self.game.point_goal - 1) - point_array[point_index]) // self.game.skunk_length} at {point_array[point_index]} points.\n"
             else:
                 if self.game.team_size == 1: #If no teams, display based on name
                     player_scores += f"{self.game.get_players()[point_index]} ended with {point_array[point_index]} points.\n"
