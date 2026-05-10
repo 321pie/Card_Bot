@@ -99,9 +99,10 @@ class Jeopardy_Print(Game_Print):
 
         #Check for daily double shenanigans
         if self.game.is_daily_double():
+            answer = self.game.get_answer()
             if player != self.game.get_play_player():
                 return self.add_return([], f"Only **{self.game.get_play_player()}** can guess.")
-            elif guess == self.game.get_answer():
+            elif guess == answer:
                 guess_points = self.game.guess(player, guess) #Get points so that we can check for game ended or not
                 if self.game.game_ended():
                     return self.add_return([], f'''Congrats, **{player}**! You've gained {guess_points} points.\nThe game is now over.\nn{self.get_end_string(player)}''')
@@ -110,9 +111,9 @@ class Jeopardy_Print(Game_Print):
             else:
                 guess_points = self.game.guess(player, guess) #Get points so that we can check for game ended or not
                 if self.game.game_ended():
-                    return self.add_return([], f'''Uh oh, **{player}**! You've lost {guess_points * -1} points.\nThe game is now over.\nn{self.get_end_string(player)}''')
+                    return self.add_return([], f'''Uh oh, **{player}**! You've lost {guess_points * -1} points. The answer was: "**{answer}**".\n**{self.game.get_play_player()}**.\nThe game is now over.\nn{self.get_end_string(player)}''')
                 else:
-                    return self.add_return([], f"Uh oh, **{player}**! You've lost {guess_points * -1} points. Please select the next question.\n\n{self.get_board()}")
+                    return self.add_return([], f"Uh oh, **{player}**! You've lost {guess_points * -1} points. The answer was: "**{answer}**".\n**{self.game.get_play_player()}**, please select the next question.\n\n{self.get_board()}")
             
         #If not daily double, 
         else:
