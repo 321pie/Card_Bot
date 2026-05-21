@@ -85,7 +85,7 @@ def load_pages():
                 if all(item == "" for item in row_data):
                     #Save local data to variable and get dates of both
                     local_page_data = read_from_file(achievement_category)
-                    if local_page_data != None:
+                    if local_page_data != None and len(local_page_data) > 0:
                         local_date = access_last_updated_date(local_page_data)
                         remote_date = access_last_updated_date(remote_page_data)
 
