@@ -86,8 +86,10 @@ class Juiced_Print(Game_Print):
     
     #Input: integer index parsed from string
     #Output: list of return statements using add_return
-    async def select_card(self, player, card_index:int):
+    async def select_card(self, player, card_index):
         output_list = []
+
+        card_index = self.select_card_parse(card_index)
 
         #If valid index for hands and not judge, elif valid index for judge to select winner
         if (card_index >= 0) and (card_index < len(self.game.get_hand(player))) and (player != self.game.get_judge()):

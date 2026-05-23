@@ -4846,6 +4846,7 @@ WHITE_CODERS:dict = {
     "Costco Onion Crank": 1,
     "My vibe": 1,
 	"Three hot Estonian men": 1,
+	"Linda from marketing": 1,
 }
 
 BLACK_CODERS:dict = {
