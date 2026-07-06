@@ -377,6 +377,16 @@ class Cribbage(game.Game):
             if self.reverse == True:
                 self.reverse_mode()
 
+    #Sets up game for mini hand
+    def mini_hand(self):
+        if(self.game_started == False):
+            self.point_goal = 61
+            self.skunk_length = 15
+            self.hand_size = 3
+
+            if self.reverse == True:
+                self.reverse_mode()
+
     #Sets up game for joker mode
     def joker_mode(self):
         if(self.game_started == False):

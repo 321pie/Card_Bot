@@ -12,6 +12,7 @@ class Cribbage_Print(Game_Print):
         self.commands["^!([a2-9jqk]|10) [hdcs]$"] = [self.make_joker]
         self.commands["^!standard$"] = [self.play_standard]
         self.commands["^!mega$"] = [self.play_mega]
+        self.commands["^!mini$"] = [self.play_mini]
         self.commands["^!joker$"] = [self.play_joker]
         self.commands["^!reverse$"] = [self.play_reverse]
         self.commands["^!teams [0-9]+$"] = [self.create_teams]
@@ -28,6 +29,7 @@ class Cribbage_Print(Game_Print):
         self.custom:bool = False
         self.joker:bool = False
         self.mega:bool = False
+        self.mini:bool = False
         self.reverse:bool = False
 
     #Input: player as defined in message.py for commands
@@ -101,9 +103,23 @@ class Cribbage_Print(Game_Print):
         if player in self.game.get_players():
             self.game.mega_hand()
             self.standard = False
+            self.mini = False
             self.mega = True
 
             return self.add_return([], f"{player} has changed the game to mega hand mode. Use !standard to swap back or **!start** to begin.")
+        else:
+            return self.add_return([], f"You can't change a game mode you aren't queued for, {player}. Use **!join** to join the game.")
+        
+    #Input: player as defined in message.py for commands
+    #Output: add_return print for message handler
+    async def play_mini(self, player, _message):
+        if player in self.game.get_players():
+            self.game.mini_hand()
+            self.standard = False
+            self.mega = False
+            self.mini = True
+
+            return self.add_return([], f"{player} has changed the game to mini hand mode. Use !standard to swap back or **!start** to begin.")
         else:
             return self.add_return([], f"You can't change a game mode you aren't queued for, {player}. Use **!join** to join the game.")
         

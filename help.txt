@@ -34,6 +34,7 @@ The bot knows the following commands:
       Game:
         '**!cribbage**', '**!cr**': Create a game of Cribbage.
         '**!standard**': Play a regular game of cribbage (default).
+        '**!mini**': Play a game of mini hand (3 cards, half as many points to win).
         '**!mega**': Play a game of mega hand (8 cards, twice as many points to win).
         '**!joker**': Play a game of joker mode (2 wild cards).
         '**!reverse**': Play a game of reverse mode (last to get out wins).
